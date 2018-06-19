@@ -3,8 +3,7 @@ title: Schisto IBM
 author: 
 - |-
   _^1^ Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta, GA, USA, 30322_
-  _^2^ _
-  ^['This Supplementary Material can be found at https://github.com/<_____>']
+  ^['This documents can be found at https://github.com/darwinanddavis/SchistoIBM']
 #bibliography:/Users/malishev/Documents/Melbourne Uni/Thesis_2016/library.bib
 output:
   html_document:
@@ -42,32 +41,66 @@ abstract: "*Corresponding author: matthew.malishev@gmail.com  \n"
 # render(f, output_format='pdf_document')
 ```
 
-### Environment  
-## Resources  
+##### 
+
+## Environment  
+### Resources  
 $$
 \frac
 {dR}
 {dt}
-= 
-
+= dt - 5
 $$
 
-## Miracidia  
+### Miracidia  
 
 $$
 \frac
 {dM}
 {dt}
 =
-
 $$
-## Cercariae  
+
+### Cercariae    
 
 $$
 \frac
 {dC}
 {dt}
 =
+$$
+#####   
+
+## Individual    
+
+### Host length 
 
 $$
+\frac 
+{dL}
+{dt}
+= 
+$$
+
+### Host reserve
+
+$$
+\frac 
+{de}
+{dt}
+= 
+$$
+
+### Parasite development (maturity)
+$$
+\frac 
+{dD}
+{dt}
+= 
+$$ 
+dRm
+dP
+dRp
+d(delta)
+dH
 
