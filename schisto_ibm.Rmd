@@ -1,0 +1,73 @@
+---
+title: Schisto IBM 
+author: 
+- |-
+  _^1^ Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta, GA, USA, 30322_
+  _^2^ _
+  ^['This Supplementary Material can be found at https://github.com/<_____>']
+#bibliography:/Users/malishev/Documents/Melbourne Uni/Thesis_2016/library.bib
+output:
+  html_document:
+    code_folding: hide
+    depth: 3
+    number_sections: no
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    template: null
+    toc: yes
+  word_document:
+    highlight: tango
+    keep_md: yes
+    pandoc_args: --smart
+    #reference: mystyles.docx
+    toc: yes
+inludes:
+  before_body: before_body.tex
+subtitle: Matthew Malishev^1^*
+tags:
+- nothing
+- nothingness
+abstract: "*Corresponding author: matthew.malishev@gmail.com  \n"
+---
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
+</script>
+
+```{r echo = FALSE}
+# library(rmarkdown)
+# setwd(" ")
+# f <- list.files()[1]
+# render(f, output_format='pdf_document')
+```
+
+### Environment  
+## Resources  
+$$
+\frac
+{dR}
+{dt}
+= 
+
+$$
+
+## Miracidia  
+
+$$
+\frac
+{dM}
+{dt}
+=
+
+$$
+## Cercariae  
+
+$$
+\frac
+{dC}
+{dt}
+=
+
+$$
+
