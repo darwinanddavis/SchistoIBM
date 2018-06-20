@@ -71,36 +71,120 @@ $$
 $$
 #####   
 
-## Individual    
+## Individual  
+
+### **Host**  
 
 ### Host length 
 
 $$
-\frac 
-{dL}
-{dt}
-= 
+  \frac 
+    {d L}
+    {d t}
+    = \frac
+      {gY_{VE}}
+      {3\chi} 
+        \cdot \left( \frac 
+        {\kappa^{*} a_{M}e - (m_{V} + m_{R}E_{M}\delta)\chi L}
+        {e + g}
+        \right)
 $$
 
 ### Host reserve
 
 $$
-\frac 
-{de}
-{dt}
-= 
+  \frac 
+    {d e}
+    {d t}
+    = (f_{H} - e)
+    \frac
+      {a_{M}}
+      {\chi E_{M}L} - p
+        \left(
+        \frac 
+        {i_{PM}f_{P}}
+        {E_{M}}
+        \right)
 $$
 
-### Parasite development (maturity)
+### Host development (maturity)
 $$
-\frac 
-{dD}
-{dt}
-= 
-$$ 
-dRm
-dP
-dRp
-d(delta)
-dH
+  \frac
+  {d D}
+  {d t}
+  = \begin{cases}
+      \text{if} \ D < D_{R}, & (1 - \kappa^{*})C - m_{D}D \\
+      \text{if} \ D ≥ D_{R}, & 0
+    \end{cases}
+$$
+
+### Host reproduction
+$$
+  \frac
+  {d R_{H}}
+  {d t}
+  = \begin{cases}
+      \text{if} \ D < D_{R}, & 0 \\
+      \text{if} \ D ≥ D_{R}, & (1 - \kappa^{*})C - m_{D}D
+    \end{cases}
+$$
+## **Parasite**  
+
+### Parasite biomass (growth)
+$$
+  \frac
+  {d P}
+  {d t}
+  = P(Y_{PE}i_{PM}f_{P} (1-r_{P}) -m_{P})
+$$
+\newline  
+\newline  
+  
+### Parasite reproduction
+$$
+  \frac
+  {d R_{P}}
+  {d t}
+  = \gamma_{RP}Y_{PE}i_{PM}f_{P}r_{P}
+$$
+\newline  
+\newline  
+  
+### Damage density
+$$
+  \frac 
+    {d \delta}
+    {d t}
+    = \frac
+      {\Theta} 
+      {\chi L^{3}} 
+      \cdot \frac
+      {dR_{P}}
+      {dt}
+        + k_{R}(1-e)-k_{R}\delta-
+        \frac
+          {3\delta}
+          {L}
+          \cdot \frac 
+            {dL}
+            {dt}
+$$
+$\frac {3\delta}{L}\cdot \frac {dL}{dt}$ = growth dilution. Growth of host reduces damage density      
+$\frac {\Theta} {\chi L^{3}}$ = damage intensity   
+$k_{R}$ = damage repair rate (via reserve depletion)  
+
+\newline  
+\newline  
+  
+### Cumulative hazard for host
+$$
+  \frac
+  {d H}
+  {d t}
+  = h_{b}+h_{\delta} \ max(\delta - \delta_{0}, \ 0)
+$$
+
+$\delta_{0}$ = linear damage density function      
+$h_{b}$ = background hazard rate  
+$h_{\delta}$ = hazard coefficient  
 

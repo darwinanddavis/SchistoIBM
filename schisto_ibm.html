@@ -292,32 +292,118 @@ div.tocify {
 </div>
 <div id="individual" class="section level2">
 <h2>Individual</h2>
+<div id="host" class="section level3">
+<h3><strong>Host</strong></h3>
+</div>
 <div id="host-length" class="section level3">
 <h3>Host length</h3>
 <p><span class="math display">\[
-\frac 
-{dL}
-{dt}
-= 
+  \frac 
+    {d L}
+    {d t}
+    = \frac
+      {gY_{VE}}
+      {3\chi} 
+        \cdot \left( \frac 
+        {\kappa^{*} a_{M}e - (m_{V} + m_{R}E_{M}\delta)\chi L}
+        {e + g}
+        \right)
 \]</span></p>
 </div>
 <div id="host-reserve" class="section level3">
 <h3>Host reserve</h3>
 <p><span class="math display">\[
-\frac 
-{de}
-{dt}
-= 
+  \frac 
+    {d e}
+    {d t}
+    = (f_{H} - e)
+    \frac
+      {a_{M}}
+      {\chi E_{M}L} - p
+        \left(
+        \frac 
+        {i_{PM}f_{P}}
+        {E_{M}}
+        \right)
 \]</span></p>
 </div>
-<div id="parasite-development-maturity" class="section level3">
-<h3>Parasite development (maturity)</h3>
+<div id="host-development-maturity" class="section level3">
+<h3>Host development (maturity)</h3>
 <p><span class="math display">\[
-\frac 
-{dD}
-{dt}
-= 
-\]</span> dRm dP dRp d(delta) dH</p>
+  \frac
+  {d D}
+  {d t}
+  = \begin{cases}
+      \text{if} \ D &lt; D_{R}, &amp; (1 - \kappa^{*})C - m_{D}D \\
+      \text{if} \ D ≥ D_{R}, &amp; 0
+    \end{cases}
+\]</span></p>
+</div>
+<div id="host-reproduction" class="section level3">
+<h3>Host reproduction</h3>
+<p><span class="math display">\[
+  \frac
+  {d R_{H}}
+  {d t}
+  = \begin{cases}
+      \text{if} \ D &lt; D_{R}, &amp; 0 \\
+      \text{if} \ D ≥ D_{R}, &amp; (1 - \kappa^{*})C - m_{D}D
+    \end{cases}
+\]</span> ## <strong>Parasite</strong></p>
+</div>
+<div id="parasite-biomass-growth" class="section level3">
+<h3>Parasite biomass (growth)</h3>
+<p><span class="math display">\[
+  \frac
+  {d P}
+  {d t}
+  = P(Y_{PE}i_{PM}f_{P} (1-r_{P}) -m_{P})
+\]</span>  </p>
+</div>
+<div id="parasite-reproduction" class="section level3">
+<h3>Parasite reproduction</h3>
+<p><span class="math display">\[
+  \frac
+  {d R_{P}}
+  {d t}
+  = \gamma_{RP}Y_{PE}i_{PM}f_{P}r_{P}
+\]</span>  </p>
+</div>
+<div id="damage-density" class="section level3">
+<h3>Damage density</h3>
+<p><span class="math display">\[
+  \frac 
+    {d \delta}
+    {d t}
+    = \frac
+      {\Theta} 
+      {\chi L^{3}} 
+      \cdot \frac
+      {dR_{P}}
+      {dt}
+        + k_{R}(1-e)-k_{R}\delta-
+        \frac
+          {3\delta}
+          {L}
+          \cdot \frac 
+            {dL}
+            {dt}
+\]</span> <span class="math inline">\(\frac {3\delta}{L}\cdot \frac {dL}{dt}\)</span> = growth dilution. Growth of host reduces damage density<br />
+<span class="math inline">\(\frac {\Theta} {\chi L^{3}}\)</span> = damage intensity<br />
+<span class="math inline">\(k_{R}\)</span> = damage repair rate (via reserve depletion)</p>
+<p> </p>
+</div>
+<div id="cumulative-hazard-for-host" class="section level3">
+<h3>Cumulative hazard for host</h3>
+<p><span class="math display">\[
+  \frac
+  {d H}
+  {d t}
+  = h_{b}+h_{\delta} \ max(\delta - \delta_{0}, \ 0)
+\]</span></p>
+<p><span class="math inline">\(\delta_{0}\)</span> = linear damage density function<br />
+<span class="math inline">\(h_{b}\)</span> = background hazard rate<br />
+<span class="math inline">\(h_{\delta}\)</span> = hazard coefficient</p>
 </div>
 </div>
 <div class="footnotes">
