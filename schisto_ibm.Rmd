@@ -28,20 +28,22 @@ tags:
 - nothing
 - nothingness
 abstract: "*Corresponding author: matthew.malishev@gmail.com  \n"
+params:
+  date: !r Sys.Date()
 ---
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
 </script>
 
+##### 
+
 ```{r echo = FALSE}
-# library(rmarkdown)
-# setwd(" ")
-# f <- list.files()[1]
-# render(f, output_format='pdf_document')
+# packages <- c("knitr", "rmarkdown")
+# lapply(packages,library,character.only=T)
 ```
 
-##### 
+Date: `r params$date` 
 
 ## Environment  
 ### Resources  
@@ -49,8 +51,15 @@ $$
 \frac
 {dR}
 {dt}
-= dt - 5
+= r
+  \left(
+  1-\frac{R}{K}
+  \right)
+  R -
+  \sum -i_{M}L^{2}f_{H}
 $$
+
+$\sum -i_{M}L^{2}f_{H}$ = feeding by snails  
 
 ### Miracidia  
 
@@ -58,8 +67,12 @@ $$
 \frac
 {dM}
 {dt}
-=
+= M(t)
+- \sum uptake 
+- death
 $$
+$M(t)$ = miracidia in environment  
+$\sum uptake$ = infection of hosts by miracidia. **Not a DEB parameter**   
 
 ### Cercariae    
 
@@ -67,13 +80,16 @@ $$
 \frac
 {dC}
 {dt}
-=
+= \sum \frac{dRp}{dt} 
+- death
 $$
-#####   
+$\sum \frac{dRp}{dt}$ = cumulative release of cercariae (parasite reproduction)
+
+#####  
 
 ## Individual  
 
-### **Host**  
+### _Host_  
 
 ### Host length 
 
@@ -128,9 +144,11 @@ $$
       \text{if} \ D ≥ D_{R}, & (1 - \kappa^{*})C - m_{D}D
     \end{cases}
 $$
-## **Parasite**  
 
-### Parasite biomass (growth)
+### _Parasite_  
+
+### Parasite biomass (growth)  
+
 $$
   \frac
   {d P}

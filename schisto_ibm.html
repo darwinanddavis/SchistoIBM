@@ -105,6 +105,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -259,6 +262,7 @@ div.tocify {
 </script>
 <div id="section" class="section level5">
 <h5></h5>
+<p>Date: 2018-06-20</p>
 </div>
 <div id="environment" class="section level2">
 <h2>Environment</h2>
@@ -268,8 +272,14 @@ div.tocify {
 \frac
 {dR}
 {dt}
-= dt - 5
+= r
+  \left(
+  1-\frac{R}{K}
+  \right)
+  R -
+  \sum -i_{M}L^{2}f_{H}
 \]</span></p>
+<p><span class="math inline">\(\sum -i_{M}L^{2}f_{H}\)</span> = feeding by snails</p>
 </div>
 <div id="miracidia" class="section level3">
 <h3>Miracidia</h3>
@@ -277,8 +287,11 @@ div.tocify {
 \frac
 {dM}
 {dt}
-=
-\]</span></p>
+= M(t)
+- \sum uptake 
+- death
+\]</span> <span class="math inline">\(M(t)\)</span> = miracidia in environment<br />
+<span class="math inline">\(\sum uptake\)</span> = infection of hosts by miracidia. <strong>Not a DEB parameter</strong></p>
 </div>
 <div id="cercariae" class="section level3">
 <h3>Cercariae</h3>
@@ -286,14 +299,18 @@ div.tocify {
 \frac
 {dC}
 {dt}
-=
-\]</span> #####</p>
+= \sum \frac{dRp}{dt} 
+- death
+\]</span> <span class="math inline">\(\sum \frac{dRp}{dt}\)</span> = cumulative release of cercariae (parasite reproduction)</p>
+<div id="section-1" class="section level5">
+<h5></h5>
+</div>
 </div>
 </div>
 <div id="individual" class="section level2">
 <h2>Individual</h2>
 <div id="host" class="section level3">
-<h3><strong>Host</strong></h3>
+<h3><em>Host</em></h3>
 </div>
 <div id="host-length" class="section level3">
 <h3>Host length</h3>
@@ -349,7 +366,10 @@ div.tocify {
       \text{if} \ D &lt; D_{R}, &amp; 0 \\
       \text{if} \ D ≥ D_{R}, &amp; (1 - \kappa^{*})C - m_{D}D
     \end{cases}
-\]</span> ## <strong>Parasite</strong></p>
+\]</span></p>
+</div>
+<div id="parasite" class="section level3">
+<h3><em>Parasite</em></h3>
 </div>
 <div id="parasite-biomass-growth" class="section level3">
 <h3>Parasite biomass (growth)</h3>
