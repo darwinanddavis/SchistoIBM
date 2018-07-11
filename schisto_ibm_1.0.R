@@ -6,52 +6,47 @@
 # ---------------------------------------------------------------------------
 # ------------------- initial Mac OS and R config ---------------------------
 # ---------------------------------------------------------------------------
+# if already loaded, uninstall RNetlogo and rJava
+p<-c("rJava", "RNetLogo")
+remove.packages(p)
 
-#if using Mac OSX Mountain Lion + and not already in JQR, download and open JGR 
-#https://www.rforge.net/JGR/files/
+# if using Mac OSX El Capitan+ and not already in JQR, download and open JGR 
 
-# after downloading, load JGR
-install.packages("JGR")
+# for a rJava error, run the following in terminal (src: https://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite)
+# sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
+# then install rJava from source
+install.packages("rJava", repos = "https://cran.r-project.org/", type="source")
+library(rJava)
+
+# load JGR after downloading 
 Sys.setenv(NOAWT=1)
+install.packages("JGR")
 library(JGR)
 Sys.unsetenv("NOAWT")
-JGR()
+JGR() # open JGR
 
 # ---------------------------------------------------------------------------
-# --------------- the rest of the script needs to be run in JGR ------------
+# ------ the rest of the script needs to be run in JGR if using Mac OSX -----
 # ---------------------------------------------------------------------------
+# install RNetlogo from source if haven't already
+# install.packages("/Users/malishev/Documents/Melbourne Uni/Programs/R code/RNetlogo/RNetLogo_1.0-4.tar.gz", repos = NULL, type="source")
+install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source")
+
+# ------------------- model setup ---------------------------
+# get packages
+packages <- c("adehabitatHR","rgeos","sp", "maptools", "raster","rworldmap","rgdal","dplyr")
+if (require(packages)) {
+  install.packages(packages,dependencies = T)
+  require(packages)
+}
+lapply(packages,library,character.only=T)
+
+#source DEB and heat budget models from https://github.com/darwinanddavis/MalishevBullKearney
+source('DEB.R')
 
 # set dirs
-wd <- "<your working dir>"
-setwd(wd) # set wd
+setwd("<your working dir>") # set wd
 results.path<- "<dir path to store result outputs>" # set results path
-
-nl.path<- "<dir path to Netlogo program>" # set path to netlogo program
-model.path<- "<dir path to Netlogo model>" # set path to netlogo model
-# if error, try adding "/app" to end of dir path for running in El Capitan for OSX
-# nl.path<-paste0(nl.path,"/app")
-
-# if already loaded, uninstall RNetlogo and rJava to download from source
-packages_source<-c("rJava", "RNetLogo")
-remove.packages(packages_source)
-
-# enter file names for downloaded packages from source
-rj_source <- "/rJava_0.9-8.tar.gz"
-rnl_source <- "/RNetLogo_1.0-2.tar.gz"  
-  
-# install Netlogo and rJava from source if haven't already
-install.packages(paste0(wd,rnl_source, repos = NULL, type="source"))
-install.packages(paste0(wd,rj_source, repos = NULL, type="source"))
-lapply(packages_source,library,character.only=T) # load libraries 
-
-# ************************** for PC and working Mac OSX *******************************
-# get relevant packages
-packages <- c("NicheMapR","adehabitatHR","rgeos","sp", "maptools", "raster","rworldmap","rgdal","dplyr")
-install.packages(packages) # install packages
-lapply(packages,library,character.only=T) # load libraries 
-
-#source DEB file (from https://github.com/darwinanddavis/)
-source('DEB.R')
 
 # apply interpolation functions
 # velfun<- approxfun(time, micro_sun[,5], rule = 2)
@@ -59,7 +54,8 @@ source('DEB.R')
 # *************************************************************************************
 # ************************** start energetics model setup *******************************
 
-debpars=as.data.frame(read.csv('DEB_pars_Tiliqua_rugosa.csv',header=FALSE))$V1 # read in DEB params
+debparams <- "<df of DEB parameters>" # optional if not setting manually
+debpars=as.data.frame(read.csv(debparams,header=FALSE))$V1 # read in DEB params
 
 # set core parameters
 z=debpars[8] # zoom factor (cm)
@@ -107,8 +103,13 @@ mass <- V_pres_init + V_pres_init*E_pres_init/mu_E/d_V*23.9
 # *************************************************************************************
 # ************************** start netlogo model setup *******************************
 
-# open netlogo 
+nl.path<- "<dir path to Netlogo program>" 
+ver <-"<version number of Netlogo>" # type in version of Netlogo e.g. "6.0.1"
+# if error, try adding "/app" to end of dir path for running in Windows and El Capitan for OSX
+# nl.path<-"<dir path to Netlogo program>/app" 
 NLStart(nl.path)
+NLStart(nl.path, nl.jarname = paste0("netlogo-",ver,".jar"))
+model.path<- "<dir path to Netlogo model>"
 NLLoadModel(model.path)
 
 # ************************** setup netlogo model
@@ -156,14 +157,11 @@ ctminthresh<-120000
 # Tairfun<-Tairfun_shd
 # Tc_init<-Tairfun(1)+0.1 # Initial core temperature
 
-# NL_T_b<-Tc_init       # Initial T_b
-# NL_T_b_min<-VTMIN         # Min foraging T_b
-# NL_T_b_max<-VTMAX        # Max foraging T_b
-# NL_ctminthresh<-ctminthresh # No. of consecutive hours below CTmin that leads to death
-NL_reserve <- E_m        # Initial reserve density
+NL_T_b_min <- VTMIN         # Min foraging T_b
+NL_T_b_max <- VTMAX        # Max foraging T_b
 NL_reserve_max <- E_m    # Maximum reserve level
+NL_reserve <- E_m        # Initial reserve density
 NL_maint <- round(p_M, 3)       # Maintenance cost
-NL_zen <- Zenfun(1*60*60)     # Zenith angle
 
 # ************************** end netlogo model setup **********************************
 # *************************************************************************************
@@ -174,11 +172,9 @@ NL_zen <- Zenfun(1*60*60)     # Zenith angle
 sc<-1 # set no. of desired simualations---for automating writing of each sim results to file. N = N runs
 for (i in 1:sc){ # ********************** start netlogo sim loop
 
-NLCommand("set Shade-patches",NL_shade,"set Food-patches",NL_food,"set No.-of-days",NL_days,"set T_b precision",
-NL_T_b, "2","set T_opt_lower precision", NL_T_b_min, "2","set T_opt_upper precision", NL_T_b_max, "2",
+NLCommand("set Shade-patches",NL_shade,"set Food-patches",NL_food,"set No.-of-days",NL_days,"set T_opt_lower precision", NL_T_b_min, "2","set T_opt_upper precision", NL_T_b_max, "2",
 "set reserve-level", NL_reserve, "set Maximum-reserve", NL_max_reserve, "set Maintenance-cost", NL_maint,
-"set Movement-cost precision", NL_move, "3", "set zenith", NL_zen, "set ctminthresh", NL_ctminthresh, 
-"set gutthresh", NL_gutthresh, 'set gutfull', gutfull, 'set V_pres precision', V_pres, "5", 'set wetstorage precision', wetstorage, "5", 
+"set Movement-cost precision", NL_move, "3", "set gutthresh", NL_gutthresh, 'set gutfull', gutfull, 'set V_pres precision', V_pres, "5", 'set wetstorage precision', wetstorage, "5", 
 'set wetfood precision', wetfood, "5", 'set wetgonad precision', wetgonad, "5","setup")
 
 NL_ticks<-NL_days / (2 / 60 / 24) # No. of NL ticks (measurement of days)
@@ -197,42 +193,8 @@ for (i in 1:NL_ticks){ # ********************** start netlogo sim loop
 stepcount<-stepcount+1
 NLDoCommand(1, "go")
 
-######### Reporting presence of shade
-shade<-NLGetAgentSet("in-shade?","turtles", as.data.frame=T); shade<-as.numeric(shade) # returns an agentset of whether turtle is currently on shade patch
-
-# choose sun or shade
-tick<-i
-times3<-c(times2[tick],times2[tick+1])
-
-if(shade==0){
-  Qsolfun<-Qsolfun_sun
-  Tradfun<-Tradfun_sun
-  Tairfun<-Tairfun_sun
-}else{
-  Qsolfun<-Qsolfun_shd
-  Tradfun<-Tradfun_shd
-  Tairfun<-Tairfun_shd
-}
-if(i==1){
-Tc_init<-Tairfun(1)+0.1 #initial core temperature
-}
-
-# one_lump_trans params
-Qsol<-Qsolfun(mean(times3)); Qsol
-
-
-# calc Tb params at 2 mins interval
-Tbs<-onelump_varenv(t=120,time=times3[2],Tc_init=Tc_init,thresh = 30, AMASS = mass, lometry = 3, Tairf=Tairfun,Tradf=Tradfun,velf=velfun,Qsolf=Qsolfun,Zenf=Zenfun)
-Tb<-Tbs$Tc
-rate<-Tbs$dTc
-Tc_init<-Tb
-
-NLCommand("set T_b precision", Tb, "2") # Updating Tb
-NLCommand("set zenith", Zenfun(times3[2])) # Updating zenith
-
-# time spent below VTMIN
-ctminhours<-NLReport("[ctmincount] of turtle 0") * 2/60 # ticks to hours
-if (ctminhours == NL_ctminthresh) {NLCommand("ask turtle 0 [stop]")}
+######### Example of reporting NL variables
+shade <- NLGetAgentSet("in-shade?","turtles", as.data.frame=T); shade<-as.numeric(shade) # returns an agentset of whether turtle is currently on shade patch
 
 # **************************** start deb sim  *************************************
 
