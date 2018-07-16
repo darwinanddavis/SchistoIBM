@@ -10,6 +10,23 @@ Schisto IBM describing environment and individual variables. Includes population
 
 ![Notes for Schisto population and DEB model](https://github.com/darwinanddavis/SchistoIBM/sibm_notes1.jpg?raw=true "Notes for Schisto population and DEB model")  
 
+
+
+
+## Environment  
+### Resources  
+$$
+\frac
+{dR}
+{dt}
+= r
+  \left(
+  1-\frac{R}{K}
+  \right)
+  R -
+  \sum -i_{M}L^{2}f_{H}
+$$
+
 Files:  
 .R  
 .Rmd  
