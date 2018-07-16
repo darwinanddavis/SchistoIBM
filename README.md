@@ -16,4 +16,4 @@ Files:
 .Rproj  
 .html  
 .pdf  
-
+.nlogo  
