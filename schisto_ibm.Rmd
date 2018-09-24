@@ -1,5 +1,5 @@
 ---
-title: Schisto IBM 
+title: SchistoIBM
 author: |
  | Matthew Malishev^1^* and David J Civitello^1^    
  |  
@@ -12,13 +12,6 @@ linkcolor: pink
 urlcolor: blue
 citecolor: red
 output:
-  html_document:
-    highlight: tango
-    code_folding: hide
-    toc: yes
-    toc_depth: 4
-    number_sections: no
-    toc_float: yes
   pdf_document:
     includes:
       in_header: # add .tex file with header content
@@ -34,6 +27,13 @@ output:
     citation_package: biblatex # natbib
     latex_engine: xelatex #pdflatex # lualatex
     keep_tex: true # keep .tex file in dir 
+  html_document:
+    highlight: tango
+    code_folding: hide
+    toc: yes
+    toc_depth: 4
+    number_sections: no
+    toc_float: yes
   word_document:
     highlight: tango
     keep_md: yes
@@ -46,7 +46,8 @@ subtitle:
 tags:
 - nothing
 - nothingness
-params: 
+params:
+  ttl: SchistoIBM 
   dir: "/Users/malishev/Documents/Emory/research/schisto_ibm"
   date: !r Sys.Date()
   version: !r getRversion()
@@ -73,7 +74,8 @@ vignette: >
 
 Date: `r params$date`  
 R version: `r params$version`  
-*Corresponding author: `r params$email`
+*Corresponding author: `r params$email`  
+DOI: `r params$doi`
 
 Model from [Civitello et al 2018 Bioenergetic theory predicts infection dynamics of human schistosomes in intermediate host snails across ecological gradients](https://onlinelibrary.wiley.com/doi/abs/10.1111/ele.12937)  
 
@@ -81,7 +83,7 @@ Model from [Civitello et al 2018 Bioenergetic theory predicts infection dynamics
 
 ## Overview  
 
-IBM of snail and schistosome ecology, including resources and environmental temperature, driven by energetic consequences.  
+Individual-based model of snail and schistosome population ecology driven by energetic consequences of host and parasites in response to resources and environmental temperature.    
 
 Population model of individual hosts (snails) and parasites (schistosomes) in a lake system. Host and parasite population sizes and production of different parasite life stages are driven by a population model. Parasites are released into the habitat according to reproduction rules of a full energy and mass budget model based on Dynamic Energy Budget (DEB) theory. Hosts feed on resource patches in the habitat and are exposed to schistosomes depending on the type of resource patch they feed on.  
 
