@@ -10,7 +10,7 @@ doi: [DOI](</>)
 
 ## Overview  
   
-Schisto IBM describing environment and individual variables. Includes population ODEs, DEB params, and parasite cycle and energetics  
+Documents outlining sub models for schistosoma IBM, including DEB model, transmission model, and environment and individual variables for simulation model. Includes population ODEs, DEB params, and parasite cycle and energetics.  
 
 ### DEB model  
 :link: [Civitello, D. J., Fatima, H. , Johnson, L. R., Nisbet, R. M., Rohr, J. R. and Ben‐Ami, F. (2018), Bioenergetic theory predicts infection dynamics of human schistosomes in intermediate host snails across ecological gradients. Ecol Lett, 21: 692-701](https://onlinelibrary.wiley.com/doi/abs/10.1111/ele.12937) 
