@@ -36,3 +36,8 @@ Files:
 sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib 
 ```  
 
+******  
+
+## Maintainer  
+Matt Malishev [@darwinanddavis](https://www.researchgate.net/profile/Matt_Malishev)  
+
