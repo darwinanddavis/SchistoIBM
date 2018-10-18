@@ -11,8 +11,11 @@
 ### :one: Download the PDF instructions and follow the steps to load the model onto your Mac OSX system.
 
 ## Maintainer  
-Matt Malishev [@darwinanddavis](https://researchgate.net/profile/Matt_Malishev)  
-Questions and bugs: matthew.malishev@gmail.com  
+**Matt Malishev**   
+:mag: [Website](https://www.researchgate.net/profile/Matt_Malishev)    
+:bird: [@darwinanddavis](https://twitter.com/darwinanddavis)  
+:email: matthew.malishev [at] gmail.com        
+
 
 
 
