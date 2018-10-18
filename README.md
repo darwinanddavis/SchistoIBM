@@ -1,12 +1,10 @@
-# Schisto IBM   
+# Individual-based Dynamic Energy Budget (DEB) *Schistosoma* model  
 
 ## Matthew Malishev<sup>1*</sup> & David J Civitello<sup>1</sup>   
 
 ### _<sup>1</sup> Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta, GA, USA, 30322_    
 
-#### *Corresponding author: matthew.malishev@gmail.com    
-
-doi: [DOI](</>)  
+#### *Corresponding author: matthew.malishev@gmail.com     
 
 ## Overview    
 
@@ -44,4 +42,5 @@ sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
 
 ## Maintainer  
 Matt Malishev [@darwinanddavis](https://www.researchgate.net/profile/Matt_Malishev)  
+Questions and bugs: matthew.malishev@gmail.com  
 
