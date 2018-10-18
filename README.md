@@ -41,6 +41,8 @@ sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
 [Civitello, D. J., Fatima, H. , Johnson, L. R., Nisbet, R. M., Rohr, J. R. and Ben‐Ami, F. (2018) Bioenergetic theory predicts infection dynamics of human schistosomes in intermediate host snails across ecological gradients. Ecol Lett, 21: 692-701](https://onlinelibrary.wiley.com/doi/abs/10.1111/ele.12937)  
 
 ## Maintainer  
-Matt Malishev [@darwinanddavis](https://www.researchgate.net/profile/Matt_Malishev)  
-Questions and bugs: matthew.malishev@gmail.com  
+Matt Malishev   
+:mag: [Website](https://www.researchgate.net/profile/Matt_Malishev)    
+:bird: [@darwinanddavis](https://twitter.com/darwinanddavis)  
+:email: matthew.malishev@gmail.com      
 
