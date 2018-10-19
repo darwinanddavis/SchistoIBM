@@ -35,5 +35,5 @@
 .jcall("java/lang/System", "S", "getProperty", "java.awt.headless")
 Sys.getenv("NOAWT")
 
-cat(geterrmessage())
+
 
