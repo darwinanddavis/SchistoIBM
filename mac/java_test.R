@@ -33,9 +33,12 @@ t3err <- geterrmessage()
 Sys.getenv("NOAWT")
 t4err <- geterrmessage()
 
-if(geterrmessage()==t1err){stop("Failed Test 1 — Headless exception \n \n Wrong awt GUI support for Java/rJava",call.=F)}
-if(geterrmessage()==t2err){stop("Failed Test 2 — Invalid method name for RcallMethod (unable to open dialog box)",call.=F)}
-if(geterrmessage()==t3err){stop("Failed Test 3 — Old version of Java. \n \n Download latest version \n \n > https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html.",call.=F)}
-if(geterrmessage()==t4err){stop("Failed Test 4 — ",call.=F)}
+errorlist <- function(){
+if(geterrmessage()==t1err){stop("Failed Test 1 — Headless exception \n \n Wrong awt GUI support for Java/rJava",call.=T)}
+if(geterrmessage()==t2err){stop("Failed Test 2 — Invalid method name for RcallMethod (unable to open dialog box)",call.=T)}
+if(geterrmessage()==t3err){stop("Failed Test 3 — Old version of Java. \n \n Download latest version \n \n > https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html.",call.=T)}
+if(geterrmessage()==t4err){stop("Failed Test 4 — ",call.=T)}
+}
+
 
 
