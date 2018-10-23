@@ -1,0 +1,171 @@
+---
+title: Instructions for runnng the individual-based Dynamic Energy Budget _Schistosoma_ popultpn model (SIDEB) on Mac OSX     
+author: |
+ | Matthew Malishev^1^* & David J. Civitello^1^   
+ |  
+ | _^1^ Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta, GA, USA, 30322_
+#bibliography:/Users/malishev/Documents/Melbourne Uni/Thesis_2016/library.bib
+fontsize: 10
+geometry: margin=1in
+documentclass: article
+linkcolor: blue  
+urlcolor: blue
+citecolor: red
+output:
+  pdf_document:
+    includes:
+      in_header: # add .tex file with header content
+    highlight: tango
+    template: null
+    toc: yes
+    toc_depth: 4
+    number_sections: false
+    fig_width: 4
+    fig_height: 5
+    fig_caption: true
+    df_print: tibble 
+    citation_package: biblatex # natbib
+    latex_engine: xelatex #pdflatex # lualatex
+    keep_tex: true # keep .tex file in dir 
+  html_document:
+    highlight: tango
+    code_folding: hide
+    toc: yes
+    toc_depth: 4
+    number_sections: no
+    toc_float: yes
+  word_document:
+    highlight: tango
+    keep_md: yes
+    pandoc_args: --smart
+    #reference: mystyles.docx
+    toc: yes
+inludes:
+  before_body: before_body.tex
+subtitle: 
+tags:
+- nothing
+- nothingness
+params: 
+  dir: "/Users/malishev/Documents/Emory/research/schisto_ibm/DEB_IBM/docs/DEB_IBM_readme"
+  date: !r Sys.Date()
+  session: !r sessionInfo()  
+  version: !r getRversion()
+  email: "matthew.malishev@gmail.com"
+  doi: https://github.com/darwinanddavis/SchistoIBM/tree/master/mac
+classoption: portrait
+# ^['https://github.com/darwinanddavis/SchistoIBM/tree/master/mac'] # footnote
+vignette: >
+  %\VignetteIndexEntry{Useful R code}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
+</script>
+
+```{r echo = FALSE}
+# library(rmarkdown)
+# setwd("")
+# f <- list.files()[1]
+# render(f, output_format='pdf_document')
+```
+
+```{r, set-options, echo = FALSE, cache = FALSE}
+options(width=100)
+knitr::opts_chunk$set(
+ eval = TRUE, # run all code
+ # echo = FALSE, # show code chunks in output 
+ comment = "",
+ tidy.opts=list(width.cutoff=100), # set width of code chunks in output
+ tidy=TRUE, # make output as tidy
+ message = FALSE,  # mask all messages
+ warning = FALSE, # mask all warnings 
+ size="small" # set code chunk size
+)
+
+# https://github.com/ucb-stat133/stat133-fall-2016/blob/master/hws/hw02-tables-ggplot.Rmd
+knitr::opts_knit$set(root.dir=paste0(params$dir,"/")) # set working dir
+
+setwd(paste0(params$dir,"/")) # for running just in R not knitr
+```
+
+\newpage   
+
+Date: `r params$date`  
+R version: `r params$version`  
+*Corresponding author: `r params$email`  
+This document can be found at `r params$doi`  
+
+\  
+
+R session info 
+
+```{r echo=F}
+params$session
+```      
+
+\newpage  
+
+## Overview
+
+Follow the instructions to run the simulation model from `R` or `RStudio`. All reports and bugs should be addressed to matthew.malishev@gmail.com.   
+
+### Set system to run C toolchain  
+1. Follow the steps for compiling a toolchain and running C code in `R` outlined at [Installing compiler toolchain for Mac OSX](https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/). See also [[4]](#references) if the above steps don't work. Thanks to the [www.thecoatlessprofessor.com](www.thecoatlessprofessor.com).         
+
+### Java tests  
+Diagnostics for testing you have the correct version of Java on your computer. Tests are sequential (from [[5]](#references)).     
+
+1. Open `R` and run the following code.  
+
+```{r, eval=F, results="hide"}
+# test java is working
+require(RCurl)
+script <- getURL("https://raw.githubusercontent.com/darwinanddavis/SchistoIBM/master/mac/java_test.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+capture.output(errorlist()) # read error message from java_test.R output
+
+```
+
+If you get an error message beginning with 'Failed Test ...', move onto ["Install JGR"](#install-jgr).  
+
+### Running `RNetLogo`  
+
+Load the 'DEB_IBM.R' file into your `R` session. 
+
+### Install `rJava`  
+\  
+If an `rJava` error occurs in your `R` session, open Terminal (Applications > Terminal) and run the following in Terminal (sourced from [[1]](#references) and [[2]](#references)) 
+\  
+```{bash,eval=F}
+sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
+```
+
+### Install JGR  
+\  
+1. Check you have the latest version of [Java/Oracle](https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html). 
+
+2. Install JGR by running the following code in your `R` session (from [[3]](#references)):
+
+```{r eval=F, results="hide"}
+install.packages('JGR',,'http://www.rforge.net/')
+library(JGR)
+JGR::JGR()
+```
+
+Now load the 'DEB_IBM.R' file into your `R` session to run the simulation model.   
+
+For up to date troubleshooting running `RNetLogo` on `R` v. 6.0 or higher, see [Running Netlogo 6.0.+](https://github.com/NetLogo/NetLogo/issues/1282).  
+
+## References  
+^1^ [rJava load error in RStudio/R after “upgrading” to OSX Yosemite](https://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite)      
+
+^2^ [Run rJava with RStudio using OSX 10.10](http://paulklemm.com/blog/2015-02-20-run-rjava-with-rstudio-under-osx-10-dot-10/)  
+
+^3^ [Installing JGR](https://github.com/markush81/JGR) 
+
+^4^ [GCC compiler in R](https://stackoverflow.com/questions/1616983/building-r-packages-using-alternate-gcc)  
+
+^5^ [Test for working version of Java on your computer](https://stackoverflow.com/questions/14915898/rnetlogo-function-nlstart-fails-to-launch-gui)  

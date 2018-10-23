@@ -1,0 +1,275 @@
+\documentclass[10,portrait]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+\hypersetup{
+            pdftitle={Instructions for runnng the individual-based Dynamic Energy Budget Schistosoma popultpn model (SIDEB) on Mac OSX},
+            colorlinks=true,
+            linkcolor=blue,
+            citecolor=red,
+            urlcolor=blue,
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage[]{biblatex}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Instructions for runnng the individual-based Dynamic Energy Budget
+\emph{Schistosoma} popultpn model (SIDEB) on Mac OSX}
+\author{Matthew Malishev\textsuperscript{1}* \& David J.
+Civitello\textsuperscript{1}\\[2\baselineskip]\emph{\textsuperscript{1}
+Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta,
+GA, USA, 30322}}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{4}
+\tableofcontents
+}
+\newpage   
+
+Date: 2018-10-23\\
+R version: 3.5.0\\
+*Corresponding author:
+\href{mailto:matthew.malishev@gmail.com}{\nolinkurl{matthew.malishev@gmail.com}}\\
+This document can be found at
+\url{https://github.com/darwinanddavis/SchistoIBM/tree/master/mac}
+
+~
+
+R session info
+
+\begin{verbatim}
+R version 3.5.0 (2018-04-23)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: OS X El Capitan 10.11.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] compiler_3.5.0  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2 tools_3.5.0     htmltools_0.3.6
+ [7] pillar_1.2.3    tibble_1.4.2    yaml_2.2.0      Rcpp_0.12.18    stringi_1.2.3   rmarkdown_1.10 
+[13] knitr_1.20      stringr_1.3.1   digest_0.6.15   rlang_0.2.1     evaluate_0.10.1
+\end{verbatim}
+
+\newpage  
+
+\subsection{Overview}\label{overview}
+
+Follow the instructions to run the simulation model from \texttt{R} or
+\texttt{RStudio}. All reports and bugs should be addressed to
+\href{mailto:matthew.malishev@gmail.com}{\nolinkurl{matthew.malishev@gmail.com}}.
+
+\subsubsection{Set system to run C
+toolchain}\label{set-system-to-run-c-toolchain}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Follow the steps for compiling a toolchain and running C code in
+  \texttt{R} outlined at
+  \href{https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/}{Installing
+  compiler toolchain for Mac OSX}. See also
+  \protect\hyperlink{references}{{[}4{]}} if the above steps don't work.
+  Thanks to the \url{www.thecoatlessprofessor.com}.
+\end{enumerate}
+
+\subsubsection{Java tests}\label{java-tests}
+
+Diagnostics for testing you have the correct version of Java on your
+computer. Tests are sequential (from
+\protect\hyperlink{references}{{[}5{]}}).
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Open \texttt{R} and run the following code.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# test java is working}
+\KeywordTok{require}\NormalTok{(RCurl)}
+\NormalTok{script <-}\StringTok{ }\KeywordTok{getURL}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/darwinanddavis/SchistoIBM/master/mac/java_test.R"}\NormalTok{, }\DataTypeTok{ssl.verifypeer =} \OtherTok{FALSE}\NormalTok{)}
+\KeywordTok{eval}\NormalTok{(}\KeywordTok{parse}\NormalTok{(}\DataTypeTok{text =}\NormalTok{ script))}
+\KeywordTok{capture.output}\NormalTok{(}\KeywordTok{errorlist}\NormalTok{()) }\CommentTok{# read error message from java_test.R output}
+\end{Highlighting}
+\end{Shaded}
+
+If you get an error message beginning with `Failed Test \ldots{}', move
+onto \protect\hyperlink{install-jgr}{``Install JGR''}.
+
+\subsubsection{\texorpdfstring{Running
+\texttt{RNetLogo}}{Running RNetLogo}}\label{running-rnetlogo}
+
+Load the `DEB\_IBM.R' file into your \texttt{R} session.
+
+\subsubsection{\texorpdfstring{Install
+\texttt{rJava}}{Install rJava}}\label{install-rjava}
+
+~ If an \texttt{rJava} error occurs in your \texttt{R} session, open
+Terminal (Applications \textgreater{} Terminal) and run the following in
+Terminal (sourced from \protect\hyperlink{references}{{[}1{]}} and
+\protect\hyperlink{references}{{[}2{]}}) ~
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ ln -s }\VariableTok{$(}\ExtensionTok{/usr/libexec/java_home}\VariableTok{)}\NormalTok{/jre/lib/server/libjvm.dylib /usr/local/lib}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{install-jgr}{\subsubsection{Install
+JGR}\label{install-jgr}}
+
+~ 1. Check you have the latest version of
+\href{https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html}{Java/Oracle}.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Install JGR by running the following code in your \texttt{R} session
+  (from \protect\hyperlink{references}{{[}3{]}}):
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{'JGR'}\NormalTok{,,}\StringTok{'http://www.rforge.net/'}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(JGR)}
+\NormalTok{JGR}\OperatorTok{::}\KeywordTok{JGR}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+Now load the `DEB\_IBM.R' file into your \texttt{R} session to run the
+simulation model.
+
+For up to date troubleshooting running \texttt{RNetLogo} on \texttt{R}
+v. 6.0 or higher, see
+\href{https://github.com/NetLogo/NetLogo/issues/1282}{Running Netlogo
+6.0.+}.
+
+\hypertarget{references}{\subsection{References}\label{references}}
+
+\textsuperscript{1}
+\href{https://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite}{rJava
+load error in RStudio/R after ``upgrading'' to OSX Yosemite}
+
+\textsuperscript{2}
+\href{http://paulklemm.com/blog/2015-02-20-run-rjava-with-rstudio-under-osx-10-dot-10/}{Run
+rJava with RStudio using OSX 10.10}
+
+\textsuperscript{3} \href{https://github.com/markush81/JGR}{Installing
+JGR}
+
+\textsuperscript{4}
+\href{https://stackoverflow.com/questions/1616983/building-r-packages-using-alternate-gcc}{GCC
+compiler in R}
+
+\textsuperscript{5}
+\href{https://stackoverflow.com/questions/14915898/rnetlogo-function-nlstart-fails-to-launch-gui}{Test
+for working version of Java on your computer}
+
+\printbibliography
+
+\end{document}
