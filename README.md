@@ -30,7 +30,7 @@ Download the instructions for your operating system
 [*Windows*](https://github.com/darwinanddavis/SchistoIBM/tree/master/windows)  
 [*Mac OSX*](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac)  
 
-## :pig: Troubleshooting for running Netlogo from `R` on Mac OSX. See the [Github page](https://github.com/darwinanddavis/rnetlogo_diagnostics) for a detailed breakdown of the troubleshooting steps.  
+## :pig: Troubleshooting for running Netlogo from `R` on Mac OSX. See the [Instructions for Mac OSX](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac) page for a detailed breakdown of the troubleshooting steps.  
 :one: [Installing compiler toolchain for Mac OSX](https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/)    
 :two: if rJava error, run the following in terminal (src: https://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite and #http://paulklemm.com/blog/2015-02-20-run-rjava-with-rstudio-under-osx-10-dot-10/):    
 ``` {bash}
