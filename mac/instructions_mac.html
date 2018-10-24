@@ -276,7 +276,7 @@ div.tocify {
   MathJax.Hub.Config({ TeX: { equationNumbers: {autoNumber: "all"} } });
 </script>
 
-<p>Date: 2018-10-23<br />
+<p>Date: 2018-10-24<br />
 R version: 3.5.0<br />
 *Corresponding author: <a href="mailto:matthew.malishev@gmail.com">matthew.malishev@gmail.com</a><br />
 This document can be found at <a href="https://github.com/darwinanddavis/SchistoIBM/tree/master/mac" class="uri">https://github.com/darwinanddavis/SchistoIBM/tree/master/mac</a></p>
@@ -304,6 +304,16 @@ loaded via a namespace (and not attached):
 <div id="overview" class="section level2">
 <h2>Overview</h2>
 <p>Follow the instructions to run the simulation model from <code>R</code> or <code>RStudio</code>. All reports and bugs should be addressed to <a href="mailto:matthew.malishev@gmail.com">matthew.malishev@gmail.com</a>.</p>
+</div>
+<div id="required-files" class="section level2">
+<h2>Required files</h2>
+<p>Files required for running the simulation are outlined below and will be automatically loaded from the <a href="https://github.com/darwinanddavis/SchistoIBM"><em>Schistosoma</em> IBM Github page</a> when running the model:</p>
+<pre><code>DEB_IBM.R
+DEB_INF_GUTS_IBM.nlogo
+FullStarve_shrink_production2.Rda
+IndividualModel_IBM.c
+IndividualModel_IBM.so
+IndividualModel_IBM.o</code></pre>
 <div id="set-system-to-run-c-toolchain" class="section level3">
 <h3>Set system to run C toolchain</h3>
 <ol style="list-style-type: decimal">
@@ -321,16 +331,37 @@ loaded via a namespace (and not attached):
 script &lt;-<span class="st"> </span><span class="kw">getURL</span>(<span class="st">&quot;https://raw.githubusercontent.com/darwinanddavis/SchistoIBM/master/mac/java_test.R&quot;</span>, <span class="dt">ssl.verifypeer =</span> <span class="ot">FALSE</span>)
 <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text =</span> script))
 <span class="kw">capture.output</span>(<span class="kw">errorlist</span>()) <span class="co"># read error message from java_test.R output</span></code></pre></div>
-<p>If you get an error message beginning with ‘Failed Test …’, move onto <a href="#install-jgr">“Install JGR”</a>.</p>
+<p>If you get an <code>R</code> error message e.g. <code>Error in .jnew ...</code> or an error beginning with <code>Failed Test ...</code>, move onto <a href="#install-jgr">“Install JGR”</a>. Otherwise, continue to <a href="#run-rnetlogo">Run RNetLogo</a>.</p>
 </div>
-<div id="running-rnetlogo" class="section level3">
-<h3>Running <code>RNetLogo</code></h3>
-<p>Load the ‘DEB_IBM.R’ file into your <code>R</code> session.</p>
+<div id="run-rnetlogo" class="section level3">
+<h3>Run <code>RNetLogo</code></h3>
+<p>Load the ‘DEB_IBM.R’ file into your <code>R</code> session. Follow the instructions to load the model and execute the simulation.</p>
+<p>If you see the following <code>rJava</code> error in your <code>R</code> session, proceed to step <a href="#install-rjava">Install <code>rJava</code></a>:</p>
+<pre><code>Error : .onLoad failed in loadNamespace() for 'rJava', details:
+  call: dyn.load(file, DLLpath = DLLpath, ...)
+  error: unable to load shared object ...
+  .  
+  .  
+  .  </code></pre>
 </div>
 <div id="install-rjava" class="section level3">
 <h3>Install <code>rJava</code></h3>
-<p>  If an <code>rJava</code> error occurs in your <code>R</code> session, open Terminal (Applications &gt; Terminal) and run the following in Terminal (sourced from <a href="#references">[1]</a> and <a href="#references">[2]</a>)  </p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="fu">sudo</span> ln -s <span class="va">$(</span><span class="ex">/usr/libexec/java_home</span><span class="va">)</span>/jre/lib/server/libjvm.dylib /usr/local/lib</code></pre></div>
+<p>  Open Terminal (<span class="math inline">\(Applications &gt; Terminal\)</span>) and run the following in Terminal (sourced from <a href="#references">[1]</a> and <a href="#references">[2]</a>)  </p>
+<pre><code>sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib</code></pre>
+<p>Now re-run the ‘DEB_IBM.R’ code in <code>R</code>.</p>
+<p>The following error in <code>R</code> when executing <code>NLStart()</code> means you have successfully navigated the <code>rJava</code> errors, but are running into a Java issue that’s preventing <code>R</code> from generating the NetLogo GUI from <code>R</code>:</p>
+<pre><code>java.awt.HeadlessException
+    at java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:204)
+    at java.awt.Window.&lt;init&gt;(Window.java:536)
+    at java.awt.Frame.&lt;init&gt;(Frame.java:420)
+    at java.awt.Frame.&lt;init&gt;(Frame.java:385)
+    at javax.swing.SwingUtilities$SharedOwnerFrame.&lt;init&gt;(SwingUtilities.java:1758)  
+ .   
+ .  
+ .  </code></pre>
+<p>For the above error, the <code>NLStart()</code> function should run successfully with <code>gui=F</code>, which launches a headless GUI mode.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">NLStart</span>(nl.path,<span class="dt">gui=</span>F,<span class="dt">nl.jarname =</span> <span class="kw">paste0</span>(<span class="st">&quot;netlogo-&quot;</span>,ver_nl,<span class="st">&quot;.jar&quot;</span>)) <span class="co"># open netlogo w/o gui</span></code></pre></div>
+<p>If the above steps don’t work, move onto <a href="#install-jgr">Install JGR</a>.</p>
 </div>
 <div id="install-jgr" class="section level3">
 <h3>Install JGR</h3>
@@ -341,7 +372,7 @@ script &lt;-<span class="st"> </span><span class="kw">getURL</span>(<span class=
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">'JGR'</span>,,<span class="st">'http://www.rforge.net/'</span>)
 <span class="kw">library</span>(JGR)
 JGR<span class="op">::</span><span class="kw">JGR</span>()</code></pre></div>
-<p>Now load the ‘DEB_IBM.R’ file into your <code>R</code> session to run the simulation model.</p>
+<p>Now load the ‘DEB_IBM.R’ file into your <code>JGR</code> session to run the simulation model.</p>
 <p>For up to date troubleshooting running <code>RNetLogo</code> on <code>R</code> v. 6.0 or higher, see <a href="https://github.com/NetLogo/NetLogo/issues/1282">Running Netlogo 6.0.+</a>.</p>
 </div>
 </div>

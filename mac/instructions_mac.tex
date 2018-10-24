@@ -118,7 +118,7 @@ GA, USA, 30322}}
 }
 \newpage   
 
-Date: 2018-10-23\\
+Date: 2018-10-24\\
 R version: 3.5.0\\
 *Corresponding author:
 \href{mailto:matthew.malishev@gmail.com}{\nolinkurl{matthew.malishev@gmail.com}}\\
@@ -158,6 +158,22 @@ Follow the instructions to run the simulation model from \texttt{R} or
 \texttt{RStudio}. All reports and bugs should be addressed to
 \href{mailto:matthew.malishev@gmail.com}{\nolinkurl{matthew.malishev@gmail.com}}.
 
+\subsection{Required files}\label{required-files}
+
+Files required for running the simulation are outlined below and will be
+automatically loaded from the
+\href{https://github.com/darwinanddavis/SchistoIBM}{\emph{Schistosoma}
+IBM Github page} when running the model:
+
+\begin{verbatim}
+DEB_IBM.R
+DEB_INF_GUTS_IBM.nlogo
+FullStarve_shrink_production2.Rda
+IndividualModel_IBM.c
+IndividualModel_IBM.so
+IndividualModel_IBM.o
+\end{verbatim}
+
 \subsubsection{Set system to run C
 toolchain}\label{set-system-to-run-c-toolchain}
 
@@ -196,27 +212,72 @@ computer. Tests are sequential (from
 \end{Highlighting}
 \end{Shaded}
 
-If you get an error message beginning with `Failed Test \ldots{}', move
-onto \protect\hyperlink{install-jgr}{``Install JGR''}.
+If you get an \texttt{R} error message e.g.
+\texttt{Error\ in\ .jnew\ ...} or an error beginning with
+\texttt{Failed\ Test\ ...}, move onto
+\protect\hyperlink{install-jgr}{``Install JGR''}. Otherwise, continue to
+\protect\hyperlink{run-rnetlogo}{Run RNetLogo}.
 
-\subsubsection{\texorpdfstring{Running
-\texttt{RNetLogo}}{Running RNetLogo}}\label{running-rnetlogo}
+\hypertarget{run-rnetlogo}{\subsubsection{\texorpdfstring{Run
+\texttt{RNetLogo}}{Run RNetLogo}}\label{run-rnetlogo}}
 
-Load the `DEB\_IBM.R' file into your \texttt{R} session.
+Load the `DEB\_IBM.R' file into your \texttt{R} session. Follow the
+instructions to load the model and execute the simulation.
 
-\subsubsection{\texorpdfstring{Install
-\texttt{rJava}}{Install rJava}}\label{install-rjava}
+If you see the following \texttt{rJava} error in your \texttt{R}
+session, proceed to step \protect\hyperlink{install-rjava}{Install
+\texttt{rJava}}:
 
-~ If an \texttt{rJava} error occurs in your \texttt{R} session, open
-Terminal (Applications \textgreater{} Terminal) and run the following in
+\begin{verbatim}
+Error : .onLoad failed in loadNamespace() for 'rJava', details:
+  call: dyn.load(file, DLLpath = DLLpath, ...)
+  error: unable to load shared object ...
+  .  
+  .  
+  .  
+\end{verbatim}
+
+\hypertarget{install-rjava}{\subsubsection{\texorpdfstring{Install
+\texttt{rJava}}{Install rJava}}\label{install-rjava}}
+
+~ Open Terminal (\(Applications > Terminal\)) and run the following in
 Terminal (sourced from \protect\hyperlink{references}{{[}1{]}} and
 \protect\hyperlink{references}{{[}2{]}}) ~
 
+\begin{verbatim}
+sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
+\end{verbatim}
+
+Now re-run the `DEB\_IBM.R' code in \texttt{R}.
+
+The following error in \texttt{R} when executing \texttt{NLStart()}
+means you have successfully navigated the \texttt{rJava} errors, but are
+running into a Java issue that's preventing \texttt{R} from generating
+the NetLogo GUI from \texttt{R}:
+
+\begin{verbatim}
+java.awt.HeadlessException
+    at java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:204)
+    at java.awt.Window.<init>(Window.java:536)
+    at java.awt.Frame.<init>(Frame.java:420)
+    at java.awt.Frame.<init>(Frame.java:385)
+    at javax.swing.SwingUtilities$SharedOwnerFrame.<init>(SwingUtilities.java:1758)  
+ .   
+ .  
+ .  
+\end{verbatim}
+
+For the above error, the \texttt{NLStart()} function should run
+successfully with \texttt{gui=F}, which launches a headless GUI mode.
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{sudo}\NormalTok{ ln -s }\VariableTok{$(}\ExtensionTok{/usr/libexec/java_home}\VariableTok{)}\NormalTok{/jre/lib/server/libjvm.dylib /usr/local/lib}
+\KeywordTok{NLStart}\NormalTok{(nl.path,}\DataTypeTok{gui=}\NormalTok{F,}\DataTypeTok{nl.jarname =} \KeywordTok{paste0}\NormalTok{(}\StringTok{"netlogo-"}\NormalTok{,ver_nl,}\StringTok{".jar"}\NormalTok{)) }\CommentTok{# open netlogo w/o gui}
 \end{Highlighting}
 \end{Shaded}
+
+If the above steps don't work, move onto
+\protect\hyperlink{install-jgr}{Install JGR}.
 
 \hypertarget{install-jgr}{\subsubsection{Install
 JGR}\label{install-jgr}}
@@ -241,7 +302,7 @@ JGR}\label{install-jgr}}
 \end{Highlighting}
 \end{Shaded}
 
-Now load the `DEB\_IBM.R' file into your \texttt{R} session to run the
+Now load the `DEB\_IBM.R' file into your \texttt{JGR} session to run the
 simulation model.
 
 For up to date troubleshooting running \texttt{RNetLogo} on \texttt{R}

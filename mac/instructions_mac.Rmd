@@ -112,6 +112,18 @@ params$session
 
 Follow the instructions to run the simulation model from `R` or `RStudio`. All reports and bugs should be addressed to matthew.malishev@gmail.com.   
 
+## Required files  
+Files required for running the simulation are outlined below and will be automatically loaded from the [*Schistosoma* IBM Github page](https://github.com/darwinanddavis/SchistoIBM) when running the model:  
+
+```
+DEB_IBM.R
+DEB_INF_GUTS_IBM.nlogo
+FullStarve_shrink_production2.Rda
+IndividualModel_IBM.c
+IndividualModel_IBM.so
+IndividualModel_IBM.o
+```
+
 ### Set system to run C toolchain  
 1. Follow the steps for compiling a toolchain and running C code in `R` outlined at [Installing compiler toolchain for Mac OSX](https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/). See also [[4]](#references) if the above steps don't work. Thanks to the [www.thecoatlessprofessor.com](www.thecoatlessprofessor.com).         
 
@@ -129,23 +141,56 @@ capture.output(errorlist()) # read error message from java_test.R output
 
 ```
 
-If you get an error message beginning with 'Failed Test ...', move onto ["Install JGR"](#install-jgr).  
+If you get an `R` error message e.g. `Error in .jnew ...` or an error beginning with `Failed Test ...`, move onto ["Install JGR"](#install-jgr). Otherwise, continue to [Run RNetLogo](#run-rnetlogo).    
 
-### Running `RNetLogo`  
+### Run `RNetLogo`  
 
-Load the 'DEB_IBM.R' file into your `R` session. 
+Load the 'DEB_IBM.R' file into your `R` session. Follow the instructions to load the model and execute the simulation.  
+
+If you see the following `rJava` error in your `R` session, proceed to step [Install `rJava`](#install-rjava):  
+
+```
+Error : .onLoad failed in loadNamespace() for 'rJava', details:
+  call: dyn.load(file, DLLpath = DLLpath, ...)
+  error: unable to load shared object ...
+  .  
+  .  
+  .  
+```
 
 ### Install `rJava`  
 \  
-If an `rJava` error occurs in your `R` session, open Terminal (Applications > Terminal) and run the following in Terminal (sourced from [[1]](#references) and [[2]](#references)) 
+Open Terminal ($Applications > Terminal$) and run the following in Terminal (sourced from [[1]](#references) and [[2]](#references)) 
 \  
-```{bash,eval=F}
+```
 sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
 ```
 
+Now re-run the 'DEB_IBM.R' code in `R`.  
+
+The following error in `R` when executing `NLStart()` means you have successfully navigated the `rJava` errors, but are running into a Java issue that's preventing `R` from generating the NetLogo GUI from `R`:  
+```
+java.awt.HeadlessException
+    at java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:204)
+    at java.awt.Window.<init>(Window.java:536)
+    at java.awt.Frame.<init>(Frame.java:420)
+    at java.awt.Frame.<init>(Frame.java:385)
+    at javax.swing.SwingUtilities$SharedOwnerFrame.<init>(SwingUtilities.java:1758)  
+ .   
+ .  
+ .  
+```  
+
+For the above error, the `NLStart()` function should run successfully with `gui=F`, which launches a headless GUI mode.     
+```{r eval=F}
+NLStart(nl.path,gui=F,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo w/o gui
+```
+
+If the above steps don't work, move onto [Install JGR](#install-jgr).      
+
 ### Install JGR  
 \  
-1. Check you have the latest version of [Java/Oracle](https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html). 
+1. Check you have the latest version of [Java/Oracle](https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html).  
 
 2. Install JGR by running the following code in your `R` session (from [[3]](#references)):
 
@@ -155,7 +200,7 @@ library(JGR)
 JGR::JGR()
 ```
 
-Now load the 'DEB_IBM.R' file into your `R` session to run the simulation model.   
+Now load the 'DEB_IBM.R' file into your `JGR` session to run the simulation model.   
 
 For up to date troubleshooting running `RNetLogo` on `R` v. 6.0 or higher, see [Running Netlogo 6.0.+](https://github.com/NetLogo/NetLogo/issues/1282).  
 
