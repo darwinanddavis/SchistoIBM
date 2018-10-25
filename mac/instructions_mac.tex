@@ -25,7 +25,7 @@
 \usepackage[unicode=true]{hyperref}
 \PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
 \hypersetup{
-            pdftitle={Instructions for runnng the individual-based Dynamic Energy Budget Schistosoma popultpn model (SIDEB) on Mac OSX},
+            pdftitle={Instructions for runnng the individual-based Dynamic Energy Budget Schistosoma population model (SIDEB) on Mac OSX},
             colorlinks=true,
             linkcolor=blue,
             citecolor=red,
@@ -101,7 +101,7 @@
 
 
 \title{Instructions for runnng the individual-based Dynamic Energy Budget
-\emph{Schistosoma} popultpn model (SIDEB) on Mac OSX}
+\emph{Schistosoma} population model (SIDEB) on Mac OSX}
 \author{Matthew Malishev\textsuperscript{1}* \& David J.
 Civitello\textsuperscript{1}\\[2\baselineskip]\emph{\textsuperscript{1}
 Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta,
@@ -118,7 +118,7 @@ GA, USA, 30322}}
 }
 \newpage   
 
-Date: 2018-10-24\\
+Date: 2018-10-25\\
 R version: 3.5.0\\
 *Corresponding author:
 \href{mailto:matthew.malishev@gmail.com}{\nolinkurl{matthew.malishev@gmail.com}}\\
@@ -174,7 +174,7 @@ IndividualModel_IBM.so
 IndividualModel_IBM.o
 \end{verbatim}
 
-\subsubsection{Set system to run C
+\subsection{Set system to run C
 toolchain}\label{set-system-to-run-c-toolchain}
 
 \begin{enumerate}
@@ -189,7 +189,7 @@ toolchain}\label{set-system-to-run-c-toolchain}
   Thanks to the \url{www.thecoatlessprofessor.com}.
 \end{enumerate}
 
-\subsubsection{Java tests}\label{java-tests}
+\subsection{Java tests}\label{java-tests}
 
 Diagnostics for testing you have the correct version of Java on your
 computer. Tests are sequential (from
@@ -218,7 +218,7 @@ If you get an \texttt{R} error message e.g.
 \protect\hyperlink{install-jgr}{``Install JGR''}. Otherwise, continue to
 \protect\hyperlink{run-rnetlogo}{Run RNetLogo}.
 
-\hypertarget{run-rnetlogo}{\subsubsection{\texorpdfstring{Run
+\hypertarget{run-rnetlogo}{\subsection{\texorpdfstring{Run
 \texttt{RNetLogo}}{Run RNetLogo}}\label{run-rnetlogo}}
 
 Load the `DEB\_IBM.R' file into your \texttt{R} session. Follow the
@@ -226,7 +226,8 @@ instructions to load the model and execute the simulation.
 
 If you see the following \texttt{rJava} error in your \texttt{R}
 session, proceed to step \protect\hyperlink{install-rjava}{Install
-\texttt{rJava}}:
+\texttt{rJava}}:\\
+\hspace*{0.333em} ~
 
 \begin{verbatim}
 Error : .onLoad failed in loadNamespace() for 'rJava', details:
@@ -237,23 +238,27 @@ Error : .onLoad failed in loadNamespace() for 'rJava', details:
   .  
 \end{verbatim}
 
-\hypertarget{install-rjava}{\subsubsection{\texorpdfstring{Install
+~ ~
+
+\hypertarget{install-rjava}{\subsection{\texorpdfstring{Install
 \texttt{rJava}}{Install rJava}}\label{install-rjava}}
 
-~ Open Terminal (\(Applications > Terminal\)) and run the following in
+Open Terminal (\(Applications > Terminal\)) and run the following in
 Terminal (sourced from \protect\hyperlink{references}{{[}1{]}} and
 \protect\hyperlink{references}{{[}2{]}}) ~
 
-\begin{verbatim}
-sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
-\end{verbatim}
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sudo}\NormalTok{ ln -s }\VariableTok{$(}\ExtensionTok{/usr/libexec/java_home}\VariableTok{)}\NormalTok{/jre/lib/server/libjvm.dylib /usr/local/lib}
+\end{Highlighting}
+\end{Shaded}
 
-Now re-run the `DEB\_IBM.R' code in \texttt{R}.
+~ Now re-run the `DEB\_IBM.R' code in \texttt{R}.
 
 The following error in \texttt{R} when executing \texttt{NLStart()}
 means you have successfully navigated the \texttt{rJava} errors, but are
 running into a Java issue that's preventing \texttt{R} from generating
-the NetLogo GUI from \texttt{R}:
+the NetLogo GUI from \texttt{R}: ~ ~
 
 \begin{verbatim}
 java.awt.HeadlessException
@@ -267,8 +272,8 @@ java.awt.HeadlessException
  .  
 \end{verbatim}
 
-For the above error, the \texttt{NLStart()} function should run
-successfully with \texttt{gui=F}, which launches a headless GUI mode.
+~ For the above error, the \texttt{NLStart()} function should run
+successfully with \texttt{gui=F}, which launches a headless GUI mode. ~
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -279,8 +284,7 @@ successfully with \texttt{gui=F}, which launches a headless GUI mode.
 If the above steps don't work, move onto
 \protect\hyperlink{install-jgr}{Install JGR}.
 
-\hypertarget{install-jgr}{\subsubsection{Install
-JGR}\label{install-jgr}}
+\hypertarget{install-jgr}{\subsection{Install JGR}\label{install-jgr}}
 
 ~ 1. Check you have the latest version of
 \href{https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html}{Java/Oracle}.
@@ -291,7 +295,7 @@ JGR}\label{install-jgr}}
 \tightlist
 \item
   Install JGR by running the following code in your \texttt{R} session
-  (from \protect\hyperlink{references}{{[}3{]}}):
+  (from \protect\hyperlink{references}{{[}3{]}}): ~
 \end{enumerate}
 
 \begin{Shaded}

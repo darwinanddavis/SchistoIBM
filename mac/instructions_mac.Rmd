@@ -1,5 +1,5 @@
 ---
-title: Instructions for runnng the individual-based Dynamic Energy Budget _Schistosoma_ popultpn model (SIDEB) on Mac OSX     
+title: Instructions for runnng the individual-based Dynamic Energy Budget _Schistosoma_ population model (SIDEB) on Mac OSX     
 author: |
  | Matthew Malishev^1^* & David J. Civitello^1^   
  |  
@@ -12,6 +12,13 @@ linkcolor: blue
 urlcolor: blue
 citecolor: red
 output:
+  html_document:
+    highlight: tango
+    code_folding: hide
+    toc: yes
+    toc_depth: 4
+    number_sections: no
+    toc_float: yes
   pdf_document:
     includes:
       in_header: # add .tex file with header content
@@ -27,13 +34,6 @@ output:
     citation_package: biblatex # natbib
     latex_engine: xelatex #pdflatex # lualatex
     keep_tex: true # keep .tex file in dir 
-  html_document:
-    highlight: tango
-    code_folding: hide
-    toc: yes
-    toc_depth: 4
-    number_sections: no
-    toc_float: yes
   word_document:
     highlight: tango
     keep_md: yes
@@ -124,10 +124,10 @@ IndividualModel_IBM.so
 IndividualModel_IBM.o
 ```
 
-### Set system to run C toolchain  
+## Set system to run C toolchain  
 1. Follow the steps for compiling a toolchain and running C code in `R` outlined at [Installing compiler toolchain for Mac OSX](https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/). See also [[4]](#references) if the above steps don't work. Thanks to the [www.thecoatlessprofessor.com](www.thecoatlessprofessor.com).         
 
-### Java tests  
+## Java tests  
 Diagnostics for testing you have the correct version of Java on your computer. Tests are sequential (from [[5]](#references)).     
 
 1. Open `R` and run the following code.  
@@ -143,12 +143,13 @@ capture.output(errorlist()) # read error message from java_test.R output
 
 If you get an `R` error message e.g. `Error in .jnew ...` or an error beginning with `Failed Test ...`, move onto ["Install JGR"](#install-jgr). Otherwise, continue to [Run RNetLogo](#run-rnetlogo).    
 
-### Run `RNetLogo`  
+## Run `RNetLogo`  
 
 Load the 'DEB_IBM.R' file into your `R` session. Follow the instructions to load the model and execute the simulation.  
 
 If you see the following `rJava` error in your `R` session, proceed to step [Install `rJava`](#install-rjava):  
-
+\  
+\  
 ```
 Error : .onLoad failed in loadNamespace() for 'rJava', details:
   call: dyn.load(file, DLLpath = DLLpath, ...)
@@ -157,18 +158,22 @@ Error : .onLoad failed in loadNamespace() for 'rJava', details:
   .  
   .  
 ```
-
-### Install `rJava`  
 \  
+\  
+
+## Install `rJava`  
+
 Open Terminal ($Applications > Terminal$) and run the following in Terminal (sourced from [[1]](#references) and [[2]](#references)) 
 \  
-```
+```{bash, eval=F}
 sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib
 ```
-
+\  
 Now re-run the 'DEB_IBM.R' code in `R`.  
 
-The following error in `R` when executing `NLStart()` means you have successfully navigated the `rJava` errors, but are running into a Java issue that's preventing `R` from generating the NetLogo GUI from `R`:  
+The following error in `R` when executing `NLStart()` means you have successfully navigated the `rJava` errors, but are running into a Java issue that's preventing `R` from generating the NetLogo GUI from `R`:
+\  
+\  
 ```
 java.awt.HeadlessException
     at java.awt.GraphicsEnvironment.checkHeadless(GraphicsEnvironment.java:204)
@@ -180,20 +185,21 @@ java.awt.HeadlessException
  .  
  .  
 ```  
-
-For the above error, the `NLStart()` function should run successfully with `gui=F`, which launches a headless GUI mode.     
+\  
+For the above error, the `NLStart()` function should run successfully with `gui=F`, which launches a headless GUI mode.
+\  
 ```{r eval=F}
 NLStart(nl.path,gui=F,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo w/o gui
 ```
 
 If the above steps don't work, move onto [Install JGR](#install-jgr).      
 
-### Install JGR  
+## Install JGR  
 \  
 1. Check you have the latest version of [Java/Oracle](https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html).  
 
 2. Install JGR by running the following code in your `R` session (from [[3]](#references)):
-
+\  
 ```{r eval=F, results="hide"}
 install.packages('JGR',,'http://www.rforge.net/')
 library(JGR)
