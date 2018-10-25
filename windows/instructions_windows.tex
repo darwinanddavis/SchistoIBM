@@ -1,0 +1,164 @@
+\documentclass[10,portrait]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+\hypersetup{
+            pdftitle={Instructions for runnng the individual-based Dynamic Energy Budget Schistosoma population model (SIDEB) on Windows},
+            colorlinks=true,
+            linkcolor=pink,
+            citecolor=red,
+            urlcolor=blue,
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage[]{biblatex}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Instructions for runnng the individual-based Dynamic Energy Budget
+\emph{Schistosoma} population model (SIDEB) on Windows}
+\author{Matthew Malishev\textsuperscript{1}* \& David J.
+Civitello\textsuperscript{1}\\[2\baselineskip]\emph{\textsuperscript{1}
+Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta,
+GA, USA, 30322}}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{4}
+\tableofcontents
+}
+\newpage   
+
+Date: 2018-10-25\\
+R version: 3.5.0\\
+*Corresponding author:
+\href{mailto:matthew.malishev@gmail.com}{\nolinkurl{matthew.malishev@gmail.com}}\\
+This document can be found at
+\url{https://github.com/darwinanddavis/SchistoIBM/tree/master/windows}
+
+~
+
+R session info
+
+\begin{verbatim}
+R version 3.5.0 (2018-04-23)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: OS X El Capitan 10.11.6
+
+Matrix products: default
+BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+loaded via a namespace (and not attached):
+ [1] compiler_3.5.0  backports_1.1.2 magrittr_1.5    rprojroot_1.3-2 tools_3.5.0     htmltools_0.3.6
+ [7] pillar_1.2.3    tibble_1.4.2    yaml_2.2.0      Rcpp_0.12.18    stringi_1.2.3   rmarkdown_1.10 
+[13] knitr_1.20      stringr_1.3.1   digest_0.6.15   rlang_0.2.1     evaluate_0.10.1
+\end{verbatim}
+
+\newpage  
+
+\subsection{Overview}\label{overview}
+
+Follow the instructions to run the simulation model from \texttt{R} or
+\texttt{RStudio}. All reports and bugs should be addresses to
+\href{mailto:matthew.malishev@gmail.com}{\nolinkurl{matthew.malishev@gmail.com}}.
+
+\subsection{Required files}\label{required-files}
+
+Files required for running the simulation are outlined below and will be
+automatically loaded from the
+\href{https://github.com/darwinanddavis/SchistoIBM}{\emph{Schistosoma}
+IBM Github page} when running the model:
+
+\begin{verbatim}
+ DEB_IBM.R  
+ DEB_INF_GUTS_IBM.nlogo  
+ FullStarve_shrink_production2.Rda  
+ IndividualModel_IBM.c  
+ IndividualModel_IBM.dll (Windows, generated from C)      
+\end{verbatim}
+
+\subsection{Install R RStudio}\label{install-r-rstudio}
+
+Install \texttt{RStudio} from the \texttt{RStudio}
+\href{https://www.rstudio.com/products/rstudio/download/\#download}{website}.
+
+\subsection{Install NetLogo}\label{install-netlogo}
+
+Install NetLogo from the NetLogo
+\href{https://ccl.northwestern.edu/netlogo/download.shtml}{website}.
+
+\subsection{\texorpdfstring{Run
+\texttt{RNetLogo}}{Run RNetLogo}}\label{run-rnetlogo}
+
+Load the `DEB\_IBM.R' file into your \texttt{R} session. Follow the
+instructions to load the model and execute the simulation.
+
+\subsection{References}\label{references}
+
+\textsuperscript{1}
+\href{https://www.rstudio.com/products/rstudio/download/\#download}{Installing
+R Studio}
+
+\textsuperscript{2}
+\href{https://www.rstudio.com/products/rstudio/download/\#download}{Installing
+NetLogo}
+
+\printbibliography
+
+\end{document}
