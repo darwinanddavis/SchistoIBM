@@ -1,0 +1,314 @@
+\documentclass[10,portrait]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+\hypersetup{
+            pdftitle={Key literature on Schistosoma and host-parasite systems},
+            colorlinks=true,
+            linkcolor=blue,
+            citecolor=red,
+            urlcolor=blue,
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage[]{biblatex}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Key literature on \emph{Schistosoma} and host-parasite systems}
+\author{Matthew
+Malishev\textsuperscript{1}*\\[2\baselineskip]\emph{\textsuperscript{1}
+Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta,
+GA, USA, 30322}}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\newpage   
+
+Date: 2018-11-01\\
+R version: 3.5.0\\
+*Corresponding author:
+\href{mailto:matthew.malishev@emory.edu}{\nolinkurl{matthew.malishev@emory.edu}}\\
+This document can be found at \url{https://github.com/darwinanddavis/}
+
+\newpage  
+
+\subsection{Overview}\label{overview}
+
+Key literature and areas of research in \emph{Schistosoma} and
+host-parasite systems.
+
+\subsection{Notes}\label{notes}
+
+\textbf{Using models with schisto}
+
+Aim: To account for time lag in population cycles based on things like
+resources and size structure
+
+\begin{itemize}
+\tightlist
+\item
+  Charles King\\
+\item
+  Mark EJ Woolhouse (1991, 1992)\\
+\item
+  David Rollinson
+\end{itemize}
+
+\newpage  
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Habitat and resources}\label{habitat-and-resources}
+
+\href{Southgate\%20VR\%20(1997)\%20Schistosomiasis\%20in\%20the\%20Senegal\%20River\%20Basin:\%20Before\%20and\%20after\%20the\%20construction\%20of\%20the\%20dams\%20at\%20Diama,\%20Senegal\%20and\%20Manantali,\%20Mali\%20and\%20future\%20pros-\%20pects.\%20J\%20Helminthol\%2071(2):125–132}{Southgate
+VR (1997) Schistosomiasis in the Senegal River Basin: Before and after
+the construction of the dams at Diama, Senegal and Manantali, Mali and
+future pros- pects. J Helminthol 71(2):125--132.}
+
+\begin{quote}
+From Sokolow et al 2015 PNAS
+\end{quote}
+
+\newpage  
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Human health stats}\label{human-health-stats}
+
+\href{}{Steinmann P, Keiser J, Bos R, Tanner M, Utzinger J (2006)
+Schistosomiasis and water resources development: Systematic review,
+meta-analysis, and estimates of people at risk. Lancet Infect Dis
+6(7):411--425}
+
+\begin{quote}
+From Sokolow et al 2015 PNAS\\
+Schistosomiasis infects an estimated 220--240 million people globally,
+and 790 million are at risk for infection, more than 90\% of whom are in
+Sub-Saharan Africa (14).
+\end{quote}
+
+\href{www.who.int/neglected_diseases/preventive_chemotherapy/databank/en/}{WHO
+(2015) Preventive Chemotherapy and Transmission Control (PCT)
+databank}\\
+\href{}{World Health Assembly (2012) Elimination of Schistosomiasis in
+WHA65/2012/REC/1 Sixty-Fifth World Health Assembly: Resolutions and
+Decisions Annexes (WHO, Geneva)}
+
+\href{}{Cheever AW, Macedonia JG, Mosimann JE, Cheever EA (1994)
+Kinetics of egg pro- duction and egg excretion by Schistosoma mansoni
+and S. japonicum in mice infected with a single pair of worms. Am J Trop
+Med Hyg 50(3):281--295}
+
+\begin{quote}
+From Sokolow et al 2015 PNAS\\
+Each infected snail sheds thousands of cer- cariae, which seek and
+penetrate human skin. After entering the skin, the parasites migrate to
+the blood vessels of the intestines (S. mansoni) or urinary bladder (S.
+hematobium), where female worms lay 350--2,200 eggs per day (15)
+\end{quote}
+
+\href{}{Jobin WR, Negrón-Aponte H, Michelson EH (1976) Schistosomiasis
+in the Gorgol Valley of Mauritania. Am J Trop Med Hyg 25(4):587--594}
+
+\begin{quote}
+From Sokolow et al 2015 PNAS
+\end{quote}
+
+\begin{quote}
+Death from liver failure or bladder cancer can be preceded by chronic
+anemia, cognitive im- pairment in children, growth stunting,
+infertility, and a higher risk of contracting HIV in women (17, 18).
+\end{quote}
+
+\href{https://www.biorxiv.org/content/early/2018/08/11/387969}{Whole
+genome sequencing and morphological analysis of the human-infecting
+schistosome emerging in Europe reveals a complex admixture between
+Schistosoma haematobium and Schistosoma bovis parasites.}
+
+\href{}{Hotez PJ, Fenwick A, Kjetland EF (2009) Africa's 32 cents
+solution for HIV/AIDS. PLoS Negl Trop Dis 3(5):e430}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{www.who.int/neglected_diseases/preventive_chemotherapy/databank/}{WHO
+(2015) Preventive Chemotherapy and Transmission Control (PCT) databank.}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{}{WHO (2011) Schistosomiasis: Progress Report 2001-2011 and
+Strategic Plan 2012-2020 (WHO, Geneva}.
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{}{Bockarie MJ, Kelly-Hope LA, Rebollo M, Molyneux DH (2013)
+Preventive chemother- apy as a strategy for elimination of neglected
+tropical parasitic diseases: Endgame challenges. Philos Trans R Soc Lond
+B Biol Sci 368(1623):20120144.}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{}{Gray DJ, et al. (2010) Schistosomiasis elimination: Lessons from
+the past guide the future. Lancet Infect Dis 10(10):733--736}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{}{Fenwick A, Savioli L (2011) Schistosomiasis elimination. Lancet
+Infect Dis 11(5):346, author reply 346--347}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{}{Zhang Z, Jiang Q (2011) Schistosomiasis elimination. Lancet
+Infect Dis 11(5):345, au- thor reply 346--347}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{}{World Health Assembly (2012) Elimination of Schistosomiasis in
+WHA65/2012/REC/1 Sixty-Fifth World Health Assembly: Resolutions and
+Decisions Annexes (WHO, Geneva).}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\newpage  
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Starvation}\label{starvation}
+
+\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4945359/}{Nelson et
+al. 2016 Effects of abnormal temperature and starvation on the internal
+defense system of the schistosome-transmitting snail Biomphalaria
+glabrata}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\href{https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/1365-2656.12195}{Andre´
+Gergs and Tjalling Jager 2014 Body size-mediated starvation resistance
+in an insect predator}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\newpage  
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Molluscicide}\label{molluscicide}
+
+\href{}{Sokolow et al 2018 To Reduce the Global Burden of Human
+Schistosomiasis, Use `Old Fashioned' Snail Control}
+
+\begin{quote}
+Contains table of papers looking at schisto control programs and
+strategies
+\end{quote}
+
+\newpage  
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Immunity}\label{immunity}
+
+\href{https://onlinelibrary.wiley.com/doi/pdf/10.1111/ele.12229}{Cressler
+et al 2014 Disentangling the interaction among host resources, the
+immune system and pathogens}
+
+\begin{quote}
+Notes
+\end{quote}
+
+\newpage  
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Predation}\label{predation}
+
+\href{http://www.pnas.org/content/pnas/early/2015/07/15/1502651112.full.pdf}{Sokolow
+et al 2015 Reduced transmission of human schistosomiasis after
+restoration of a native river prawn that preys on the snail intermediate
+host}
+
+\begin{quote}
+`Reinfection after treatment is a problem that plagues efforts to
+control parasites with complex transmission pathways, such as
+schistosomiasis, which affects at least 220 million people worldwide and
+requires an obligate snail intermediate host.'
+\end{quote}
+
+\begin{quote}
+\end{quote}
+
+\printbibliography
+
+\end{document}
