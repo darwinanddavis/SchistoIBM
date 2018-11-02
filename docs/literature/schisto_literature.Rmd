@@ -12,6 +12,13 @@ linkcolor: blue
 urlcolor: blue
 citecolor: red
 output:
+  html_document:
+    highlight: tango
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    number_sections: no
+    toc_float: yes
   pdf_document:
     includes:
       in_header: # add .tex file with header content
@@ -27,13 +34,6 @@ output:
     citation_package: biblatex # natbib
     latex_engine: xelatex #pdflatex # lualatex
     keep_tex: true # keep .tex file in dir 
-  html_document:
-    highlight: tango
-    code_folding: hide
-    toc: yes
-    toc_depth: 3
-    number_sections: no
-    toc_float: yes
   word_document:
     highlight: tango
     keep_md: yes
@@ -106,7 +106,7 @@ Key literature and areas of research in _Schistosoma_ and host-parasite systems.
 
 ## Notes  
 
-**Using models with schisto**  
+**Models with schisto**  
 
 Aim: To account for time lag in population cycles based on things like resources and size structure  
 
