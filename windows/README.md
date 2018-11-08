@@ -7,7 +7,7 @@
 - IndividualModel_IBM.c  
 - IndividualModel_IBM.dll  
 
-### :one: Download the PDF instructions and follow the steps to load the model onto your Windows system.
+### :one: [Download the PDF instructions](https://github.com/darwinanddavis/SchistoIBM/raw/master/windows/instructions_windows.pdf) and follow the steps to load the model onto your Windows system.
 
 ## Maintainer  
 **Matt Malishev**   
