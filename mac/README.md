@@ -8,7 +8,7 @@
 - IndividualModel_IBM.so
 - IndividualModel_IBM.o
 
-### :one: Download the PDF instructions and follow the steps to load the model onto your Mac OSX system.
+### :one: [Download the PDF instructions](https://github.com/darwinanddavis/SchistoIBM/raw/master/mac/instructions_mac.pdf) and follow the steps to load the model onto your Mac OSX system.
 
 ## Maintainer  
 **Matt Malishev**   
