@@ -37,7 +37,7 @@ Notation follows the standard DEB notation, except in the following aspects:
 - Rates are indicated with '_rate' rather than a dot  
 - '_ee_' is scaled reserve density of hosts in `Netlogo`    
 
-Table 1. Definitions of model parameters for individual hosts and **parasites**. Dimensions and units: -, dimensionless; cm, centimetres.  
+Table 1. Definitions of model parameters for individual hosts and **parasites**. Dimensions and units: -, dimensionless; cm, centimetres; J, Joules; L, length.    
 
 | Parameter | Definition | Dimension<br/>(unit) | Environment |    
 | :---: | :--- | :---: | :--- |    
@@ -55,7 +55,7 @@ Table 1. Definitions of model parameters for individual hosts and **parasites**.
 
 ### Environment  
 
-Table 2. Definitions of model parameters of the simulation model environment. Dimensions and units: N, number; L, length.  
+Table 2. Definitions of model parameters of the simulation model environment. Dimensions and units: N, number.    
 
 | Parameter | Definition | Dimension<br/>(unit) | Environment |    
 | :---: | :--- | :---: | :--- |  
