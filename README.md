@@ -30,6 +30,47 @@ Download the instructions for your operating system
 [*Windows*](https://github.com/darwinanddavis/SchistoIBM/tree/master/windows)  
 [*Mac OSX*](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac)  
 
+## Parameters and variables   
+
+### Individual 
+Notation follows the standard DEB notation, except in the following aspects:  
+- Rates are indicated with '_rate' rather than a dot  
+- 'ee' is scaled reserve density of hosts in `Netlogo`    
+
+Table 1. Definitions of model parameters for individual hosts and **parasites**. Dimensions and units: cm, centimetres.  
+
+| Parameter | Definition | Dimension<br/>(unit) | Environment |    
+| :---: | :--- | :---: | :--- |    
+| _L_ | structural length | cm | `NetLogo` |      
+| _ee_ | scaled reserve density | J (cm <sup>3</sup> ) | `NetLogo` |  
+| _D_ | host development | --- | `NetLogo` |    
+| _RH_ | energy in reproduction buffer| J | `NetLogo` |  
+
+
+
+             ; 
+           ; 
+  DAM         ; starvation-related damage
+  HAZ         ; starvation-related hazard rate
+  LG          ; cm, physical shell length
+      ; --- Parasite state variables ---
+  P           ; parasite biomass
+  RPP         ; energy in parasite reproduction
+
+ 
+### Environment  
+
+Table 2. Definitions of model parameters of the simulation model environment. Dimensions and units: N, number; L, length.  
+
+| Parameter | Definition | Dimension<br/>(unit) | Environment |    
+| :---: | :--- | :---: | :--- |  
+| _F_ | periphyton (food) density| N | `NetLogo` |      
+| _M_ | total number of miracidia | N | `NetLogo` |  
+| _Z_ | cercarial density | N | `NetLogo` |    
+| _G_ | total number of eggs | N | `NetLogo` |        
+
+
+
 ## :pig: Troubleshooting for running Netlogo from `R` on Mac OSX. See the [Instructions for Mac OSX](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac) page for a detailed breakdown of the troubleshooting steps.  
 :one: [Installing compiler toolchain for Mac OSX](https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/)    
 :two: if rJava error, run the following in terminal (src: https://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite and #http://paulklemm.com/blog/2015-02-20-run-rjava-with-rstudio-under-osx-10-dot-10/):    
