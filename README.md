@@ -1,4 +1,4 @@
-# Individual-based Dynamic Energy Budget (DEB) *Schistosoma* model  
+# Individual-based Dynamic Energy Budget *Schistosoma* model (SIDEB)    
 
 ## Matthew Malishev<sup>1*</sup> & David J Civitello<sup>1</sup>   
 
