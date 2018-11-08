@@ -1,6 +1,23 @@
 ## DEB IBM 
 # check bottom of page for diagnostics for running netlogo in rstudio
 
+# version  
+# 6-11-18  
+
+# TO DO
+# find papers on periodicity in resource loads in pops (Nisbet, Gurney, daphnia, etc)
+# E.g. Nisbet Gurney Population dynamics in a periodically varying environment
+# verify what volume of food density is reasonable  (F)
+# - sin wave of resource change 
+# - step function of resources (on/off season) (most unrealistic)   
+# - non-regenerative detritus (event-based)   
+# R = algae supply rate, don't vary K
+
+# heat map of where peaks or resources and peaks of cercariae occur    
+
+# fix days parameter in NL   
+# output NL plots to R 
+
 # --------------- --------------- --------------- ---------------
 # --------------- --------------- --------------- ---------------
 
@@ -25,34 +42,11 @@ test.java <- 0 # 1 = run java diagnostics
 mac <- 1 # 1 = Mac, 0 = Windows
 gui <- 1 # 1 = run Netlogo with a GUI  
 
+# run java test  
 if(test.java==1){
-  # test 1  
-  # test java is working
-  .jinit() 
-  .jnew( "java/awt/Point", 10L, 10L )
-  f <- .jnew("java/awt/Frame","Hello")
-  .jcall(f,"setVisible",TRUE)
-  
-  # test 2
-  component <- .jnull()
-  component <- .jcast(component, new.class = "java/awt/Component")
-  message <- .jnew("java/lang/String","This is a JOptionPane test from rJava.")
-  message <- .jcast(message, new.class = "java/lang/Object")
-  title <- .jnew("java/lang/String","Test")
-  type <- .jnew("java/lang/Integer", as.integer(2))
-  f <- .jnew("javax/swing/JOptionPane")
-  .jcall(f,"showMessageDialog", component, message, title, .jsimplify(type))
-  
-  # test 3
-  .jcall("java/lang/System", "S", "getProperty", "java.vm.version")
-  .jcall("java/lang/System", "S", "getProperty", "java.vm.name")
-  .jcall("java/lang/System", "S", "getProperty", "java.vm.info")
-  .jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
-  .jcall("java/lang/System", "S", "getProperty", "sun.arch.data.model")
-  
-  # test 4
-  .jcall("java/lang/System", "S", "getProperty", "java.awt.headless")
-  Sys.getenv("NOAWT")
+  require(RCurl)
+  script <- getURL("https://raw.githubusercontent.com/darwinanddavis/SchistoIBM/master/mac/java_test.R", ssl.verifypeer = FALSE)
+  eval(parse(text = script))
 }
 
 #### :three: [GCC compiler in R (unconfirmed)](https://stackoverflow.com/questions/1616983/building-r-packages-using-alternate-gcc)
@@ -67,43 +61,43 @@ if(test.java==1){
 
 # if using Mac OSX El Capitan+ and not already in JQR, download and open JGR 
 if(mac==1){
-  # load JGR after downloading 
-  Sys.setenv(NOAWT=1)
-  install.packages("JGR")
+  install.packages('JGR',,'http://www.rforge.net/')
   library(JGR)
-  Sys.unsetenv("NOAWT")
-  JGR() # open JGR
+  JGR::JGR()
 }
 
 # ------------------------------------------------------------------
 # ------------------------- JGR onwards ----------------------------
 # ------------------------------------------------------------------
 
-#### set wd
-mac <- 1
-gui <- 1
-wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/DEB_IBM"
+#### set paths
+
+mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
+gui <- 1 # display the gui? 1 = yes, 0 = no
+pck <- 0 # install rnetlogo and rjava again from source? 1 = yes, 0 = already installed 
+
+wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/DEB_IBM" # set working directory  
+ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
+ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
+nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Netlogo program location
+
+# set model paths
 setwd(wd)
-
-### load Netlogo model  
-installed.packages()["RNetLogo","Version"] # check rnetlogo version  
-installed.packages()["rJava","Version"] # check rnetlogo version  
-
-ver <-"6.0.4" # type in Netlogo version
-nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" ; nl.path # set path to Netlogo program location
-nl.path <- paste0(nl.path,"NetLogo ",ver,"/Java/"); nl.path
-
+nl.model <- list.files(pattern="*.nlogo") # Netlogo model
+nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java/"); nl.path
 model.path <- paste0(wd,"/"); model.path # set path to Netlogo model  
-#nl.model <- "DEB_INF_IBM_almost_working2.nlogo" # name of Netlogo model
-nl.model <- "DEB_INF_GUTS_IBM.nlogo"
-
 
 # if already loaded, uninstall RNetlogo and rJava
-p<-c("rJava", "RNetLogo"); remove.packages(p)
+if(pck==1){
+  p<-c("rJava", "RNetLogo"); remove.packages(p)
+  # then install rJava and RNetLogo from source
+  install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
+  install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
+}
 
-# then install rJava and RNetLogo from source
-install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
-install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
+# check pck versions
+installed.packages()["RNetLogo","Version"] 
+installed.packages()["rJava","Version"]
 
 # check rJava version  
 .jinit()
@@ -119,16 +113,32 @@ if(require(packages)){
 }
 lapply(packages,library,character.only=T)
 
+#####################################################
+# load plot function 
+require(RCurl)
+script <- getURL("https://raw.githubusercontent.com/darwinanddavis/plot_it/master/plot_it.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+
+require(RColorBrewer)
+display.brewer.all()
+# Set global plotting parameters
+cat("plot_it( \n0 for presentation, 1 for manuscript, \nset colour for background, \nset colour palette 1. use 'display.brewer.all()', \nset colour palette 2. use 'display.brewer.all()', \nset alpha for colour transperancy, \nset font style \n)")
+
+plot_it(0,"blue","Spectral","Greens",1,"mono") # set plot function params       
+plot_it_gg("white") # same as above for ggplot   
+#####################################################
+
 ### Install rtools and gcc for using C code and coda package 
 #### https://cran.r-project.org/bin/macosx/tools/
 
+# make below paste function from gcc
 if(mac==1){ #### Mac OSX
   rtools <- "/usr/local/clang6/bin"
-  gcc <- "usr/local/clang6/gcc-4.6.3/bin"
+  gcc <- paste0("usr/local/clang6/gcc-",ver_gcc,"/bin")
   # Mac OSX
   }else{ #### Windows 
   rtools <- "C:\\Rtools\\bin"
-  gcc <- "C:\\Rtools\\gcc-4.6.3\\bin"
+  gcc <- paste0("C:\\Rtools\\gcc-",ver_gcc,"\\bin")
 }
 
 #### point to path on comp to access rtools and gcc for C compiler  
@@ -148,13 +158,15 @@ if(mac==1){
   dyn.load("IndividualModel_IBM.dll") # Load dll (Windows only)
 }
 
-# load DEB starvation model parameters and create mcmc
-#samps = as.mcmc(readRDS("FullStarve_shrink_production2.Rda"))
-#samps = readRDS("FullStarve_shrink_adaptMCMC_original_DAM_run2.Rda")
+# ------------------------------------------------------------------------
+# ------------------------------------------------------------------------
+# ------------------------------------------------------------------------
+# point where windows/mac merge  
 
+# load DEB starvation model parameters and create mcmc
 samps = readRDS("FullStarve_Shrink_adaptMCMC_original_DAM_run2.Rda")
-lpost = samps$log.p
-samps = convert.to.coda(samps)
+lpost = samps$log.p #
+samps = convert.to.coda(samps) # convert mcmc chain to coda format
 samps = cbind(samps, lpost)
 samps <- as.mcmc(samps[, c("iM", "k", "M", "EM", "Fh", "muD", "DR", "fe", "yRP",
                            "ph", "yPE", "iPM", "eh", "mP", "alpha", "yEF", "LM",
@@ -162,7 +174,39 @@ samps <- as.mcmc(samps[, c("iM", "k", "M", "EM", "Fh", "muD", "DR", "fe", "yRP",
                            "sd.LI1", "sd.LU1", "sd.EI1", "sd.EU1", "sd.W1", 
                            "sd.LI2", "sd.LU2", "sd.EI2", "sd.EU2", "sd.W2",
                            "lpost")])
-summary(samps)
+
+### summarise and plot mcmc
+svar <- "M" # select variable 
+sampsvar <- samps[,svar] # pull from mcmc
+summary(sampsvar) # get mean, sd, se, and quantiles for each input variable  
+
+den <- density(sampsvar) # get AUC
+densplot(sampsvar, show.obs = F,type="n") # density estimate of each variable
+polygon(den, col=adjustcolor(colv2,alpha=0.5),border=colv2) # fill AUC 
+
+plot(sampsvar,trace=T,density=T,col=colv) # traceplot (below) and density plot (above)
+# intensive  
+traceplot(sampsvar,smooth=T,type="l",lwd=0.3,xlim=c(0,length(sampsvar)),col=colv[2],xlab=paste0("Iterations"),ylab=paste0("Sampled values"),main=paste0("Sampled values over iterations for ",svar)) # iterations vs sampled valued per variable 
+
+### save plots to PDF
+traceplot <- 0 # include traceplot? intensive!!!
+
+par(mfrow=c(1,1))
+plotlist <- list()
+pdf("plots/mcmc_vars.pdf",onefile = T,paper="a4")
+for(i in colnames(samps)){
+  par(bty="n", las = 1)
+  if(traceplot==1){
+    traceplot(sampsvar,smooth=T,type="l",xlim=c(0,length(sampsvar)),col=colv[2],xlab=paste0("Iterations"),ylab=paste0("Sampled values"),main=paste0("Sampled values over iterations for ",svar)) # iterations vs sampled valued per variable
+  }
+  svar <- i # select variable 
+  sampsvar <- samps[,svar] # pull from mcmc
+  den <- density(sampsvar) # get AUC
+  densplot(sampsvar, show.obs = F,type="n",main=paste0("Density estimate of ",i)) # density estimate of each variable
+  polygon(den, col=adjustcolor(colv,alpha=0.5),border=colv) # fill AUC 
+}  
+dev.off()
+
 
 # get the best fit DEB parameters to match the data (using mcmc)
 pars = as.vector(data.frame(samps)[max(which(data.frame(samps)$lpost >= max(data.frame(samps)$lpost) -0.001)),])
@@ -178,27 +222,30 @@ pars["M_in"] = 10
 pars["K"] = 1
 ######
 
+# solve deb state for each time step 
 DEB = function(step, Food, L, e, D, RH, P, RP, DAM, HAZ, iM, k, M, EM, 
                Fh, muD, DR, yRP, ph, yPE, iPM, eh, mP, alpha, yEF,
                LM, kd, z, kk, hb, theta, mR, yVE, ENV, Lp){
-  
+      # starting conditions 
       initials = c(Food=Food, L=L, e=e, D=D, RH=RH, P=P, RP=RP, DAM=DAM, HAZ=HAZ)
+      # deb parameters
       parameters = c(iM, k, M, EM, Fh, muD, DR, yRP, ph, yPE, iPM,
                      eh, mP, alpha, yEF, LM, kd, z, kk, hb, theta, mR, yVE, ENV, Lp)
-    
+      # estimate starting deb conditions using fitted params by solving ode's   
       DEBstep <- lsoda(initials, c(0,step), func = "derivs", dllname = "IndividualModel_IBM", 
                              initfunc = "initmod",  nout=2, outnames=c("Survival", "LG"), maxsteps=500000,
                              as.numeric(parameters),  rtol=1e-6, atol=1e-6, hmax=1)
       DEBstep[2, 2:12] # 12 = survival
-  
 }
 
+# deb output for each timestep 
 result = DEB(step=1, Food=5, L=10, e=0.9, D=as.numeric(pars["DR"]), RH=0, P=0, RP=0, DAM=0, HAZ=0, iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], 
     Fh=pars["Fh"], muD=pars["muD"], DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
     mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], kk=pars["kk"], hb=pars["hb"],
     theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], ENV=pars["ENV"], Lp=10)
 
 ### Exposure submodel
+# pass the deb state vars into infection model 
 Infection = function(snail.stats, miracidia, parameters){
   # Parameters
   epsilon = as.numeric(parameters["epsilon"])
@@ -251,9 +298,9 @@ geterrmessage() # check if there were any error messages
 
 # working NLStart in RStudio. works with gui=F (2018/09/24)
 if(gui==0){
-  	NLStart(nl.path,gui=F,nl.jarname = paste0("netlogo-",ver,".jar")) # open netlogo without a gui  
+  	NLStart(nl.path,gui=F,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo without a gui  
 	}else{
-	NLStart(nl.path,nl.jarname = paste0("netlogo-",ver,".jar")) # open netlogo
+	NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
 }
 NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model  
 # if java.lang error persists, try copying all .jar files from the 'Java' folder where Netlogo is installed into the main Netlogo folder   	
@@ -261,6 +308,7 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 ################################################################################	
 ######################### start Netlogo sim ####################################
 ################################################################################
+
 NLCommand("setup")
 day = 1
 n.ticks = 100
@@ -326,14 +374,14 @@ Sys.setenv(NOAWT=1)
 Sys.unsetenv("NOAWT") 
 
 # 2. have attempted this with NL v. 5.3.0 and 6.0.4
-ver <-"6.0.4" # type in Netlogo version
+ver_nl <-"6.0.4" # type in Netlogo version
 nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" ; nl.path # set path to Netlogo program location
 
-nl.path <- paste0(nl.path,"NetLogo ",ver,"/"); nl.path # opt 1
-nl.path <- paste0(nl.path,"NetLogo ",ver,"/Java/"); nl.path # opt 2 
-nl.path <- paste0(nl.path,"NetLogo ",ver,"/Java"); nl.path # opt 3 
+nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/"); nl.path # opt 1
+nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java/"); nl.path # opt 2 
+nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java"); nl.path # opt 3 
 
 model.path <- paste0(wd,"/"); model.path # set path to Netlogo model  
 nl.model <- "DEB_INF_IBM_almost_working2.nlogo" # name of Netlogo model
-NLStart(nl.path,nl.jarname = paste0("netlogo-",ver,".jar")) # open netlogo
+NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
 
