@@ -69,12 +69,16 @@ if(mac==1){
 # ------------------------------------------------------------------
 # ------------------------- JGR onwards ----------------------------
 # ------------------------------------------------------------------
+# isolate sensitive data:
+# "FullStarve_Shrink_adaptMCMC_original_DAM_run2.Rda"
+seninf <- 1 # 1 = keep files local; 0 = make files public  
+if(seninf==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
 
 #### set paths
 
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 1 # display the gui? 1 = yes, 0 = no
-pck <- 0 # install rnetlogo and rjava again from source? 1 = yes, 0 = already installed 
+pck <- 1 # install rnetlogo and rjava again from source? 1 = yes, 0 = already installed 
 
 wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/DEB_IBM" # set working directory  
 ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
@@ -164,7 +168,7 @@ if(mac==1){
 # point where windows/mac merge  
 
 # load DEB starvation model parameters and create mcmc
-samps = readRDS("FullStarve_Shrink_adaptMCMC_original_DAM_run2.Rda")
+samps = readRDS(paste0(pp,"FullStarve_Shrink_adaptMCMC_original_DAM_run2.Rda"))
 lpost = samps$log.p #
 samps = convert.to.coda(samps) # convert mcmc chain to coda format
 samps = cbind(samps, lpost)
@@ -182,7 +186,7 @@ summary(sampsvar) # get mean, sd, se, and quantiles for each input variable
 
 den <- density(sampsvar) # get AUC
 densplot(sampsvar, show.obs = F,type="n") # density estimate of each variable
-polygon(den, col=adjustcolor(colv2,alpha=0.5),border=colv2) # fill AUC 
+polygon(den, col=adjustcolor(colv,alpha=0.5),border=colv) # fill AUC 
 
 plot(sampsvar,trace=T,density=T,col=colv) # traceplot (below) and density plot (above)
 # intensive  
@@ -311,7 +315,7 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 
 NLCommand("setup")
 day = 1
-n.ticks = 100
+n.ticks = 50
 Env_G = numeric()
 for(t in 1:n.ticks){
   snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ","LG"), "snails")
