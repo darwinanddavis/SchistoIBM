@@ -38,7 +38,7 @@
 # java troubleshooting. tests are sequential. 
 # https://stackoverflow.com/questions/14915898/rnetlogo-function-nlstart-fails-to-launch-gui
 
-test.java <- 0 # 1 = run java diagnostics  
+test.java <- 1 # 1 = run java diagnostics  
 mac <- 1 # 1 = Mac, 0 = Windows
 gui <- 1 # 1 = run Netlogo with a GUI  
 
@@ -78,7 +78,7 @@ if(seninf==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/Schist
 
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 1 # display the gui? 1 = yes, 0 = no
-pck <- 1 # install rnetlogo and rjava again from source? 1 = yes, 0 = already installed 
+pck <- 1 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
 
 wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set working directory  
 ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
@@ -109,7 +109,7 @@ installed.packages()["rJava","Version"]
 # get latest Java/Oracle version: https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html  
 
 ### install relevant packages   
-packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC")
+packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","ggplot2")
 
 if(require(packages)){
   install.packages(packages,dependencies = T)

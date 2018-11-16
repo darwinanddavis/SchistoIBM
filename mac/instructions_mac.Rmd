@@ -47,7 +47,7 @@ tags:
 - nothing
 - nothingness
 params: 
-  dir: "/Users/malishev/Documents/Emory/research/schisto_ibm/DEB_IBM/docs/DEB_IBM_readme"
+  dir: "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM/mac"
   date: !r Sys.Date()
   session: !r sessionInfo()  
   version: !r getRversion()

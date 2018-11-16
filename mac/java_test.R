@@ -2,7 +2,7 @@
 # Tests are sequential (from https://stackoverflow.com/questions/14915898/rnetlogo-function-nlstart-fails-to-launch-gui).
 
 # test 1
-
+install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
 .jinit()
 .jnew( "java/awt/Point", 10L, 10L )
 f <- .jnew("java/awt/Frame","Hello")
