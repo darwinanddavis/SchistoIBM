@@ -80,7 +80,7 @@ mac <- 1 # mac or windows system? 1 = mac, 0 = windows
 gui <- 1 # display the gui? 1 = yes, 0 = no
 pck <- 1 # install rnetlogo and rjava again from source? 1 = yes, 0 = already installed 
 
-wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/DEB_IBM" # set working directory  
+wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set working directory  
 ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
 ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
 nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Netlogo program location

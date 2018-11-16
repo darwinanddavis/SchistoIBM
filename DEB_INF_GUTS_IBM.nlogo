@@ -32,6 +32,7 @@ patches-own[
 ; the notation follows the DEBtool-notation as far as possible
 ; deviation: rates are indicated with "_rate" rather than a dot
 ; each individual(turtle) in the model has the following parameters
+
 snails-own[
   ; - - - - - - - - - - - - - - - STATE VARIABLES - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       ; --- Host state variables ---
@@ -157,6 +158,12 @@ to do-plots
 ;
 ;    set-current-plot "parasite distribution"
 ;  histogram [d_CERCS * timestep] of snails with [d_CERCS > 0]
+
+  set-current-plot "parasite biomass"
+  set-plot-pen-interval 1
+  ifelse any? snails with [P  > 0] [plot count snails with [P  > 0]]
+  [plot 0]
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -332,6 +339,24 @@ false
 "" ""
 PENS
 "default" 0.1 1 -16777216 true "" ""
+
+PLOT
+851
+322
+1051
+472
+parasite biomass
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"parasites" 1.0 0 -16777216 true ";set-plot-y-range 0 10000 + 5" ""
 
 @#$#@#$#@
 # Model Overview  
