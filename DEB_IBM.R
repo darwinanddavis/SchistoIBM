@@ -2,7 +2,8 @@
 # check bottom of page for diagnostics for running netlogo in rstudio
 
 # version  
-# 6-11-18  
+# 19-11-18  
+# added  "DEB_INF_GUTS_IBM_1.1.nlogo" as test model    
 
 # TO DO
 # find papers on periodicity in resource loads in pops (Nisbet, Gurney, daphnia, etc)
@@ -78,7 +79,7 @@ if(seninf==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/Schist
 
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 1 # display the gui? 1 = yes, 0 = no
-pck <- 1 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
+pck <- 0 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
 
 wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set working directory  
 ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
@@ -87,7 +88,7 @@ nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Net
 
 # set model paths
 setwd(wd)
-nl.model <- list.files(pattern="*.nlogo") # Netlogo model
+nl.model <- list.files(pattern="*.nlogo")[1] # Netlogo model
 nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java/"); nl.path
 model.path <- paste0(wd,"/"); model.path # set path to Netlogo model  
 
@@ -179,7 +180,7 @@ samps <- as.mcmc(samps[, c("iM", "k", "M", "EM", "Fh", "muD", "DR", "fe", "yRP",
                            "sd.LI2", "sd.LU2", "sd.EI2", "sd.EU2", "sd.W2",
                            "lpost")])
 
-### summarise and plot mcmc
+### summarise and plot estimated params
 svar <- "M" # select variable 
 sampsvar <- samps[,svar] # pull from mcmc
 summary(sampsvar) # get mean, sd, se, and quantiles for each input variable  
@@ -197,7 +198,7 @@ traceplot <- 0 # include traceplot? intensive!!!
 
 par(mfrow=c(1,1))
 plotlist <- list()
-pdf("plots/mcmc_vars.pdf",onefile = T,paper="a4")
+pdf("mcmc_vars.pdf",onefile = T,paper="a4")
 for(i in colnames(samps)){
   par(bty="n", las = 1)
   if(traceplot==1){
