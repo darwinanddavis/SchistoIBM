@@ -49,8 +49,8 @@ Table 1. Definitions of model parameters for individual hosts and **parasites**.
 | _HAZ_ | starvation-related hazard rate | ?? | `NetLogo` |  
 | _LG_ |  shell length | L (cm) | `NetLogo` |  
 | age |  age of egg (hatches at 7 days) | t (days) | `NetLogo` |  
-| **_P_** |  parasite biomass | cm<sup>3</sup> | `NetLogo` |    
-| **_RPP_** |  energy in parasite reproduction | J | `NetLogo` |    
+| **_P_** |  **parasite biomass** | **cm<sup>3</sup>** | **`NetLogo`** |    
+| **_RPP_** |  **energy in parasite reproduction** | **J** | **`NetLogo`** |    
 
 
 ### Environment  

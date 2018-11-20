@@ -16,6 +16,7 @@ globals[
   ;e0    ; t L^2, initial reserves of the embryos at the start of the simulation
   L_0      ; cm, initial structural volume
 
+
 ]
 ; ------------------------------------------------------------------------------------------------------------------------------------------
 ; parameters for the environment: here only prey density
@@ -99,6 +100,7 @@ end
 
 to go
   ask snails [am-I-dead]
+  update-resources
   do-plots
   tick
 end

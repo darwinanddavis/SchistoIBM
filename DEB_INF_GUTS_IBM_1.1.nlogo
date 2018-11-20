@@ -15,6 +15,7 @@ breed [eggs egg]
 globals[
   ;e0    ; t L^2, initial reserves of the embryos at the start of the simulation
   L_0      ; cm, initial structural volume
+  resources ; type of dynamics food in the environment follows
 
 ]
 ; ------------------------------------------------------------------------------------------------------------------------------------------
@@ -99,10 +100,26 @@ end
 
 to go
   ask snails [am-I-dead]
-   do-plots
-   tick
+  update-resources
+  do-plots
+  tick
 end
 
+; ------------------------------------------------------------------------------------------------------------------------------------------
+; ----------------- UPDATE-RESOURCES -------------------------------------------------------------------------------------------------------
+; ------------------------------------------------------------------------------------------------------------------------------------------
+; ######### R #########
+; calculate changes in food based on either cyclical or event-based dynamics
+
+to update-resources
+  if resources = "cyclical"
+  [
+    ;set d_X (r_X) * X * (1 - (X / K_X))   - sum [ S_A * J_XAm_rate   ] of turtles-here / volume
+    ]
+
+  if resources = "event-based"
+  []
+end
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------
 ; ----------------- PLOT -------------------------------------------------------------------------------------------------------------------
@@ -167,13 +184,13 @@ to do-plots
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
--2
-11
-31
-45
--1
--1
-25.0
+1017
+10
+1262
+206
+0
+0
+165.0
 1
 10
 1
@@ -228,10 +245,10 @@ NIL
 1
 
 PLOT
-102
-10
-731
-160
+248
+11
+877
+161
 stage class density
 time
 density
@@ -249,10 +266,10 @@ PENS
 "infected" 1.0 0 -2674135 true "" ""
 
 PLOT
-219
-324
-419
-474
+365
+325
+565
+475
 shrinkage distribution
 size
 frequency
@@ -267,10 +284,10 @@ PENS
 "default" 1.0 1 -7500403 true "" ""
 
 PLOT
-431
-322
-631
-472
+577
+323
+777
+473
 juv e distribution
 NIL
 NIL
@@ -285,10 +302,10 @@ PENS
 "default" 0.1 1 -16777216 true "" ""
 
 PLOT
-642
-325
-842
-475
+788
+326
+988
+476
 adult e distribution
 NIL
 NIL
@@ -303,10 +320,10 @@ PENS
 "default" 0.1 1 -16777216 true "" ""
 
 PLOT
-100
-165
-752
-315
+246
+166
+898
+316
 Environment
 NIL
 NIL
@@ -323,10 +340,10 @@ PENS
 "cercariae" 1.0 0 -2674135 true "" ""
 
 PLOT
-12
-323
-212
-473
+158
+324
+358
+474
 parasite distribution
 NIL
 NIL
@@ -341,10 +358,10 @@ PENS
 "default" 0.1 1 -16777216 true "" ""
 
 PLOT
-851
-322
-1051
-472
+997
+323
+1197
+473
 parasite biomass
 NIL
 NIL
@@ -359,9 +376,14 @@ PENS
 "parasites" 1.0 0 -16777216 true ";set-plot-y-range 0 10000 + 5" ""
 
 @#$#@#$#@
-# Model Overview  
+# Model Overview
 
-## For the full model description, instructions, and troubleshooting, go to https://github.com/darwinanddavis/SchistoIBM.  
+## For the full model description, instructions, and troubleshooting, go to https://github.com/darwinanddavis/SchistoIBM.
+
+# Updates
+
+### 10-11-18
+> added `resources` global -- cyclic or event-based
 @#$#@#$#@
 default
 true
@@ -667,8 +689,9 @@ false
 0
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
+
 @#$#@#$#@
-NetLogo 6.0.4
+NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -684,6 +707,7 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
+
 @#$#@#$#@
 0
 @#$#@#$#@
