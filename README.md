@@ -10,7 +10,7 @@
 
 Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalaria spp.* snail host population interactions based on dynamic energy budget (DEB) and transmission model. Model outlines how resource use by a size-structured host population influences population cycles of hosts and parasites. Host and parasite ecology and energetics are captured using a mechanistic energy budget model and interactions among hosts and parasites are captured by a disease tranmission model. Resource use by hosts and thus parasites is captured by the IBM.       
 
-Files:  
+*Files:*      
 
 .R    
 .html    
@@ -21,7 +21,7 @@ Files:
 .so  
 .sh  
 
-Updates:  
+*Updates:*      
 
 For `NetLogo` version updates, see the Info tab within the `NetLogo` file 'DEB_INF_GUTS_IBM.nlogo'.  
 For `R` version updates, see the header within the `R` file 'DEB_IBM.R'.        
@@ -32,8 +32,8 @@ For `R` version updates, see the header within the `R` file 'DEB_IBM.R'.
 
 Download the instructions for your operating system  
 
-[*Windows*](https://github.com/darwinanddavis/SchistoIBM/tree/master/windows)  
-[*Mac OSX*](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac)  
+[**Windows**](https://github.com/darwinanddavis/SchistoIBM/tree/master/windows)  
+[**Mac OSX**](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac)  
 
 ## Parameters and variables   
 
@@ -77,7 +77,7 @@ Table 2. Definitions of model parameters of the simulation model environment. Di
 ``` {bash}
 sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib 
 ```  
-:three: For running java tests for Mac OSX, see the [*Instructions for Mac OSX*](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac) documentation.     
+:three: For running java tests for Mac OSX, see the [**Instructions for Mac OSX**](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac) documentation.     
 
 ## References  
 [Civitello, D. J., Fatima, H. , Johnson, L. R., Nisbet, R. M., Rohr, J. R. and Ben‐Ami, F. (2018) Bioenergetic theory predicts infection dynamics of human schistosomes in intermediate host snails across ecological gradients. Ecol Lett, 21: 692-701](https://onlinelibrary.wiley.com/doi/abs/10.1111/ele.12937)  

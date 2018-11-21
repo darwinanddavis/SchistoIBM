@@ -6,6 +6,9 @@
 # added  "DEB_INF_GUTS_IBM_1.1.nlogo" as test model    
 
 # TO DO
+# define 
+	# - starvation-related hazard rate
+	# - 
 # find papers on periodicity in resource loads in pops (Nisbet, Gurney, daphnia, etc)
 # E.g. Nisbet Gurney Population dynamics in a periodically varying environment
 # verify what volume of food density is reasonable  (F)
@@ -67,11 +70,12 @@ seninf <- 1 # 1 = keep files local; 0 = make files public
 if(seninf==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
 
 #### set paths
-
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 1 # display the gui? 1 = yes, 0 = no
 pck <- 0 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
+save_to_file <- 0 # 1 = save plots to local dir, 0 = plot in current R session
 
+# set dir paths  
 wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set working directory  
 ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
 ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
@@ -90,6 +94,7 @@ if(pck==1){
   install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
   install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
 }
+library(rJava); library(RNetLogo) 
 
 # check pck versions
 installed.packages()["RNetLogo","Version"] 
@@ -187,22 +192,23 @@ traceplot(sampsvar,smooth=T,type="l",lwd=0.3,xlim=c(0,length(sampsvar)),col=colv
 ### save plots to PDF
 traceplot <- 0 # include traceplot? intensive!!!
 
-par(mfrow=c(1,1))
-plotlist <- list()
-pdf("mcmc_vars.pdf",onefile = T,paper="a4")
-for(i in colnames(samps)){
-  par(bty="n", las = 1)
-  if(traceplot==1){
-    traceplot(sampsvar,smooth=T,type="l",xlim=c(0,length(sampsvar)),col=colv[2],xlab=paste0("Iterations"),ylab=paste0("Sampled values"),main=paste0("Sampled values over iterations for ",svar)) # iterations vs sampled valued per variable
-  }
-  svar <- i # select variable 
-  sampsvar <- samps[,svar] # pull from mcmc
-  den <- density(sampsvar) # get AUC
-  densplot(sampsvar, show.obs = F,type="n",main=paste0("Density estimate of ",i)) # density estimate of each variable
-  polygon(den, col=adjustcolor(colv,alpha=0.5),border=colv) # fill AUC 
+if(save_to_file==1){
+	par(mfrow=c(1,1))
+	plotlist <- list()
+	pdf("mcmc_vars.pdf",onefile = T,paper="a4")
+	for(i in colnames(samps)){
+		par(bty="n", las = 1)
+		if(traceplot==1){
+		traceplot(sampsvar,smooth=T,type="l",xlim=c(0,length(sampsvar)),col=colv[2],xlab=paste0("Iterations"),ylab=paste0("Sampled values"),main=paste0("Sampled values over iterations for ",svar)) # iterations vs sampled valued per variable
+		}
+	svar <- i # select variable 
+	sampsvar <- samps[,svar] # pull from mcmc
+	den <- density(sampsvar) # get AUC
+	densplot(sampsvar, show.obs = F,type="n",main=paste0("Density estimate of ",i)) # density estimate of each variable
+	polygon(den, col=adjustcolor(colv,alpha=0.5),border=colv) # fill AUC 
 }  
 dev.off()
-
+}
 
 # get the best fit DEB parameters to match the data (using mcmc)
 pars = as.vector(data.frame(samps)[max(which(data.frame(samps)$lpost >= max(data.frame(samps)$lpost) -0.001)),])
@@ -219,6 +225,7 @@ pars["K"] = 1
 ######
 
 # solve deb state for each time step 
+cat("DEB\nFood=food\nL = length \n")
 DEB = function(step, Food, L, e, D, RH, P, RP, DAM, HAZ, iM, k, M, EM, 
                Fh, muD, DR, yRP, ph, yPE, iPM, eh, mP, alpha, yEF,
                LM, kd, z, kk, hb, theta, mR, yVE, ENV, Lp){
@@ -305,6 +312,16 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 ######################### start Netlogo sim ####################################
 ################################################################################
 
+# set type of resource dynamics  
+set_resources<-function(resources){ # set movement strategy 
+  if (resources == "cyclical"){
+    NLCommand("set resources \"cyclical\" ") 
+  }else{
+    NLCommand("set resources \"event\" ") 
+  }
+}
+set_resources("cyclical") # "cyclical" or "event"
+
 NLCommand("setup")
 day = 1
 n.ticks = 50
@@ -326,16 +343,16 @@ for(t in 1:n.ticks){
                                           mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
                                           kk=pars["kk"], hb=pars["hb"], theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], ENV=pars["ENV"])))
   
-  L = snail.update[,"L"]
-  e = snail.update[,"e"]
-  D = snail.update[,"D"]
-  RH = snail.update[,"RH"]
-  P = snail.update[,"P"]
-  RP = snail.update[,"RP"]
-  DAM = snail.update[,"DAM"]
-  HAZ = snail.update[,"HAZ"]
-  LG = snail.update[,"LG"]
-  ingestion = sum(environment[1] - snail.update[,"Food"])
+  L = snail.update[,"L"] # host structural length
+  e = snail.update[,"e"] # host scaled reserve density    
+  D = snail.update[,"D"] # host development 
+  RH = snail.update[,"RH"] # host energy to reproduction buffer  
+  DAM = snail.update[,"DAM"] # host damage from starvation  
+  HAZ = snail.update[,"HAZ"] # host hazard rate from starvation   
+  LG = snail.update[,"LG"] # host shell length  
+  P = snail.update[,"P"] # parasite mass (sum within host)
+  RP = snail.update[,"RP"] # parasite reproductive buffer  
+  ingestion = sum(environment[1] - snail.update[,"Food"]) # food intake by host from environment 
   
   Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released
   RH = RH %% 0.015        # Remove released cercariae from the buffer
