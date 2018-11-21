@@ -15,7 +15,7 @@ breed [eggs egg]
 globals[
   ;e0    ; t L^2, initial reserves of the embryos at the start of the simulation
   L_0      ; cm, initial structural volume
-  resources ; type of dynamics food in the environment follows
+  resources ; type of food dynamics in the environment, e.g. cyclical or event-based
 
 ]
 ; ------------------------------------------------------------------------------------------------------------------------------------------

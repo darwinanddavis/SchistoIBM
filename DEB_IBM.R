@@ -30,15 +30,6 @@
 # "IndividualModel_IBM.o" # Mac OSX. generated from C  
 # "IndividualModel_IBM.dll" # Windows. generated from C  
 
-### Troubleshooting  
-#### :one: [Installing compiler toolchain for Mac OSX](https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/)  
-#### :two: if rJava error, run the following in terminal (src: https://stackoverflow.com/questions/30738974/rjava-load-error-in-rstudio-r-after-upgrading-to-osx-yosemite)
-  ##### and #http://paulklemm.com/blog/2015-02-20-run-rjava-with-rstudio-under-osx-10-dot-10/
-  ##### sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib 
-
-# java troubleshooting. tests are sequential. 
-# https://stackoverflow.com/questions/14915898/rnetlogo-function-nlstart-fails-to-launch-gui
-
 test.java <- 1 # 1 = run java diagnostics  
 mac <- 1 # 1 = Mac, 0 = Windows
 gui <- 1 # 1 = run Netlogo with a GUI  

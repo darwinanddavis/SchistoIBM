@@ -21,6 +21,11 @@ Files:
 .so  
 .sh  
 
+Updates:  
+
+For `NetLogo` version updates, see the Info tab within the `NetLogo` file 'DEB_INF_GUTS_IBM.nlogo'.  
+For `R` version updates, see the header within the `R` file 'DEB_IBM.R'.        
+
 ******  
 
 ## Running the simulation model  
@@ -72,6 +77,7 @@ Table 2. Definitions of model parameters of the simulation model environment. Di
 ``` {bash}
 sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib 
 ```  
+:three: For running java tests for Mac OSX, see the [*Instructions for Mac OSX*](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac) documentation.     
 
 ## References  
 [Civitello, D. J., Fatima, H. , Johnson, L. R., Nisbet, R. M., Rohr, J. R. and Ben‐Ami, F. (2018) Bioenergetic theory predicts infection dynamics of human schistosomes in intermediate host snails across ecological gradients. Ecol Lett, 21: 692-701](https://onlinelibrary.wiley.com/doi/abs/10.1111/ele.12937)  
