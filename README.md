@@ -14,7 +14,7 @@ Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalari
 Hosts incur costs from infection through damage density _\delta_	and cumulative hazard rate _H_.      
 
 **Parasite**  
-The number of free-living miracidia in the environment is based on a probability function (multinomial distribution) of probability of infecting host () .     
+The number of free-living miracidia in the environment is based on a probability function (multinomial distribution) of surviving miracidia, miracidia that successfully infected hosts, and unsuccessful miracidia that died.       
 
 *Files:*      
 
