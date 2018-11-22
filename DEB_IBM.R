@@ -2,13 +2,16 @@
 # check bottom of page for diagnostics for running netlogo in rstudio
 
 # version  
+# 22-11-19 
+# added debfunction.txt for defining params  
+
 # 19-11-18  
 # added  "DEB_INF_GUTS_IBM_1.1.nlogo" as test model    
 
 # TO DO
 # define 
 	# - starvation-related hazard rate
-	# - 
+	# - pars and debfunction
 # find papers on periodicity in resource loads in pops (Nisbet, Gurney, daphnia, etc)
 # E.g. Nisbet Gurney Population dynamics in a periodically varying environment
 # verify what volume of food density is reasonable  (F)
@@ -21,6 +24,10 @@
 
 # fix days parameter in NL   
 # output NL plots to R 
+
+# OUTPUTS
+# survival and shell length results from DEBstep
+# plot of rP vs. P/V (parasite biomass outcome)  
 
 # --------------- --------------- --------------- ---------------
 # --------------- --------------- --------------- ---------------
@@ -211,30 +218,33 @@ dev.off()
 }
 
 # get the best fit DEB parameters to match the data (using mcmc)
+read.csv("pars.txt",header=T,sep="/",fill=T,flush=T,strip.white=T,row.names=NULL)
 pars = as.vector(data.frame(samps)[max(which(data.frame(samps)$lpost >= max(data.frame(samps)$lpost) -0.001)),])
 pars["Fh"] = 0.25
 pars["ENV"] = 500 # Units: L
 pars["r"] = 1   # Units: day-1
 pars["step"] = 1  # Units: day
 pars["epsilon"] = 20 # Units: L host-1, day-1 (Rounded estimate from Civitello and Rohr)
-pars["sigma"] = 0.5
+pars["sigma"] = 0.5 
 pars["m_M"] = 1   # Units: day-1
 pars["m_Z"] = 1   # Units: day-1
 pars["M_in"] = 10
 pars["K"] = 1
 ######
 
-# solve deb state for each time step 
-cat("DEB\nFood=food\nL = length \n")
+## solve deb state for each time step 
+# display list of param definitions
+read.csv("debfunction.txt",header=T,sep="/",fill=T,flush=T,strip.white=T,row.names=NULL)
 DEB = function(step, Food, L, e, D, RH, P, RP, DAM, HAZ, iM, k, M, EM, 
                Fh, muD, DR, yRP, ph, yPE, iPM, eh, mP, alpha, yEF,
                LM, kd, z, kk, hb, theta, mR, yVE, ENV, Lp){
-      # starting conditions 
+  # starting conditions 
       initials = c(Food=Food, L=L, e=e, D=D, RH=RH, P=P, RP=RP, DAM=DAM, HAZ=HAZ)
       # deb parameters
       parameters = c(iM, k, M, EM, Fh, muD, DR, yRP, ph, yPE, iPM,
                      eh, mP, alpha, yEF, LM, kd, z, kk, hb, theta, mR, yVE, ENV, Lp)
-      # estimate starting deb conditions using fitted params by solving ode's   
+      # estimate starting deb conditions using fitted params by solving ode's
+      ## return survival and host shell length  
       DEBstep <- lsoda(initials, c(0,step), func = "derivs", dllname = "IndividualModel_IBM", 
                              initfunc = "initmod",  nout=2, outnames=c("Survival", "LG"), maxsteps=500000,
                              as.numeric(parameters),  rtol=1e-6, atol=1e-6, hmax=1)
@@ -258,18 +268,20 @@ Infection = function(snail.stats, miracidia, parameters){
   step = as.numeric(parameters["step"])
   
   # Later calculations depend on exposure probabilities
-  exp.rates =epsilon/ENV*(snail.stats[,"L"]>0) # This is just to get uniform exposure rates
+  exp.rates = epsilon/ENV*(snail.stats[,"L"]>0) # This is just to get uniform exposure rates
   sum.exp.rates = sum(exp.rates)
   
   # Probabilities for fate of miracidia
-  P.left.in.water = exp(-(m_M+sum(exp.rates))*step)                             # Still in water
-  P.infects.this.snail = (1 - P.left.in.water)*(sigma*exp.rates/(m_M+sum.exp.rates))  # Infect a snail
-  # Die in water or fail to infect
-  P.dead = (1 - P.left.in.water)*(m_M/(m_M+sum.exp.rates)) + sum((1 - P.left.in.water)*((1-sigma)*exp.rates/(m_M+sum.exp.rates)))                      # die
+  ## Still in water
+  P.left.in.water = exp(-(m_M+sum(exp.rates))*step)
+  ## Infect a snail
+  P.infects.this.snail = (1 - P.left.in.water)*(sigma*exp.rates/(m_M+sum.exp.rates)) 
+  ## Die in water or fail to infect
+  P.dead = (1 - P.left.in.water)*(m_M/(m_M+sum.exp.rates)) + sum((1 - P.left.in.water)*((1-sigma)*exp.rates/(m_M+sum.exp.rates)))
   
   prob.vector = c(P.infects.this.snail, P.left.in.water, P.dead)
   
-  # Multinomial outcome
+  # Multinomial outcome from number of miracidia in env based on their survival probability
   rmultinom(n=1, size=miracidia, prob=prob.vector)
   #sum(P.left.in.water, P.invades.this.snail, P.dead)
 }

@@ -1,0 +1,49 @@
+Parameter / Definition
+iM / TEXT
+k / TEXT
+M / TEXT
+EM / TEXT
+Fh / TEXT
+muD / TEXT
+DR / TEXT
+fe / TEXT
+yRP / TEXT
+ph / TEXT
+yPE / TEXT
+iPM / TEXT
+eh / TEXT
+mP / TEXT
+alpha / TEXT
+yEF / TEXT
+LM / TEXT
+kd / TEXT
+z / TEXT
+kk / TEXT
+hb / TEXT
+theta / TEXT
+mR / TEXT
+yVE / TEXT
+yEF2 / TEXT
+sd.LI1 / TEXT
+sd.LU1 / TEXT
+sd.EI1 / TEXT
+sd.EU1 / TEXT
+sd.W1 / TEXT
+sd.LI2 / TEXT
+sd.LU2 / TEXT
+sd.EI2 / TEXT
+sd.EU2 / TEXT
+sd.W2 / TEXT
+lpost / TEXT
+ENV / TEXT
+r / TEXT
+step / time step
+epsilon / TEXT
+sigma / TEXT
+m_M / TEXT
+m_Z / TEXT
+M_in / TEXT
+K / TEXT
+
+
+

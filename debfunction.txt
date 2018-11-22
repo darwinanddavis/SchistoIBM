@@ -1,0 +1,39 @@
+Parameter / Definition
+step / time step 
+Food / food
+L / host structural length
+e / host scaled reserve density 
+D / host development
+RH / host energy to reproduction buffer
+P / parasite mass (sum within host)
+RP / parasite reproductive buffer
+DAM / host damage from starvation
+HAZ / host hazard rate from starvation
+iM / TEXT
+k / TEXT
+M / TEXT
+EM / TEXT
+Fh / TEXT
+muD / TEXT
+DR / TEXT
+yRP / TEXT
+ph / TEXT
+yPE / TEXT
+iPM / TEXT
+eh / TEXT
+mP / TEXT
+alpha / TEXT
+yEF / TEXT
+LM / TEXT
+kd / TEXT
+z / TEXT
+kk / TEXT
+hb / TEXT
+theta / TEXT
+mR / TEXT
+yVE / TEXT
+ENV / TEXT
+Lp / TEXT
+
+
+
