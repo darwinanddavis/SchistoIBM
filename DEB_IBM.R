@@ -2,8 +2,11 @@
 # check bottom of page for diagnostics for running netlogo in rstudio
 
 # version  
+# 23-11-18
+# all user inputs at beginning of doc  
+
 # 22-11-19 
-# added debfunction.txt for defining params  
+# added debfunction.txt and pars.txt for defining params  
 
 # 19-11-18  
 # added  "DEB_INF_GUTS_IBM_1.1.nlogo" as test model    
@@ -41,9 +44,11 @@
 # "IndividualModel_IBM.dll" # Windows. generated from C  
 
 test.java <- 1 # 1 = run java diagnostics  
-mac <- 1 # 1 = Mac, 0 = Windows
-gui <- 1 # 1 = run Netlogo with a GUI  
-
+mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
+gui <- 1 # display the gui? 1 = yes, 0 = no
+pck <- 0 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
+save_to_file <- 0 # 1 = save plots to local dir, 0 = plot in current R session
+ 
 # run java test  
 if(test.java==1){
   require(RCurl)
@@ -71,12 +76,14 @@ if(mac==1){
 # ------------------------------------------------------------------
 # ------------------------- JGR onwards ----------------------------
 # ------------------------------------------------------------------
+
+####################################end  set user inputs ####################################end 
 # isolate sensitive data:
 # "FullStarve_Shrink_adaptMCMC_original_DAM_run2.Rda"
 seninf <- 1 # 1 = keep files local; 0 = make files public  
 if(seninf==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
 
-#### set paths
+# set paths
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 1 # display the gui? 1 = yes, 0 = no
 pck <- 0 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
@@ -87,6 +94,13 @@ wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set wo
 ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
 ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
 nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Netlogo program location
+
+# define starting conditions for simulation model @netlogo  
+set_resources("cyclical") # set resources: "cyclical" or "event"
+n.ticks <- 50 # set number of simulation ticks
+day <- 1 # number of days to run simulation    
+
+####################################end set user inputs ####################################end 
 
 # set model paths
 setwd(wd)
@@ -113,7 +127,7 @@ installed.packages()["rJava","Version"]
 # get latest Java/Oracle version: https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html  
 
 ### install relevant packages   
-packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","ggplot2")
+packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","ggplot2", "RCurl","RColorBrewer")
 
 if(require(packages)){
   install.packages(packages,dependencies = T)
@@ -319,12 +333,8 @@ if(gui==0){
 }
 NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model  
 # if java.lang error persists, try copying all .jar files from the 'Java' folder where Netlogo is installed into the main Netlogo folder   	
-	
-################################################################################	
-######################### start Netlogo sim ####################################
-################################################################################
 
-# set type of resource dynamics  
+# set type of resource dynamics @netlogo
 set_resources<-function(resources){ # set movement strategy 
   if (resources == "cyclical"){
     NLCommand("set resources \"cyclical\" ") 
@@ -332,13 +342,15 @@ set_resources<-function(resources){ # set movement strategy
     NLCommand("set resources \"event\" ") 
   }
 }
-set_resources("cyclical") # "cyclical" or "event"
 
+################################################################################	
+######################### start Netlogo sim ####################################
+################################################################################
+
+# ---------------------------- start sim model ----------------------------
 NLCommand("setup")
-day = 1
-n.ticks = 50
 Env_G = numeric()
-for(t in 1:n.ticks){
+for(t in 1:n.ticks){ # @netlogo
   snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ","LG"), "snails")
   N.snails = length(snail.stats[,"L"])
   environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches"))
@@ -377,10 +389,10 @@ for(t in 1:n.ticks){
   Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"])
   Env_G[day] = max(0, sum(Eggs))
   
-  # define food dynamics
-  NLCommand("set F F") 
+  # define food dynamics @netlogo
+  NLCommand(" ask turtles [set F F]") 
   
-  # Command back to NL
+  # Command back to NL @netlogo
   NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
   snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
   NLCommand(snail.commands)
