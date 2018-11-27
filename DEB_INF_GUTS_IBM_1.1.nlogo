@@ -9,6 +9,9 @@
 ; ==========================================================================================================================================
 breed [snails snail]
 breed [eggs egg]
+;breed [embryo embryos]
+;breed [juvenile juveniles]
+;breed [adult adults]
 
 
 ; global parameters: are accessible for patches and turtles
@@ -77,6 +80,9 @@ to setup
   ;calc-embryo-reserve-investment     ; then the initial energy is calculated for each
  ]
 
+;  create-juvenile count snails with [RH  = 0]
+;  create-adult count snails with [RH > 0]
+
  ask patches [
     set F 1
     set M 0
@@ -119,6 +125,7 @@ to update-resources
 
   if resources = "event-based"
   []
+  ;ask patches [set F F + F / time]
 end
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------
@@ -130,18 +137,24 @@ to do-plots
 ; set-current-plot-pen "embryo"
 ; set-plot-pen-interval 1 / timestep
 ;    ifelse any? eggs  [plot count eggs / volume]
- ;   [plot 0]
-   set-current-plot-pen "juvenile"
-   set-plot-pen-interval 1
+;    [plot 0]
+
+  set-current-plot-pen "juvenile"
+  set-plot-pen-interval 1
   ifelse any? snails with [RH  = 0] [plot count snails with [RH = 0]]
+;  ifelse any? juvenile [plot count juvenile]
   [plot 0]
+
   set-current-plot-pen "adult"
   set-plot-pen-interval 1
   ifelse any? snails with [RH  > 0] [plot count snails with [RH  > 0]]
+  ;  ifelse any? adult [plot count adult]
   [plot 0]
-    set-current-plot-pen "infected"
+
+  set-current-plot-pen "infected"
   set-plot-pen-interval 1
   ifelse any? snails with [RPP  > 0] [plot count snails with [RPP  > 0]]
+  ;  ifelse any? infected [plot count infected]
   [plot 0]
 
 
@@ -177,19 +190,19 @@ to do-plots
 ;  histogram [d_CERCS * timestep] of snails with [d_CERCS > 0]
 
   set-current-plot "parasite biomass"
-  set-plot-pen-interval 1
-  ifelse any? snails with [P  > 0] [plot count snails with [P  > 0]]
-  [plot 0]
+;  set-plot-pen-interval 1
+;  ifelse any? snails with [P  > 0] [plot count snails with [P  > 0]]
+;  [plot 0]
 
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
 1017
 10
-1262
-206
-0
-0
+1190
+184
+-1
+-1
 165.0
 1
 10
@@ -375,6 +388,39 @@ false
 PENS
 "parasites" 1.0 0 -16777216 true ";set-plot-y-range 0 10000 + 5" ""
 
+MONITOR
+881
+12
+948
+57
+Juveniles
+count snails with [RH = 0]
+0
+1
+11
+
+MONITOR
+882
+62
+949
+107
+Adult
+count snails with [RH > 0]
+0
+1
+11
+
+MONITOR
+882
+113
+950
+158
+Infected
+count snails with [RPP  > 0]
+0
+1
+11
+
 @#$#@#$#@
 # Model Overview
 
@@ -382,8 +428,12 @@ PENS
 
 # Updates
 
+### 26-11-18
+> added embryo, juvenile, and adult breeds as temporary globals  
+> added juvenile, adult, and infected counters to interface  
+
 ### 10-11-18
-> added `resources` global -- cyclic or event-based
+> added `resources` global -- cyclic or event-based  
 @#$#@#$#@
 default
 true
@@ -689,9 +739,8 @@ false
 0
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
-
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -707,7 +756,6 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
-
 @#$#@#$#@
 0
 @#$#@#$#@

@@ -2,6 +2,11 @@
 # check bottom of page for diagnostics for running netlogo in rstudio
 
 # version  
+
+# 27-11-18
+# list to check if 'create snails' command isn't producing NAs from Env_G
+# set pop density outputs in NL loop to integer to pass into Env_G and rbinom func
+
 # 23-11-18
 # all user inputs at beginning of doc  
 
@@ -96,7 +101,7 @@ ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if un
 nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Netlogo program location
 
 # define starting conditions for simulation model @netlogo  
-set_resources("cyclical") # set resources: "cyclical" or "event"
+resources <- "cyclical" # set resources: "cyclical" or "event"
 n.ticks <- 50 # set number of simulation ticks
 day <- 1 # number of days to run simulation    
 
@@ -335,13 +340,14 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 # if java.lang error persists, try copying all .jar files from the 'Java' folder where Netlogo is installed into the main Netlogo folder   	
 
 # set type of resource dynamics @netlogo
-set_resources<-function(resources){ # set movement strategy 
+set_resources<-function(resources){ # set resource input in env  
   if (resources == "cyclical"){
     NLCommand("set resources \"cyclical\" ") 
   }else{
     NLCommand("set resources \"event\" ") 
   }
 }
+set_resources(resources) # set resources: "cyclical" or "event"  @netlogo
 
 ################################################################################	
 ######################### start Netlogo sim ####################################
@@ -349,7 +355,8 @@ set_resources<-function(resources){ # set movement strategy
 
 # ---------------------------- start sim model ----------------------------
 NLCommand("setup")
-Env_G = numeric()
+Env_G = integer() # make sure Env_G is an integer  
+cs <- list()
 for(t in 1:n.ticks){ # @netlogo
   snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ","LG"), "snails")
   N.snails = length(snail.stats[,"L"])
@@ -378,34 +385,38 @@ for(t in 1:n.ticks){ # @netlogo
   RP = snail.update[,"RP"] # parasite reproductive buffer  
   ingestion = sum(environment[1] - snail.update[,"Food"]) # food intake by host from environment 
   
-  Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released
+  Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
   RH = RH %% 0.015        # Remove released cercariae from the buffer
   Cercs = floor(RP/4e-5)  # Figure out how many (whole) cercs are released
   RP = RP %% 4e-5         # Remove released cercariae from buffer
+ # set pop density outputs to integer to pass into Env_G and rbinom func
+  Eggs = as.integer(Eggs); Cercs = as.integer(Cercs); Env_G = as.integer(Env_G)
   
   # Update environment
   Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion
   Env_M = as.numeric(Infection.step[N.snails + 1] + pars["M_in"])
   Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"])
-  Env_G[day] = max(0, sum(Eggs))
+  Env_G[day] = max(0, sum(Eggs))  
   
   # define food dynamics @netlogo
-  NLCommand(" ask turtles [set F F]") 
+  NLCommand(" ask patches [set F F ]") 
   
   # Command back to NL @netlogo
   NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
   snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
-  NLCommand(snail.commands)
+  NLCommand(snail.commands) 
   if(day > 10){
-    NLCommand("create-snails ", rbinom(n=1, size=Env_G[day - 10], prob=0.5), "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")}
+	 NLCommand("create-snails ", rbinom(n=1, size=Env_G[day - 10], prob=0.5), "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
+}
   NLCommand("go")
-  
+  cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
   day = day + 1
 }
 
-
 NLQuit()
 
+# TS step for rbinom producing NAs 
+NLCommand("create-snails ", rbinom(n=1, size=as.vector(which(!is.na(Env_G)))[day - 10], prob=0.5), "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
 
 ### ---------------------------- Netlogo diagnostics attempted ---------------------------------     
 #25-9-18
