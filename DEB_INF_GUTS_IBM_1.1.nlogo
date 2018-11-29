@@ -19,6 +19,7 @@ globals[
   ;e0    ; t L^2, initial reserves of the embryos at the start of the simulation
   L_0      ; cm, initial structural volume
   resources ; type of food dynamics in the environment, e.g. cyclical or event-based
+  step      ; desired time step of simulations (days)
 
 ]
 ; ------------------------------------------------------------------------------------------------------------------------------------------
@@ -29,6 +30,8 @@ patches-own[
   M        ; # total miracidia
   Z        ; # /L cercarial density
   G        ; # total eggs
+  dF       ; change in food density per patch
+  r        ; rate of food growth
 ]
 ; ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +53,8 @@ snails-own[
       ; --- Parasite state variables ---
   P           ; parasite biomass
   RPP         ; energy in parasite reproduction
+  K           ; half saturation coefficient for food intake
+
 ]
 
 eggs-own[
@@ -64,26 +69,28 @@ eggs-own[
 
 to setup
   clear-all
+  set step 1
 
- create-snails 60                   ; turtles are created in the beginning
- ask  snails  [
-  set L random-float 2 + 4
-  set ee 0.9
-  set D 0
-  set RH 0
-  set P 0
-  set RPP 0
-  set DAM 0
-  set HAZ 0
-  set LG L
+  create-snails 60                   ; turtles are created in the beginning
+  ask  snails  [
+    set L random-float 2 + 4
+    set ee 0.9
+    set D 0
+    set RH 0
+    set P 0
+    set RPP 0
+    set DAM 0
+    set HAZ 0
+    set LG L
+    set K 1
     ;individual-variability  ; first their individual variability in the parameter is set
   ;calc-embryo-reserve-investment     ; then the initial energy is calculated for each
- ]
+  ]
 
 ;  create-juvenile count snails with [RH  = 0]
 ;  create-adult count snails with [RH > 0]
 
- ask patches [
+  ask patches [
     set F 1
     set M 0
     set Z 0
@@ -105,8 +112,10 @@ end
 ; ------------------------------------------------------------------------------------------------------------------------------------------
 
 to go
-  ask snails [am-I-dead]
+  ask snails [
+    am-I-dead
   update-resources
+  ]
   do-plots
   tick
 end
@@ -120,12 +129,14 @@ end
 to update-resources
   if resources = "cyclical"
   [
-    ;set d_X (r_X) * X * (1 - (X / K_X))   - sum [ S_A * J_XAm_rate   ] of turtles-here / volume
+    set dF K * F / (F + (K - F) * exp(- r * step)) - sum(F) ; change in food in environment (Env_F in DEB_IBM.R)
     ]
 
   if resources = "event-based"
-  []
-  ;ask patches [set F F + F / time]
+  [
+  set dF F
+  ]
+  set F F + dF ; change in food density
 end
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------
@@ -427,6 +438,10 @@ count snails with [RPP  > 0]
 ## For the full model description, instructions, and troubleshooting, go to https://github.com/darwinanddavis/SchistoIBM.
 
 # Updates
+
+### 27-11-18  
+> added `dF` parameter to updates changes in `F` in Netlogo environment based on `resources` global parameter
+> added step (global) and K (host) variables 
 
 ### 26-11-18
 > added embryo, juvenile, and adult breeds as temporary globals  

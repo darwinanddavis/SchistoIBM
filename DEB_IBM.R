@@ -103,7 +103,7 @@ nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Net
 
 # define starting conditions for simulation model @netlogo  
 resources <- "cyclical" # set resources: "cyclical" or "event"
-n.ticks <- 50 # set number of simulation ticks
+n.ticks <- 500 # set number of simulation ticks
 day <- 1 # number of days to run simulation  
 cs <- list() # diagnostics list for checking NAs in 'create snails' command  
 
@@ -361,7 +361,7 @@ Env_G = integer() # make sure Env_G is an integer
 for(t in 1:n.ticks){ # @netlogo
   snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ","LG"), "snails")
   N.snails = length(snail.stats[,"L"])
-  environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches"))
+  environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches")) # define patches from NL        
   
   # Infect snails
   Infection.step = as.vector(Infection(snail.stats, environment[2], pars)) # Who gets infected
@@ -402,7 +402,24 @@ for(t in 1:n.ticks){ # @netlogo
   Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
   
   # define food dynamics @netlogo
-  NLCommand(" ask patches [set F F ]") 
+  if(resources == "cyclical"){
+	### overdamped food cycle (from Nisbet et al. 1976)
+	#pars["r"] * pars["step"] > pi/2 # oscillatory food cycle 
+	# undefined params
+	## a 
+	## f
+	## phi
+	## b
+	#pars["r"] <- pars["r"]*(1 + a * cos(2 * pi * f * pars["step"] + phi)) # eq 2 from Nisbet et al. 1976 	
+	#pars["K"] <- pars["K"]*(1 + b * cos * 2 * pi * f * pars["step"])
+	
+	### periodic food dynamics (eq 1a in Abrams2004)
+	# Env_F = I in Abrams2004 
+	Env_F <- Env_F * (1 + sin(2 * pi * pars["step"] / pars["r"])) - ingestion
+	
+	}
+
+  # NLCommand("ask patches [set F F ]") 
   
   # Command back to NL @netlogo
   NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
