@@ -2,6 +2,8 @@
 # check bottom of page for diagnostics for running netlogo in rstudio
 
 # version  
+# 28-11-18
+# added overdamped and periodic food dynamics to nl loop 
 
 # 27-11-18
 # fixed NAs in 'create snails' command (Env_G param)  
