@@ -24,16 +24,6 @@ theta / TEXT
 mR / TEXT
 yVE / TEXT
 yEF2 / TEXT
-sd.LI1 / TEXT
-sd.LU1 / TEXT
-sd.EI1 / TEXT
-sd.EU1 / TEXT
-sd.W1 / TEXT
-sd.LI2 / TEXT
-sd.LU2 / TEXT
-sd.EI2 / TEXT
-sd.EU2 / TEXT
-sd.W2 / TEXT
 lpost / TEXT
 ENV / TEXT
 r / TEXT

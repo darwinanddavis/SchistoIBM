@@ -395,7 +395,7 @@ for(t in 1:n.ticks){ # @netlogo
  # set pop density outputs to integer to pass into Env_G and rbinom func
   Eggs = as.integer(Eggs); Cercs = as.integer(Cercs)
   
-  # Update environment
+  # Update environment 
   Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion
   Env_M = as.numeric(Infection.step[N.snails + 1] + pars["M_in"])
   Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"])
@@ -412,12 +412,16 @@ for(t in 1:n.ticks){ # @netlogo
 	## f
 	## phi
 	## b
-	#pars["r"] <- pars["r"]*(1 + a * cos(2 * pi * f * pars["step"] + phi)) # eq 2 from Nisbet et al. 1976 	
+	# pars["r"] <- pars["r"]*(1 + a * cos(2 * pi * f * pars["step"] + phi)) # eq 2 from Nisbet et al. 1976 	
 	#pars["K"] <- pars["K"]*(1 + b * cos * 2 * pi * f * pars["step"])
 	
 	### periodic food dynamics (eq 1a in Abrams2004)
 	# Env_F = I in Abrams2004 
+	# params to change?
+	# r = Q (variation in resource growth)
+	# gamma (sin * gamma) = resource amplitude 	
 	Env_F <- Env_F * (1 + sin(2 * pi * pars["step"] / pars["r"])) - ingestion
+	r = r0 + gamma * sin * (2 * pi * t/Q) # r0 = mean growth rate. resource growth rate varies from the mean  
 	
 	}
 
