@@ -405,27 +405,11 @@ for(t in 1:n.ticks){ # @netlogo
   
   # define food dynamics @netlogo
   if(resources == "cyclical"){
-	### overdamped food cycle (from Nisbet et al. 1976)
-	#pars["r"] * pars["step"] > pi/2 # oscillatory food cycle 
-	# undefined params
-	## a 
-	## f
-	## phi
-	## b
-	# pars["r"] <- pars["r"]*(1 + a * cos(2 * pi * f * pars["step"] + phi)) # eq 2 from Nisbet et al. 1976 	
-	#pars["K"] <- pars["K"]*(1 + b * cos * 2 * pi * f * pars["step"])
-	
-	### periodic food dynamics (eq 1a in Abrams2004)
-	# Env_F = I in Abrams2004 
-	# params to change?
-	# r = Q (variation in resource growth)
-	# gamma (sin * gamma) = resource amplitude 	
-	Env_F <- Env_F * (1 + sin(2 * pi * pars["step"] / pars["r"])) - ingestion
-	r = r0 + gamma * sin * (2 * pi * t/Q) # r0 = mean growth rate. resource growth rate varies from the mean  
-	
+  # r0 = mean growth rate. resource growth rate varies from the mean  	
+  # alpha = seasonality of resources
+  # P = time period (time range of resource cycles)  
+	Env_F = Env_Fm + alpha * sin * (2 * pi * t/P) 
 	}
-
-  # NLCommand("ask patches [set F F ]") 
   
   # Command back to NL @netlogo
   NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
@@ -440,6 +424,10 @@ for(t in 1:n.ticks){ # @netlogo
 }
 
 NLQuit()
+
+# ----------------------------------- END SIMULATION ------------------------------------------------- 
+# --------------------------------------------------------------------------------------------------- 
+# ---------------------------------------------------------------------------------------------------  
 
 ### ---------------------------- Netlogo diagnostics attempted ---------------------------------     
 # 27-11-18
@@ -464,3 +452,22 @@ model.path <- paste0(wd,"/"); model.path # set path to Netlogo model
 nl.model <- "DEB_INF_IBM_almost_working2.nlogo" # name of Netlogo model
 NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
 
+### ------------------------------- Alternative food dynamics ------------------
+	### periodic food dynamics 
+	# eq 1a in Abrams2004)
+	# Env_F = I in Abrams2004 
+	# params to change?
+	# r = Q (variation in resource growth)
+	# gamma (sin * gamma) = resource amplitude 	
+	### Env_F <- Env_F * (1 + sin(2 * pi * pars["step"] / pars["r"])) - ingestion
+
+	### overdamped food cycle (from Nisbet et al. 1976)
+	#pars["r"] * pars["step"] > pi/2 # oscillatory food cycle 
+	# undefined params
+	## a 
+	## f
+	## phi
+	## b
+	### pars["r"] <- pars["r"]*(1 + a * cos(2 * pi * f * pars["step"] + phi)) # eq 2 from Nisbet et al. 1976 	
+	### pars["K"] <- pars["K"]*(1 + b * cos * 2 * pi * f * pars["step"])
+	
