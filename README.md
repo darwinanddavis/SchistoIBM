@@ -4,14 +4,14 @@
 
 ### _<sup>1</sup> Department of Biology, Emory University, 1510 Clifton Road NE, Atlanta, GA, USA, 30322_    
 
-#### *Corresponding author: matthew.malishev@gmail.com     
+#### *Corresponding author: matthew.malishev [at] gmail.com     
 
 ## Overview    
 
 Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalaria spp.* snail host population interactions based on dynamic energy budget (DEB) and transmission model. The model outlines how resource use by a size-structured host population influences population cycles of hosts and parasites. Host and parasite ecology and energetics are captured using a mechanistic energy budget model and interactions among hosts and parasites are captured by a disease tranmission model. Resource use by hosts and thus parasites is modelled by the IBM.  
 
 **Host**  
-Hosts incur costs from infection through damage density _\delta_	and cumulative hazard rate _H_.      
+Hosts incur costs from infection through damage density \delta and cumulative hazard rate _H_.      
 
 **Parasite**  
 The number of free-living miracidia in the environment is based on a probability function (multinomial distribution) of surviving miracidia, miracidia that successfully infected hosts, and unsuccessful miracidia that died.       
