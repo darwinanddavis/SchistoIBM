@@ -255,7 +255,7 @@ pars["M_in"] = 10
 pars["K"] = 1
 ######
 
-## solve deb state for each time step 
+### -------------------- solve deb state for each time step --------------------
 # display list of param definitions
 read.csv("debfunction.txt",header=T,sep="/",fill=T,flush=T,strip.white=T,row.names=NULL)
 DEB = function(step, Food, L, e, D, RH, P, RP, DAM, HAZ, iM, k, M, EM, 
@@ -405,12 +405,15 @@ for(t in 1:n.ticks){ # @netlogo
   
   # define food dynamics @netlogo
   if(resources == "cyclical"){
-  # r0 = mean growth rate. resource growth rate varies from the mean  	
+  # Env_Fm = mean growth rate. resource growth rate varies from the mean  	
   # alpha = seasonality of resources
   # P = time period (time range of resource cycles)  
-	Env_F = Env_Fm + alpha * sin * (2 * pi * t/P) 
+	alpha <- 1
+	P <- n.ticks / 50
+	Env_F = Env_F + (alpha * sin(2 * pi * t/P)) 
+
 	}
-  
+
   # Command back to NL @netlogo
   NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
   snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
@@ -419,7 +422,7 @@ for(t in 1:n.ticks){ # @netlogo
 	 NLCommand("create-snails ", rbinom(n=1, size=Env_G[day - 10], prob=0.5), "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
 }
   NLCommand("go")
-  cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
+  #cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
   day = day + 1
 }
 

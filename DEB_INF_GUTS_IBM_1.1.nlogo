@@ -129,14 +129,15 @@ end
 to update-resources
   if resources = "cyclical"
   [
-    set dF K * F / (F + (K - F) * exp(- r * step)) - sum(F) ; change in food in environment (Env_F in DEB_IBM.R)
+    ; set dF K * F / (F + (K - F) * exp(- r * step)) - sum(F) ; change in food in environment (Env_F in DEB_IBM.R)
+;    set dF F
     ]
 
   if resources = "event-based"
   [
-  set dF F
+;  set dF F
   ]
-  set F F + dF ; change in food density
+  ;set F F + dF ; change in food density
 end
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------
@@ -431,6 +432,24 @@ count snails with [RPP  > 0]
 0
 1
 11
+
+PLOT
+906
+164
+1106
+314
+Food
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot mean [F] of patches"
 
 @#$#@#$#@
 # Model Overview
