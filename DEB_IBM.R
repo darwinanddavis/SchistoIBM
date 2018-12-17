@@ -1,7 +1,16 @@
 ## DEB IBM 
 # check bottom of page for diagnostics for running netlogo in rstudio
 
-# version  
+# version 
+
+#16-11-18
+# new damage density deb params (IndividualModel_IBM2.c, ILL_shrink_damageA5.Rda)
+# added alpha and periodicity (p) param space to resource dynamics  
+
+# 11-12-18
+# changed overdamped and periodic food dynamics to cyclical resource dynamics
+# fixed cyclical resource dynamics
+
 # 28-11-18
 # added overdamped and periodic food dynamics to nl loop 
 
@@ -20,6 +29,8 @@
 # added  "DEB_INF_GUTS_IBM_1.1.nlogo" as test model    
 
 # TO DO
+# change r and food 
+  # - plot food against r as heatmap
 # define 
 	# - starvation-related hazard rate
 	# - pars and debfunction
@@ -45,8 +56,8 @@
 
 ### Files required  
 # "DEB_INF_GUTS_IBM.nlogo"
-# "FullStarve_shrink_production2.Rda"
-# "IndividualModel_IBM.c"
+# "ILL_shrink_damageA5.Rda"
+# "IndividualModel_IBM2.c"
 # "IndividualModel_IBM.so" # Mac OSX. generated from C
 # "IndividualModel_IBM.o" # Mac OSX. generated from C  
 # "IndividualModel_IBM.dll" # Windows. generated from C  
@@ -87,7 +98,7 @@ if(mac==1){
 
 ####################################end  set user inputs ####################################end 
 # isolate sensitive data:
-# "FullStarve_Shrink_adaptMCMC_original_DAM_run2.Rda"
+# "ILL_shrink_damageA5.Rda"
 seninf <- 1 # 1 = keep files local; 0 = make files public  
 if(seninf==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
 
@@ -103,9 +114,11 @@ ver_nl <-"6.0.4" # type in Netlogo version. found in local dir.
 ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
 nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Netlogo program location
 
-# define starting conditions for simulation model @netlogo  
+# -------------------------------------------- -------------------------------------------- -------------------------------------------- 
+# ------------------------------ define starting conditions for simulation model @netlogo ----------------------------------------------
+# -------------------------------------------- -------------------------------------------- --------------------------------------------  
 resources <- "cyclical" # set resources: "cyclical" or "event"
-n.ticks <- 500 # set number of simulation ticks
+n.ticks <- 150 # set number of simulation ticks
 day <- 1 # number of days to run simulation  
 cs <- list() # diagnostics list for checking NAs in 'create snails' command  
 
@@ -179,14 +192,14 @@ new_path <- new_path[!duplicated(tolower(new_path))]
 Sys.setenv(PATH = paste(new_path, collapse = ";"))
 
 if(mac==1){
-    # dyn.unload("IndividualModel_IBM.so") # unLoad .so (Mac OSX
-    system("R CMD SHLIB IndividualModel_IBM.c") # generates .o and .so files 
-    dyn.load("IndividualModel_IBM.so") # Load .so (Mac OSX)
+    # dyn.unload("IndividualModel_IBM2.so") # unLoad .so (Mac OSX
+    system("R CMD SHLIB IndividualModel_IBM2.c") # generates .o and .so files 
+    dyn.load("IndividualModel_IBM2.so") # Load .so (Mac OSX)
 }else{
   # compile my model from C definition
-  dyn.unload("IndividualModel_IBM.dll") # unload dll (Windows only)
-  system("R CMD SHLIB IndividualModel_IBM.c")
-  dyn.load("IndividualModel_IBM.dll") # Load dll (Windows only)
+  dyn.unload("IndividualModel_IBM2.dll") # unload dll (Windows only)
+  system("R CMD SHLIB IndividualModel_IBM2.c")
+  dyn.load("IndividualModel_IBM2.dll") # Load dll (Windows only)
 }
 
 # ------------------------------------------------------------------------
@@ -194,17 +207,21 @@ if(mac==1){
 # ------------------------------------------------------------------------
 # point where windows/mac merge  
 
-# load DEB starvation model parameters and create mcmc
-samps = readRDS(paste0(pp,"FullStarve_Shrink_adaptMCMC_original_DAM_run2.Rda"))
-lpost = samps$log.p #
-samps = convert.to.coda(samps) # convert mcmc chain to coda format
-samps = cbind(samps, lpost)
+# load DEB starvation model parameters and create mcmc (and convert mcmc chain to coda format)
+samps = readRDS(paste0(pp,"ILL_shrink_damageA5.Rda"))
+# lpost = samps$log.p #
+# samps = convert.to.coda(samps)
+# samps = cbind(samps, lpost)
+# samps <- as.mcmc(samps[, c("iM", "k", "M", "EM", "Fh", "muD", "DR", "fe", "yRP",
+#                            "ph", "yPE", "iPM", "eh", "mP", "alpha", "yEF", "LM",
+#                            "kd", "z", "kk", "hb", "theta", "mR", "yVE", "yEF2",
+#                            "sd.LI1", "sd.LU1", "sd.EI1", "sd.EU1", "sd.W1", 
+#                            "sd.LI2", "sd.LU2", "sd.EI2", "sd.EU2", "sd.W2",
+#                            "lpost")])
 samps <- as.mcmc(samps[, c("iM", "k", "M", "EM", "Fh", "muD", "DR", "fe", "yRP",
                            "ph", "yPE", "iPM", "eh", "mP", "alpha", "yEF", "LM",
                            "kd", "z", "kk", "hb", "theta", "mR", "yVE", "yEF2",
-                           "sd.LI1", "sd.LU1", "sd.EI1", "sd.EU1", "sd.W1", 
-                           "sd.LI2", "sd.LU2", "sd.EI2", "sd.EU2", "sd.W2",
-                           "lpost")])
+                           "sd.L", "sd.E", "sd.W", "lpost")])
 
 ### summarise and plot estimated params
 svar <- "M" # select variable 
@@ -268,7 +285,7 @@ DEB = function(step, Food, L, e, D, RH, P, RP, DAM, HAZ, iM, k, M, EM,
                      eh, mP, alpha, yEF, LM, kd, z, kk, hb, theta, mR, yVE, ENV, Lp)
       # estimate starting deb conditions using fitted params by solving ode's
       ## return survival and host shell length  
-      DEBstep <- lsoda(initials, c(0,step), func = "derivs", dllname = "IndividualModel_IBM", 
+      DEBstep <- lsoda(initials, c(0,step), func = "derivs", dllname = "IndividualModel_IBM2", 
                              initfunc = "initmod",  nout=2, outnames=c("Survival", "LG"), maxsteps=500000,
                              as.numeric(parameters),  rtol=1e-6, atol=1e-6, hmax=1)
       DEBstep[2, 2:12] # 12 = survival
@@ -356,18 +373,38 @@ set_resources(resources) # set resources: "cyclical" or "event"  @netlogo
 ################################################################################	
 ######################### start Netlogo sim ####################################
 ################################################################################
+testrun <-0 # do a quick testrun to see plots
+ ifelse(testrun==1,n.ticks<-5,n.ticks<-100)
+
+#pdf("/Users/malishev/Documents/Emory/research/schisto_ibm/plots/resouce_dynamics_test.pdf",onefile=T,paper="a4")
+
+# cyclical resource param space
+alpha_pars <- seq(0.5,2,0.5) # alphas
+p_pars <- c(2,5,10,20) # ps
+alpha_list <- list()
+p_list <- list()
+env_z_list <- list() # cerc list  
+master <-list() # master plot list for viewing env_Z outputs under diff resources
+
+# define plot window
+graphics.off() 
+plot.matrix <- matrix(c(length(alpha_pars),length(p_pars)))
+par(mfrow=plot.matrix)
+
+for(alpha in alpha_pars){ # loop through alphas 
+	for(p in p_pars){ # loop through periodicity (p)
 
 # ---------------------------- start sim model ----------------------------
 NLCommand("setup")
 Env_G = integer() # make sure Env_G is an integer  
 for(t in 1:n.ticks){ # @netlogo
-  snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ","LG"), "snails")
+  snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
   N.snails = length(snail.stats[,"L"])
-  environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches")) # define patches from NL        
+  environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches"))
   
   # Infect snails
   Infection.step = as.vector(Infection(snail.stats, environment[2], pars)) # Who gets infected
-  snail.stats[which(Infection.step[1:N.snails] > 0),"P"] = snail.stats[which(Infection.step[1:N.snails] > 0),"P"] + 2.85e-5
+  snail.stats[which(Infection.step[1:N.snails] > 0),"P"] = snail.stats[which(Infection.step[1:N.snails] > 0),"P"] + 2.85e-5 # add biomass of one miracidia
   
   # Update DEBS, HAZ=0 so survival probs are calculated for the current day
   snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
@@ -396,23 +433,22 @@ for(t in 1:n.ticks){ # @netlogo
   Eggs = as.integer(Eggs); Cercs = as.integer(Cercs)
   
   # Update environment 
-  Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion
   Env_M = as.numeric(Infection.step[N.snails + 1] + pars["M_in"])
   Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"])
   Env_G = as.integer(Env_G)
   Env_G[day] = max(0, sum(Eggs),na.rm=T)  
   Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
-  
   # define food dynamics @netlogo
   if(resources == "cyclical"){
-  # Env_Fm = mean growth rate. resource growth rate varies from the mean  	
   # alpha = seasonality of resources
-  # P = time period (time range of resource cycles)  
-	alpha <- 1
-	P <- n.ticks / 50
-	Env_F = Env_F + (alpha * sin(2 * pi * t/P)) 
-
-	}
+  # p = time period (time range of resource cycles)  
+  # candidates (a,p): (1,10)
+	alpha <- alpha
+	p <- p
+	#Env_F = Env_F + (alpha * sin(2 * pi * t/p)) # core resource dynamics eq
+	Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * sin(2 * pi * t/p)) - ingestion)) # Analytical soln to logistic - ingestion with core resource dynamics eq
+#	Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion
+	} # end food dynamics  
 
   # Command back to NL @netlogo
   NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
@@ -420,13 +456,52 @@ for(t in 1:n.ticks){ # @netlogo
   NLCommand(snail.commands) 
   if(day > 10){
 	 NLCommand("create-snails ", rbinom(n=1, size=Env_G[day - 10], prob=0.5), "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
-}
+	} # end create snails
   NLCommand("go")
   #cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
-  day = day + 1
-}
+  day = day + 1 
+ if(testrun==1){
+	  env_z_list[t] <- Env_F + p # use to test plot outputs quickly (plots food + p value to show amplitude)  
+	}else{
+		env_z_list[t] <- Env_Z # get cercariae density  
+		} # end testrun
+
+
+} # end p_pars list
+  env_z_list<-as.numeric(env_z_list)
+  master[[length(master)+1]] <- env_z_list # store results in master list
+  # plot outputs 
+  plot(env_z_list,,type="l",las=1,bty="n",ylim=c(0,do.call(max,master)),col=round(do.call(max,master)),
+	main=paste0("amplitude = ",alpha, "; periodicity = ", p),xlab="Days") 
+  text(which(env_z_list==max(env_z_list)),max(env_z_list),paste0("a= ",alpha," \n p= ",p),#col=max(env_z_list),
+  )
+#dev.off()
+	} # ------------------ end p_pars 
+} # --------------------------------- end alphas
+
+
+# plot master 
+for(m in master){
+  plot(m,type="l",las=1,bty="n",ylim=c(0,do.call(max,master)),col=round(max(m)),
+  main=paste0("amplitude = ",alpha, "; periodicity = ", p),xlab="Time",,axis=T,
+  ) 
+  text(which(m==max(m)),max(m),paste0("a= ",alpha," \np= ",p),#col=round(max(m)),
+  )
+  }
+
+# plot master with ggplot 
+y_m <- melt(master);y_m
+require(reshape2);require(ggplot2); require(ggthemes)
+ggplot() +
+  geom_line(data = y_m, aes(x = rep.int(1:n.ticks,max(L1)) , y = value, group = L1,
+	colour=factor(L1)),
+	linetype=y_m$L1) +
+  theme_tufte()
++ # geom_text(x=,y=,label = max(value),check_overlap = TUE)
+
 
 NLQuit()
+
 
 # ----------------------------------- END SIMULATION ------------------------------------------------- 
 # --------------------------------------------------------------------------------------------------- 

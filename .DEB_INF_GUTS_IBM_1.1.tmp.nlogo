@@ -183,7 +183,8 @@ to do-plots
   set-plot-pen-interval 1
   ;ifelse (any? snails with [d_CERCS > 0]) [plot  mean [d_CERCS] of snails with [d_CERCS > 0]] [plot 0] ; [Z] of patches
   plot mean [Z] of patches
-;
+
+
 ;  set-current-plot "population density"
 ;  set-plot-pen-interval 1 / timestep
 ; plot count snails with [D > 0]
@@ -433,23 +434,16 @@ count snails with [RPP  > 0]
 1
 11
 
-PLOT
-906
-164
-1106
-314
-Food
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot mean [F] of patches"
+MONITOR
+901
+168
+1007
+213
+Max food value
+max [F] of patches
+0
+1
+11
 
 @#$#@#$#@
 # Model Overview
