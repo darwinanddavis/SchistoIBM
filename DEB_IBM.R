@@ -4,7 +4,7 @@
 # version 
 
 #16-11-18
-# added resource wave eq 
+# changed resource wave eq to r = r + alpha * pars["r"] * sin(2 * pi * t/p)  
 # new damage density deb params (IndividualModel_IBM2.c, ILL_shrink_damageA5.Rda)
 # added alpha and periodicity (p) param space to resource dynamics  
 
@@ -30,6 +30,10 @@
 # added  "DEB_INF_GUTS_IBM_1.1.nlogo" as test model    
 
 # TO DO
+
+# set netlogo in windows to /app folder and /java for mac
+# remove .o .so and .dll from github 
+
 # change r and food 
   # - plot food against r as heatmap
 # define 
@@ -376,27 +380,27 @@ set_resources(resources) # set resources: "cyclical" or "event"  @netlogo
 ######################### start Netlogo sim ####################################
 ################################################################################
 testrun <-0 # do a quick testrun to see plots
- ifelse(testrun==1,n.ticks<-5,n.ticks<-50)
+ ifelse(testrun==1,n.ticks<-5,n.ticks<-100)
 
 #pdf("/Users/malishev/Documents/Emory/research/schisto_ibm/plots/resouce_dynamics_test.pdf",onefile=T,paper="a4")
 
-# cyclical resource param space
-#alpha_pars <- c(0,0.25,0.5,1) # alphas
-#p_pars <- c(10,20,50,100) # ps
-#alpha_list <- list()
-#p_list <- list()
-#env_z_list <- list() # cerc list  
-#env_f_list <- list() # food list  
-#master <- list() # master list for cerc density (Env_Z) 
-#food_master <- list() # master list for food dynamics (Env_F) 
-#
-# define plot window
-#graphics.off() 
-#plot.matrix <- matrix(c(length(alpha_pars),length(p_pars)))
-#par(mfrow=plot.matrix)
-#
-#for(alpha in alpha_pars){ # loop through alphas 
-#	for(p in p_pars){ # loop through periodicity (p)
+#cyclical resource param space
+alpha_pars <- c(0,0.25,0.5,1) # alphas
+p_pars <- c(10,20,50,100) # ps
+alpha_list <- list()
+p_list <- list()
+env_z_list <- list() # cerc list  
+env_f_list <- list() # food list  
+master <- list() # master list for cerc density (Env_Z) 
+food_master <- list() # master list for food dynamics (Env_F) 
+
+#define plot window
+graphics.off() 
+plot.matrix <- matrix(c(length(alpha_pars),length(p_pars)))
+par(mfrow=plot.matrix)
+
+for(alpha in alpha_pars){ # loop through alphas 
+	for(p in p_pars){ # loop through periodicity (p)
 
 # ---------------------------- start sim model ----------------------------
 NLCommand("setup")
@@ -444,15 +448,16 @@ for(t in 1:n.ticks){ # @netlogo
   Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
   # define food dynamics @netlogo
   if(resources == "cyclical"){
-	#alpha <- alpha # amplitude of resources
-	#p <- p  # periodicity (time range of resource cycles)  
-	# r_t <- alpha * pars["r"] * sin(2 * pi * t/p) 
+	alpha <- alpha # amplitude of resources
+	p <- p  # periodicity (time range of resource cycles)  
+	r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/p) 
 	
 	#Env_F = Env_F + (alpha * sin(2 * pi * t/p)) # core resource dynamics eq
 	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
 	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * sin(2 * pi * t/p)) - ingestion)) # Analytical soln to logistic - ingestion with external resource addition (alphas [1,100])
 	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with resource growth wave (alphas [1,100])
-	Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * pars["r"] * sin(2 * pi * t/p)) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (alphas [0,1])
+	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * pars["r"] * sin(2 * pi * t/p)) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (alphas [0,1])
+	Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (alphas [0,1])
 	} # end food dynamics  
 
   # Command back to NL @netlogo
@@ -482,33 +487,23 @@ for(t in 1:n.ticks){ # @netlogo
   text(which(env_z_list==max(env_z_list)),max(env_z_list),paste0("a= ",alpha," \n p= ",p),#col=max(env_z_list),
   )
 #dev.off()
-#	} # ------------------ end p_pars 
-#} # --------------------------------- end alphas
+	} # ------------------ end p_pars 
+} # --------------------------------- end alphas
 
 
 
-# ----- resource dynamics test
-graphics.off()
-par(mfrow=c(1,3));lplot <- function(...) plot(..., type="l")
+ee<- env_f_list
+plot(ee,type="l",las=1,bty="n")
+abline(h=c(1),lty=2)
 
-RR1<-list();RR2<-list();RR3<-list()
-alpha<-0.8
-p<-10
-r_t <- alpha * pars["r"] * sin(2 * pi * t/p) 
-
-
-for(t in 1:100){
-	r_t <- alpha * pars["r"] * sin(2 * pi * t/p) 
-	# non-cyclical
-	RR1[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
-	# cyclical
-	RR2[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion))
-	# external addition of cyclical 
-	RR3[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + r_t - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (alphas [0,1])
-	lplot(as.numeric(RR1)); lplot(as.numeric(RR2)); lplot(as.numeric(RR3))
-	}
-# --------- end test
-
+for(m in food_master[1:18]){
+	plot(m,type="l",las=1,bty="n",ylim=c(0,do.call(max,master)),col=round(max(m)),
+	#main = bquote("amplitude = " ~ .(alpha_pars[i])))
+	main=paste0("FOOD amplitude = ",alpha, "; periodicity = ", p),xlab="Time",axis=T)		
+	text(which(m==max(m)),max(m),paste0("a= ",alpha," \np= ",p)#col=round(max(m)),
+	)
+	#points(f,type="l",las=1,bty="n",ylim=c(0,do.call(max,food_master)),col=round(max(f)),add=T)
+	}# master  
 
 
 
@@ -529,7 +524,6 @@ for(m in food_master){
 	#points(f,type="l",las=1,bty="n",ylim=c(0,do.call(max,food_master)),col=round(max(f)),add=T)
 	}# master  
 
-
 # plot master with ggplot 
 y_m <- melt(master);y_m
 require(reshape2);require(ggplot2); require(ggthemes)
@@ -539,6 +533,39 @@ ggplot() +
 	linetype=y_m$L1) +
   theme_tufte()
 + # geom_text(x=,y=,label = max(value),check_overlap = TUE)
+
+### plot param space  
+packages <- c("Interpol.T","lubridate","ggExtra","tidyr","ggthemes","ggplot2")
+install.packages(packages,dependencies = T)
+
+# get tbl_df tibble of (ORIGINAL)
+#   stationid   day  hour month  year  temp
+ #1 T0001         1     0 Jan    2004  -1.7
+# 2 T0001         1     1 Jan    2004  -1.8
+# 3 T0001         1     2 Jan    2004  -1.8 
+
+#   Station  alpha  p     r   env_list  density
+#   <fct>     <int> <int> <ord> <dbl> <dbl>
+ #1 T0001      0     10  0.1   cerc  -1.7
+# 2 T0001      0.25  20  0.25  food  -1.8
+# 3 T0001      0.5   50  1     infec -1.8
+
+master <- tbl_df(master)
+
+p <-ggplot(master,aes(day,hour,fill=temp))+
+  geom_tile(color= "white",size=0.1) +
+  scale_fill_viridis(name="Hrly Temps C",option ="magma")
+p <-p + facet_grid(year~month)
+p <-p + scale_y_continuous(trans = "reverse", breaks = unique(df$hour))
+p <-p + scale_x_continuous(breaks =c(1,10,20,31)) 
+p <- p + theme_tufte() + 
+  theme(legend.title=element_text(size=8)) +
+  labs(title= paste("Hourly Temps - Station",statno), x="Day", y="Hour Commencing") +
+  theme(legend.position = "bottom")
+p
+
+
+
 
 # NLQuit()
 
@@ -594,3 +621,26 @@ NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
 
 # insert posthoc titles into plot 
 # https://stackoverflow.com/questions/21333083/how-to-use-an-atomic-vector-as-a-string-for-a-graph-title-in-r
+
+
+# ----- resource dynamics test
+#graphics.off()
+par(mfrow=c(1,3));lplot <- function(...) plot(..., type="l",ylim=c(-1,1))
+
+RR1<-list();RR2<-list();RR3<-list()
+alpha<-0.8
+p<-10
+pars["r"] <- 1
+ingestion <-0
+
+for(t in 1:100){
+	  r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/p) 
+	# non-cyclical
+	RR1[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
+	# cyclical
+	RR2[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion))
+	# external addition of cyclical 
+	RR3[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + r_t - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (alphas [0,1])
+	lplot(as.numeric(RR1)); lplot(as.numeric(RR2)); lplot(as.numeric(RR3))
+	}
+# --------- end test
