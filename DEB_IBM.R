@@ -4,6 +4,9 @@
 # version 
 
 #18-12-18
+# changed p to rho
+# added rgrowth (pars[“r”]) (rg)
+# added master lists for total and infected hosts 
 # changed resource wave eq to r = r + alpha * r * sin(2 * pi * t/rho)  
 
 #16-12-18
