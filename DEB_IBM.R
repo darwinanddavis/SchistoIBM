@@ -2,6 +2,8 @@
 # check bottom of page for diagnostics for running netlogo in rstudio
 
 # version 
+# 20-12-18
+# removed .so .o and .dll files from github and added to .gitignore and sensitive files dir 
 
 #18-12-18
 # changed p to rho
@@ -34,7 +36,7 @@
 # 19-11-18  
 # added  "DEB_INF_GUTS_IBM_1.1.nlogo" as test model    
 
-# TO DO
+###### TO DO ######
 
 # set netlogo in windows to /app folder and /java for mac
 # remove .o .so and .dll from github 
@@ -101,8 +103,8 @@ if(mac==1){
 ####################################  set user inputs ####################################### 
 # isolate sensitive data:
 # "ILL_shrink_damageA5.Rda"
-seninf <- 1 # 1 = keep files local; 0 = make files public  
-if(seninf==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
+sensdata <- 1 # 1 = keep files local; 0 = make files public  
+if(sensdata==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
 
 # set user outputs
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
@@ -391,7 +393,7 @@ for(alpha in alpha_pars){ # loop through alphas
       for(t in 1:n.ticks){ # start nl sim  @netlogo
         snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
         N.snails = length(snail.stats[,"L"])
-        environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches"))
+        environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches")) # calc food, free miracidia, cercariae released, and eggs, per patch
   
         # Infect snails
         Infection.step = as.vector(Infection(snail.stats, environment[2], pars)) # Who gets infected
