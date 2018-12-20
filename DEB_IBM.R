@@ -3,6 +3,7 @@
 
 # version 
 # 20-12-18
+# added host length and parasite biomass to model outputs 
 # removed .so .o and .dll files from github and added to .gitignore and sensitive files dir 
 
 #18-12-18
@@ -131,8 +132,12 @@ deb_compile <- "IndividualModel_IBM2"
 
 ####################################  set model paths #######################################
 setwd(wd)
-nl.model <- list.files(pattern="*.nlogo")[1] # Netlogo model
-nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java/"); nl.path
+nl.model <- list.files(pattern="*.nlogo")[1] ;nl.model # Netlogo model
+if(mac==1){
+  nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java/"); cat("Mac path:",nl.path)
+}else{
+  nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/app/"); cat("Windows path:",nl.path)
+}
 model.path <- paste0(wd,"/"); model.path # set path to Netlogo model  
 
 ####################################  load packages #######################################
@@ -359,21 +364,24 @@ set_resources(resources) # set resources: "cyclical" or "event"  @netlogo
 ################################################################################################
 ####################################  start netlogo sim ######################################## 
 ################################################################################################
-testrun <- 0 # do a quick testrun to see plots
+testrun <- 1 # do a quick testrun to see plots
 
-if(save_to_file==1){pdf(paste0(wd,"plots/master_sim.pdf"),onefile=T,paper="a4")}
+if(save_to_file==1){pdf(paste0(wd,"/master_sim.pdf"),onefile=T,paper="a4")}
 ifelse(testrun==1,n.ticks<-5,n.ticks<-120)
  
 # param space
 alpha_pars <- c(0,0.25,0.5,0.75,1) # alphas
 rho_pars <- c(10,20,50,100) # rhos
 rg_pars <- c(0.1,0.25,1,2) # rs
+Env_G = numeric() # create empty environment vector 
 
 # individual outputs
 cerc_list <- list() # cerc list  
 food_list <- list() # food list  
 host_list <- list() # total host list  
 infec_list <- list() # infected host list  
+hl_list <- list() # host length
+pmass_list <- list() # parasite biomass 
 
 # master outputs
 cerc_master <- list() # master list for cerc density (Env_Z) 
@@ -382,13 +390,13 @@ host_master <- list() # master list for total host pop ()
 infec_master <- list() # master list for infected host pop () 
 
 # define plot window
-plot.matrix <- matrix(c(length(alpha_pars),length(p_pars)))
+plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
 par(mfrow=plot.matrix)
 
 ####################################  start netlogo sim ######################################## 
-for(alpha in alpha_pars){ # loop through alphas 
-	for(rho in rho_pars){ # loop through rhos (periodicity)
-	  for(rg in rg_pars){
+for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
+	for(rho in rho_pars){ # loop through rhos (periodicity of food cycle)
+	  for(rg in rg_pars){ # loop through rgs (food growth rates)
 	    NLCommand("setup")
       for(t in 1:n.ticks){ # start nl sim  @netlogo
         snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
@@ -416,6 +424,8 @@ for(alpha in alpha_pars){ # loop through alphas
         P = snail.update[,"P"] # parasite mass (sum within host)
         RP = snail.update[,"RP"] # parasite reproductive buffer  
         ingestion = sum(environment[1] - snail.update[,"Food"]) # food intake by host from environment 
+        hl_list[t] <- L # get host lengths per model step
+        pmass_list[t] <- P # get parasite mass per model step 
         
         Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
         RH = RH %% 0.015        # Remove released cercariae from the buffer
@@ -457,10 +467,12 @@ for(alpha in alpha_pars){ # loop through alphas
         #cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
         day = day + 1 
         if(testrun==1){
-          cerc_list[t] <- Env_F + p # use to test plot outputs quickly (plots food + p value to show amplitude)  
+          cerc_list[t] <- Env_F + rho # use to test plot outputs quickly (plots food + p value to show amplitude)  
           }else{
             cerc_list[t] <- Env_Z # get cercariae density 
-		        food_list[t] <- Env_F # get food growth  
+		        food_list[t] <- Env_F # get food growth
+		        host_list[t]         # get total host
+		        infec_list[t]         # get infected hosts
 		        } # end testrun
         } # --------------------------------------- end nl sim
 	    # save individual outputs 
@@ -509,8 +521,21 @@ ggplot() +
 	colour=factor(L1)),
 	linetype=y_m$L1) +
   theme_tufte()
-+ # geom_text(x=,y=,label = max(value),check_overlap = TUE)
+# +  geom_text(x=,y=,label = max(value),check_overlap = TUE)
 
+# plot host properties
+par(mfrow=c(1,1))
+# get host length over time 
+plot(as.numeric(L_list),ylim=c(0,10),type="l")
+
+names(snail.stats)
+ss <- L #"L"
+ss <- as.numeric(ss)
+with(snail.stats,plot(who,ss,col=adjustcolor("pink",0.6),pch=20,cex=snail.stats$RPP*10^12,ylim=c(1,10))
+)
+plot(density(snail.stats$RPP))
+
+  
 ### plot param space  
 # get tbl_df tibble of (ORIGINAL)
 #   stationid   day  hour month  year  temp
