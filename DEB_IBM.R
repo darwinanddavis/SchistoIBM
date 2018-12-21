@@ -2,6 +2,12 @@
 # check bottom of page for diagnostics for running netlogo in rstudio
 
 # version 
+
+# 21-12-18
+# added .dll file to Github
+# added adult, juv, and infected host pop that sheds to sim results output
+# fixed install packages section for windows 
+
 # 20-12-18
 # added host length and parasite biomass to model outputs 
 # removed .so .o and .dll files from github and added to .gitignore and sensitive files dir 
@@ -82,6 +88,7 @@
 test.java <- 1 # 1 = run java diagnostics  
 
 # run java test  
+install.packages("RCurl")
 if(test.java==1){
   require(RCurl)
   script <- getURL("https://raw.githubusercontent.com/darwinanddavis/SchistoIBM/master/mac/java_test.R", ssl.verifypeer = FALSE)
@@ -116,11 +123,11 @@ save_to_file <- 0 # 1 = save simulation outputs to local dir, 0 = plot in curren
 mcmcplot <- 0 # 1 = save mcmc plots to dir
 traceplot <- 0 # 1 = include traceplot in mcmc plots? intensive!!!
 
-# set dir paths  
+# set dir paths (for "/" for both Windows and Mac)
 wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set working directory  
 ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
 ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
-nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" # set path to Netlogo program location
+nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs" # set path to Netlogo program location
 
 # define starting conditions for simulation model @netlogo
 n.ticks <- 120 # set number of days to simulate
@@ -133,23 +140,24 @@ deb_compile <- "IndividualModel_IBM2"
 
 ####################################  set model paths #######################################
 setwd(wd)
-nl.model <- list.files(pattern="*.nlogo")[1] ;nl.model # Netlogo model
+nl.model <- list.files(pattern="*.nlogo")[2] ;nl.model # Netlogo model
 if(mac==1){
-  nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java/"); cat("Mac path:",nl.path)
+  nl.path <- paste0(nl.path,"/NetLogo ",ver_nl,"/Java/"); cat("Mac path:",nl.path)
 }else{
-  nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/app/"); cat("Windows path:",nl.path)
+  nl.path <- paste0(nl.path,"/NetLogo ",ver_nl,"/app/"); cat("Windows path:",nl.path)
 }
-model.path <- paste0(wd,"/"); model.path # set path to Netlogo model  
+model.path <- paste0(wd,"/"); model.path # set path to Netlogo model   
 
 ####################################  load packages #######################################
 # if already loaded, uninstall RNetlogo and rJava
 if(pck==1){
   p<-c("rJava", "RNetLogo"); remove.packages(p)
   # then install rJava and RNetLogo from source
-  install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
-  install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
+  if(mac==1){
+    install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
+    install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
+  }
 }
-library(rJava); library(RNetLogo) 
 
 # check pck versions
 installed.packages()["RNetLogo","Version"] 
@@ -161,13 +169,22 @@ installed.packages()["rJava","Version"]
 # get latest Java/Oracle version: https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html  
 
 # install relevant packages   
-packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","ggplot2", "RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","ggplot2","reshape2")
+packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","sp","RNetLogo","ggplot2","RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","reshape2")
 if(require(packages)){
   install.packages(packages,dependencies = T)
-  require(packages)
 }
-lapply(packages,library,character.only=T)
-cs <- list() # diagnostics list for checking NAs in 'create snails' command  
+# load annoying packages manually because they're stubborn 
+if(mac==0){
+  install.packages("RNetLogo")
+  install.packages("RCurl")
+  install.packages("Interpol.T")
+  install.packages("lubridate")
+  install.packages("tidyr")
+  install.packages("ggthemes")
+  install.packages("ggExtra")
+}
+lapply(packages, require, character.only = T)
+cs <- list() # diagnostics list for checking NAs in create snails command  
 
 # load plot function 
 script <- getURL("https://raw.githubusercontent.com/darwinanddavis/plot_it/master/plot_it.R", ssl.verifypeer = FALSE)
@@ -176,7 +193,7 @@ display.brewer.all()
 # Set global plotting parameters
 cat("plot_it( \n0 for presentation, 1 for manuscript, \nset colour for background, \nset colour palette 1. use 'display.brewer.all()', \nset colour palette 2. use 'display.brewer.all()', \nset alpha for colour transperancy, \nset font style \n)")
 plot_it(0,"blue","YlOrRd","Greens",1,"mono") # set plot function params       
-plot_it_gg("white") # same as above for ggplot   
+plot_it_gg("white") # same as above for ggplot     
 
 ################################  compile packages and load files ###################################
 
@@ -205,7 +222,7 @@ if(mac==1){
     dyn.load(paste0(deb_compile,".so")) # Load .so (Mac OSX)
 }else{
   # compile model from C definition
-  dyn.unload(paste0(deb_compile,".dll")) # unload dll (Windows only)
+  #dyn.unload(paste0(deb_compile,".dll")) # unload dll (Windows only)
   system(paste0("R CMD SHLIB ",deb_compile,".c"))
   dyn.load(paste0(deb_compile,".dll"))# Load dll (Windows only)
 }
@@ -348,9 +365,10 @@ if(gui==0){
   NLStart(nl.path,gui=F,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo without a gui  
   }else{
     NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
-    }
+  }
+
 NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model  
-# if java.lang error persists, try copying all .jar files from the 'Java' folder where Netlogo is installed into the main Netlogo folder   	
+# if java.lang error persists on Mac, try copying all .jar files from the 'Java' folder where Netlogo is installed into the main Netlogo folder   	
 
 # set type of resource dynamics @netlogo
 set_resources<-function(resources){ # set resource input in env  
@@ -494,16 +512,17 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
       infec_shed_master[[length(infec_shed_master)+1]] <- infec_shed_list # infected shedding host pop master list
       # plot outputs 
       plot(cerc_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(do.call(max,cerc_master)),
-    	main=paste0("amplitude = ",alpha, "; periodicity = ", rho, "growth rate = ", rg),ylab="Cercariae density",xlab="Days") 
+    	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),ylab="Cercariae density",xlab="Days") 
+      paste0(expression("alpha = ",alpha, "; rho = ", rho, "; r = ", rg)) 
       text(which(cerc_list==max(cerc_list)),max(cerc_list),paste0("a= ",alpha," \n p= ",rho)#,col=max(cerc_list),
            )
-      plot(juv_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,juv_master)),col=round(do.call(max,juv_master)))
       #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
       if(save_to_file==1){dev.off()}
       } # ------------------------------ end rg_pars 
 	  } # --------------------------------------------- end rhos
 } # ----------------------------------------------------------- end alphas
 ####################################  end netlogo sim ######################################## 
+which(cerc_list==max(cerc_list))
 
 ##########################################  plots ############################################ 
 # define plot window
@@ -515,7 +534,7 @@ for(m in cerc_master){
   for(f in food_master){
   	plot(m,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(max(m)),
   	#main = bquote("amplitude = " ~ .(alpha_pars[alpha])))
-  	main=paste0("amplitude = ",alpha, "; periodicity = ", rho),xlab="Time",axis=T)		
+  	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),xlab="Days",axes=T) 		
   	text(which(m==max(m)),max(m),paste0("a= ",alpha," \np= ",rho)#col=round(max(m)),
   	)
   	#points(f,type="l",las=1,bty="n",ylim=c(0,do.call(max,food_master)),col=round(max(f)),add=T)
