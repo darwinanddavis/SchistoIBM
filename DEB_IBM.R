@@ -4,7 +4,6 @@
 # version 
 
 # 21-12-18
-# added .dll file to Github
 # added adult, juv, and infected host pop that sheds to sim results output
 # fixed install packages section for windows 
 
@@ -535,7 +534,7 @@ for(m in cerc_master){
   	plot(m,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(max(m)),
   	#main = bquote("amplitude = " ~ .(alpha_pars[alpha])))
   	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),xlab="Days",axes=T) 		
-  	text(which(m==max(m)),max(m),paste0("a= ",alpha," \np= ",rho)#col=round(max(m)),
+  	text(which(m==max(m)),max(m),paste0("a= ",alpha," \np= ",rho,"\nr=",rg)#col=round(max(m)),
   	)
   	#points(f,type="l",las=1,bty="n",ylim=c(0,do.call(max,food_master)),col=round(max(f)),add=T)
   	} # food master 
