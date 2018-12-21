@@ -39,6 +39,7 @@
 
 ###### TO DO ######
 
+# get ratio of infected hosts and shedding infected hosts     
 # set netlogo in windows to /app folder and /java for mac
 # remove .o .so and .dll from github 
 
@@ -376,18 +377,22 @@ rg_pars <- c(0.1,0.25,1,2) # rs
 Env_G = numeric() # create empty environment vector 
 
 # individual outputs
-cerc_list <- list() # cerc list  
-food_list <- list() # food list  
-host_list <- list() # total host list  
-infec_list <- list() # infected host list  
+cerc_list <- list() # cercariae   
+food_list <- list() # food in env 
+juv_list <- list() # juvenile hosts
+adult_list <- list() # adult hosts 
+infec_list <- list() # infected hosts
+infec_shed_list <- list() # infected shedding hosts
 hl_list <- list() # host length
 pmass_list <- list() # parasite biomass 
 
 # master outputs
 cerc_master <- list() # master list for cerc density (Env_Z) 
 food_master <- list() # master list for food dynamics (Env_F) 
-host_master <- list() # master list for total host pop () 
+juv_master <- list() # master list for total host pop () 
+adult_master <- list() # master list for total host pop () 
 infec_master <- list() # master list for infected host pop () 
+infec_shed_master <- list() # master list for infected shedding host pop
 
 # define plot window
 plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
@@ -440,6 +445,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
         Env_G[day] = max(0, sum(Eggs),na.rm=T)  
         Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
         if(resources == "cyclical"){ # start food dynamics @netlogo
+          #Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
           # F = K(F/F + K) - F * exp(- r + alpha * r * sin(2 * pi * t/rho) * s) - sum(F - uptake) # food growth eq. (19-12-18) 
           # r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/rho) # equilibrium resource dynamics (static)
           pars["r"] <- rg # set resource growth rate 
@@ -447,13 +453,6 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
         	rho <- rho  # periodicity (time range of resource cycles)  
         	rg <- rg # resource growth rate 
       	  rg_t <- rg + alpha * rg * sin(2 * pi * t/rho) # equilibrium resource dynamics (19-12-18)
-      	  
-        	#Env_F = Env_F + (alpha * sin(2 * pi * t/rho)) # core resource dynamics eq
-        	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
-        	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * sin(2 * pi * t/rho)) - ingestion)) # Analytical soln to logistic - ingestion with external resource addition (alphas [1,100])
-        	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with resource growth wave (alphas [1,100])
-        	#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * pars["r"] * sin(2 * pi * t/rho)) - ingestion)) # Analytical soln to logistic - ingestion with external resource addition (alphas [0,1])
-        	# Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (r_t) (alphas [0,1])
         	Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-rg_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (rg_t) (alphas [0,1])
         	} # end food dynamics  
         # Command back to NL @netlogo
@@ -461,7 +460,8 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
         snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
         NLCommand(snail.commands) 
         if(day > 10){
-          NLCommand("create-snails ", rbinom(n=1, size=Env_G[day - 10], prob=0.5), "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
+          create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)
+          NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
           } # end create snails
         NLCommand("go")
         #cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
@@ -469,27 +469,35 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
         if(testrun==1){
           cerc_list[t] <- Env_F + rho # use to test plot outputs quickly (plots food + p value to show amplitude)  
           }else{
+            # results outputs
             cerc_list[t] <- Env_Z # get cercariae density 
 		        food_list[t] <- Env_F # get food growth
-		        host_list[t]         # get total host
-		        infec_list[t]         # get infected hosts
+		        juv_list[t] <- length(which(snail.stats$RH==0)) # get juvenile hosts
+		        adult_list[t] <- length(which(snail.stats$RH>0)) # get juvenile hosts
+		        infec_list[t] <- length(which(snail.stats$P>0)) # get just infected hosts
+		        infec_shed_list[t] <- length(which(snail.stats$RP>0)) # get infected hosts that are shedding
 		        } # end testrun
         } # --------------------------------------- end nl sim
 	    # save individual outputs 
-	    cerc_list<-as.numeric(cerc_list) 
-	    food_list<-as.numeric(food_list)
-      host_list<-as.numeric(host_list)
-      infec_list<-as.numeric(infec_list)
+	    cerc_list <- as.numeric(cerc_list) 
+	    food_list <- as.numeric(food_list)
+	    juv_list <- as.numeric(juv_list)
+	    adult_list <- as.numeric(adult_list)
+      infec_list <- as.numeric(infec_list)
+      infec_shed_list <- as.numeric(infec_shed_list)
       # save master outputs 
       cerc_master[[length(cerc_master)+1]] <- cerc_list # cerc master list
       food_master[[length(food_master)+1]] <- food_list # food master list
-      host_master[[length(host_master)+1]] <- host_list # host pop master list
+      juv_master[[length(juv_master)+1]] <- juv_list # juv pop master list
+      adult_master[[length(adult_master)+1]] <- adult_list # adult pop master list
       infec_master[[length(infec_master)+1]] <- infec_list # infected host pop master list
+      infec_shed_master[[length(infec_shed_master)+1]] <- infec_shed_list # infected shedding host pop master list
       # plot outputs 
       plot(cerc_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(do.call(max,cerc_master)),
     	main=paste0("amplitude = ",alpha, "; periodicity = ", rho, "growth rate = ", rg),ylab="Cercariae density",xlab="Days") 
-      text(which(cerc_list==max(cerc_list)),max(cerc_list),paste0("a= ",alpha," \n p= ",rho),#col=max(cerc_list),
+      text(which(cerc_list==max(cerc_list)),max(cerc_list),paste0("a= ",alpha," \n p= ",rho)#,col=max(cerc_list),
            )
+      plot(juv_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,juv_master)),col=round(do.call(max,juv_master)))
       #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
       if(save_to_file==1){dev.off()}
       } # ------------------------------ end rg_pars 
@@ -535,6 +543,10 @@ with(snail.stats,plot(who,ss,col=adjustcolor("pink",0.6),pch=20,cex=snail.stats$
 )
 plot(density(snail.stats$RPP))
 
+# hosts > N mm
+mm <- 6
+length(which(snail.stats$L>mm))
+
   
 ### plot param space  
 # get tbl_df tibble of (ORIGINAL)
@@ -571,7 +583,12 @@ p
 ##########################################  end body ############################################ 
 #################################################################################################
 
+##########################################  alternative resource equations (21-12-18) ############################################      
 
+#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * sin(2 * pi * t/rho)) - ingestion)) # Analytical soln to logistic - ingestion with external resource addition (alphas [1,100])
+#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with resource growth wave (alphas [1,100])
+#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * pars["r"] * sin(2 * pi * t/rho)) - ingestion)) # Analytical soln to logistic - ingestion with external resource addition (alphas [0,1])
+# Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (r_t) (alphas [0,1])
 
 ##########################################  netlogo diagnostics ############################################      
 # 27-11-18
