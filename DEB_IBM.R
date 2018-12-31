@@ -144,7 +144,7 @@ deb_compile <- "IndividualModel_IBM2"
 
 ####################################  set model paths #######################################
 setwd(wd)
-nl.model <- list.files(pattern="*.nlogo")[1] ;nl.model # Netlogo model
+nl.model <- list.files(pattern="*.nlogo") ;nl.model # Netlogo model
 if(mac==1){
   nl.path <- paste0(nl.path,"/NetLogo ",ver_nl,"/Java/"); cat("Mac path:",nl.path)
 }else{
@@ -398,7 +398,7 @@ alpha_pars <- 0 # amplitude of resources (alphas)
 rho_pars <- c(10,20,50,100) # periodicity of resources (rhos)
 rg_pars <- c(0.1,0.25,1,2) # resource growth rates (rs)
 me_pars <- seq(10,110,10) # molluscicide events (me)
-me_95 <- 2.99 # background hazard rate for 95% snail mortality from molluscicide event (per day) 
+me_90 <- 2.3 # background hazard rate for 90% snail mortality from molluscicide event (per day) 
 Env_G = numeric() # create empty environment vector 
 
 # individual outputs
@@ -444,7 +444,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
                                   MoreArgs = list(step=1, HAZ=0, Food=environment[1], iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], Fh=pars["Fh"], muD=pars["muD"],
                                                   DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
                                                   mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
-                                                  kk=pars["kk"], hb=ifelse(t==me,hb <- me_95, hb <- pars["hb"]), theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], ENV=pars["ENV"])))
+                                                  kk=pars["kk"], hb=ifelse(day==me,hb <- me_90, hb <- pars["hb"]), theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], ENV=pars["ENV"])))
           L = snail.update[,"L"] # host structural length
           e = snail.update[,"e"] # host scaled reserve density    
           D = snail.update[,"D"] # host development 
@@ -459,6 +459,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           pmass_list[t] <- P # get parasite mass per model step 
           
           Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
+          # if(day==me){Eggs <- Eggs[1:round(0.1*length(Eggs))]} # kill off 90% of snail eggs in water with molluscicide event  
           RH = RH %% 0.015        # Remove released cercariae from the buffer
           Cercs = floor(RP/4e-5)  # Figure out how many (whole) cercs are released
           RP = RP %% 4e-5         # Remove released cercariae from buffer
@@ -468,7 +469,8 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           Env_M = as.numeric(Infection.step[N.snails + 1] + pars["M_in"]) # total miracidia density 
           Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"]) # total cerc density
           Env_G = as.integer(Env_G) # set pop density outputs to integer to pass into Env_G and rbinom func
-          ifelse(t==me,Env_G[day] <- max(0, 0.05*sum(Eggs),na.rm=T),Env_G[day] <- max(0, sum(Eggs),na.rm=T)) # kill off 95% of snail eggs in water with molluscicide event 
+          # ifelse(day==me,Env_G[day] <- max(0, 0.1*sum(Eggs),na.rm=T),Env_G[day] <- max(0, sum(Eggs),na.rm=T)) # kill off 90% of snail eggs in water with molluscicide event 
+          Env_G[day] <- max(0, sum(Eggs),na.rm=T)
           
           Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
           if(resources == "cyclical"){ # start food dynamics @netlogo
@@ -487,7 +489,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
           NLCommand(snail.commands) 
           if(day > 10){
-            create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)  
+            ifelse(day==me,create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.1),create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)) # kill off 90% of snail eggs in water with molluscicide event  
             NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
             } # end create snails
           NLCommand("go")
