@@ -117,6 +117,7 @@ if(mac==1){
 # "ILL_shrink_damageA5.Rda"
 sensdata <- 1 # 1 = keep files local; 0 = make files public  
 if(sensdata==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
+pp <- ""
 
 # set user outputs
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
@@ -389,7 +390,7 @@ set_resources(resources) # set resources: "cyclical" or "event"  @netlogo
 testrun <- 1 # do a quick testrun to see plots
 
 if(save_to_file==1){pdf(paste0(wd,"/master_sim.pdf"),onefile=T,paper="a4")}
-ifelse(testrun==1,n.ticks<-20,n.ticks<-120)
+ifelse(testrun==1,n.ticks<-5,n.ticks<-120)
  
 # param space
 alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
@@ -467,7 +468,8 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           Env_M = as.numeric(Infection.step[N.snails + 1] + pars["M_in"]) # total miracidia density 
           Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"]) # total cerc density
           Env_G = as.integer(Env_G) # set pop density outputs to integer to pass into Env_G and rbinom func
-          Env_G[day] <- max(0, sum(Eggs),na.rm=T)
+          ifelse(t==me,Env_G[day] <- max(0, 0.05*sum(Eggs),na.rm=T),Env_G[day] <- max(0, sum(Eggs),na.rm=T)) # kill off 95% of snail eggs in water with molluscicide event 
+          
           Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
           if(resources == "cyclical"){ # start food dynamics @netlogo
             #Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
@@ -485,8 +487,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
           NLCommand(snail.commands) 
           if(day > 10){
-            if(t==me){create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.05) # kill off 95% of snail eggs in water with molluscicide event 
-            }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}  
+            create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)  
             NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
             } # end create snails
           NLCommand("go")
@@ -526,8 +527,8 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
       #        )
         #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
         if(save_to_file==1){dev.off()}
-        } # --------------- end hb_pars
-	    } # ------------------------------ end rg_pars 
+        } # --------------- end mes
+	    } # ------------------------------ end rgs
 	  } # --------------------------------------------- end rhos
   } # ----------------------------------------------------------- end alphas
 ####################################  end netlogo sim ######################################## 
@@ -537,10 +538,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
 # define plot window
 plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
 par(mfrow=plot.matrix)
-par(mfrow=c(1,1))
-plot(
-  cerc_master[[11]]
-  )
+
 #plot masters
 for(m in cerc_master){
   for(f in food_master){
