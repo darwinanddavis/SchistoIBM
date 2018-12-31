@@ -5,4 +5,4 @@
 *.so
 *.o
 *.dll
-.Rda
+*.Rda
