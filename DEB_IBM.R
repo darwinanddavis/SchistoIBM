@@ -115,9 +115,6 @@ if(mac==1){
 ####################################  set user inputs ####################################### 
 # isolate sensitive data:
 # "ILL_shrink_damageA5.Rda"
-sensdata <- 1 # 1 = keep files local; 0 = make files public  
-if(sensdata==1){pp <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM_/"}else{pp <-""}
-pp <- ""
 
 # set user outputs
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
@@ -187,7 +184,8 @@ if(mac==0){
   install.packages("ggthemes")
   install.packages("ggExtra")
 }
-lapply(packages, require, character.only = T)
+ppp <- lapply(packages,require,character.only=T)
+if(any(ppp==F)){print("Check packages are loaded")}
 cs <- list() # diagnostics list for checking NAs in create snails command  
 
 # load plot function 
@@ -234,7 +232,7 @@ if(mac==1){
 ####################################  load deb params #######################################
 
 # load DEB starvation model parameters and create mcmc (and convert mcmc chain to coda format)
-samps = readRDS(paste0(pp,deb_samps))
+samps = readRDS(deb_samps)
 samps <- as.mcmc(samps[, c("iM", "k", "M", "EM", "Fh", "muD", "DR", "fe", "yRP",
                            "ph", "yPE", "iPM", "eh", "mP", "alpha", "yEF", "LM",
                            "kd", "z", "kk", "hb", "theta", "mR", "yVE", "yEF2",
@@ -646,7 +644,7 @@ NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
 
 #### old deb samp loading 
 # load DEB starvation model parameters and create mcmc (and convert mcmc chain to coda format)
-samps = readRDS(paste0(pp,deb_samps))
+samps = readRDS(deb_samps)
 # lpost = samps$log.p #
 # samps = convert.to.coda(samps)
 # samps = cbind(samps, lpost)
