@@ -12,13 +12,6 @@ linkcolor: blue
 urlcolor: blue
 citecolor: red
 output:
-  html_document:
-    highlight: tango
-    code_folding: hide
-    toc: yes
-    toc_depth: 3
-    number_sections: no
-    toc_float: yes
   pdf_document:
     includes:
       in_header: # add .tex file with header content
@@ -34,6 +27,13 @@ output:
     citation_package: biblatex # natbib
     latex_engine: xelatex #pdflatex # lualatex
     keep_tex: true # keep .tex file in dir 
+  html_document:
+    highlight: tango
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    number_sections: no
+    toc_float: yes
   word_document:
     highlight: tango
     keep_md: yes
@@ -122,6 +122,22 @@ Aim: To account for time lag in population cycles based on things like resources
 [Southgate VR (1997) Schistosomiasis in the Senegal River Basin: Before and after the construction of the dams at Diama, Senegal and Manantali, Mali and future pros- pects. J Helminthol 71(2):125–132.](Southgate VR (1997) Schistosomiasis in the Senegal River Basin: Before and after the construction of the dams at Diama, Senegal and Manantali, Mali and future pros- pects. J Helminthol 71(2):125–132)    
 
 > From Sokolow et al 2015 PNAS   
+
+\newpage  
+
+*****   
+## Cerc stuff    
+
+### Cerc host choice  
+
+Snail-host-finding by Miracidia and Cercariae: Chemical Host Cues  
+
+Langeloh (2018) Relative importance of chemical attractiveness to parasites for susceptibility to trematode infection  
+
+Seppala (2015) Quality attracts parasites: host condition-dependent
+chemo-orientation of trematode larvae  
+
+Sukhdeo (2004) Trematode behaviours and the perceptual worlds of parasites  
 
 \newpage  
 
