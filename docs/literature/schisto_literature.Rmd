@@ -125,7 +125,20 @@ Aim: To account for time lag in population cycles based on things like resources
 
 \newpage  
 
+*****
+
+## Host population  
+
+Rumi and Hamann 1992 - size structure dynamics of Biomphalaria  
+
+Loreau 1987 - Size structure in natural Biomphalaria population  
+
+Ituarte 1989 - Growth dynamics of B glabrata in the field  
+
+\newpage    
+
 *****   
+
 ## Cerc stuff    
 
 ### Cerc host choice  

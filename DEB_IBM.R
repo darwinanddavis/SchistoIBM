@@ -88,7 +88,7 @@
 # "IndividualModel_IBM.o" # Mac OSX. generated from C  
 # "IndividualModel_IBM.dll" # Windows. generated from C  
 
-test.java <- 1 # 1 = run java diagnostics  
+test.java <- 0 # 1 = run java diagnostics  
 
 # run java test  
 install.packages("RCurl")
@@ -102,6 +102,8 @@ if(test.java==1){
 
 #################################  Running NetLogo in Mac ##################################
 # if using Mac OSX El Capitan+ and not already in JQR, download and open JGR 
+mac <- 0
+
 if(mac==1){
   install.packages('JGR',,'http://www.rforge.net/')
   library(JGR)
@@ -116,6 +118,12 @@ if(mac==1){
 # isolate sensitive data:
 # "ILL_shrink_damageA5.Rda"
 
+# set dir paths (for "/" for both Windows and Mac)
+wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set working directory  
+ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
+ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
+nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs" # set path to Netlogo program location
+
 # set user outputs
 mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 0 # display the gui? 1 = yes, 0 = no
@@ -124,22 +132,16 @@ save_to_file <- 0 # 1 = save simulation outputs to local dir, 0 = plot in curren
 mcmcplot <- 0 # 1 = save mcmc plots to dir
 traceplot <- 0 # 1 = include traceplot in mcmc plots? intensive!!!
 
-# set dir paths (for "/" for both Windows and Mac)
-wd <- "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM" # set working directory  
-ver_nl <-"6.0.4" # type in Netlogo version. found in local dir. 
-ver_gcc <-"4.6.3" # NULL # type in gcc version (if known). leave as "NULL" if unknown   
-nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs" # set path to Netlogo program location
-
 # define starting conditions for simulation model @netlogo
 n.ticks <- 120 # set number of days to simulate
 day <- 1 # number of days to run simulation  
 resources <- "cyclical" # set resources: "cyclical" or "event"
 
+####################################  set model paths #######################################
 # load files
 deb_samps <- "ILL_shrink_damageA5.Rda"
 deb_compile <- "IndividualModel_IBM2"
 
-####################################  set model paths #######################################
 setwd(wd)
 nl.model <- list.files(pattern="*.nlogo") ;nl.model # Netlogo model
 if(mac==1){
@@ -610,94 +612,3 @@ p
 #################################################################################################
 ##########################################  end body ############################################ 
 #################################################################################################
-
-##########################################  alternative resource equations (21-12-18) ############################################      
-
-#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * sin(2 * pi * t/rho)) - ingestion)) # Analytical soln to logistic - ingestion with external resource addition (alphas [1,100])
-#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with resource growth wave (alphas [1,100])
-#Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + (alpha * pars["r"] * sin(2 * pi * t/rho)) - ingestion)) # Analytical soln to logistic - ingestion with external resource addition (alphas [0,1])
-# Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (r_t) (alphas [0,1])
-
-##########################################  netlogo diagnostics ############################################      
-# 27-11-18
-
-# TS step for rbinom producing NAs (https://stackoverflow.com/questions/13264001/r-rbinom-na-and-matrices-how-to-ignore-na-yet-retain-them)
-NLCommand("create-snails ", rbinom(n=1, size=as.vector(which(!is.na(Env_G)))[day - 10], prob=0.5), "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
-
-#25-9-18
-# 1. have tried this
-Sys.setenv(NOAWT=1) 
-Sys.unsetenv("NOAWT") 
-
-# 2. have attempted this with NL v. 5.3.0 and 6.0.4
-ver_nl <-"6.0.4" # type in Netlogo version
-nl.path <- "/Users/malishev/Documents/Melbourne Uni/Programs/" ; nl.path # set path to Netlogo program location
-
-nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/"); nl.path # opt 1
-nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java/"); nl.path # opt 2 
-nl.path <- paste0(nl.path,"NetLogo ",ver_nl,"/Java"); nl.path # opt 3 
-
-model.path <- paste0(wd,"/"); model.path # set path to Netlogo model  
-nl.model <- "DEB_INF_IBM_almost_working2.nlogo" # name of Netlogo model
-NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
-
-#### old deb samp loading 
-# load DEB starvation model parameters and create mcmc (and convert mcmc chain to coda format)
-samps = readRDS(deb_samps)
-# lpost = samps$log.p #
-# samps = convert.to.coda(samps)
-# samps = cbind(samps, lpost)
-# samps <- as.mcmc(samps[, c("iM", "k", "M", "EM", "Fh", "muD", "DR", "fe", "yRP",
-#                            "ph", "yPE", "iPM", "eh", "mP", "alpha", "yEF", "LM",
-#                            "kd", "z", "kk", "hb", "theta", "mR", "yVE", "yEF2",
-#                            "sd.LI1", "sd.LU1", "sd.EI1", "sd.EU1", "sd.W1", 
-#                            "sd.LI2", "sd.LU2", "sd.EI2", "sd.EU2", "sd.W2",
-#                            "lpost")])
-
-### ------------------------------- Alternative food dynamics ------------------
-	### periodic food dynamics 
-	# eq 1a in Abrams2004)
-	# Env_F = I in Abrams2004 
-	# params to change?
-	# r = Q (variation in resource growth)
-	# gamma (sin * gamma) = resource amplitude 	
-	### Env_F <- Env_F * (1 + sin(2 * pi * pars["step"] / pars["r"])) - ingestion
-
-	### overdamped food cycle (from Nisbet et al. 1976)
-	#pars["r"] * pars["step"] > pi/2 # oscillatory food cycle 
-	# undefined params
-	## a 
-	## f
-	## phi
-	## b
-	### pars["r"] <- pars["r"]*(1 + a * cos(2 * pi * f * pars["step"] + phi)) # eq 2 from Nisbet et al. 1976 	
-	### pars["K"] <- pars["K"]*(1 + b * cos * 2 * pi * f * pars["step"])
-
-# plotting notes
-
-# insert posthoc titles into plot 
-# https://stackoverflow.com/questions/21333083/how-to-use-an-atomic-vector-as-a-string-for-a-graph-title-in-r
-
-# ---- resource dynamics test
-#graphics.off()
-par(mfrow=c(1,3));lplot <- function(...) plot(..., type="l",ylim=c(-1,1))
-
-RR1<-list();RR2<-list();RR3<-list()
-alpha<-0.8
-p<-10
-pars["r"] <- 1
-ingestion <-0
-
-for(t in 1:100){
-	  r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/p) 
-	# non-cyclical
-	RR1[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
-	# cyclical
-	RR2[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-r_t*pars["step"])) - ingestion))
-	# external addition of cyclical 
-	RR3[t]<-max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) + r_t - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (alphas [0,1])
-	lplot(as.numeric(RR1)); lplot(as.numeric(RR2)); lplot(as.numeric(RR3))
-	}
-# --------- end test
-
-##########################################  end netlogo diagnostics ############################################ 
