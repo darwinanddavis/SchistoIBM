@@ -50,6 +50,8 @@
 
 ###### TO DO ######
 
+# LHC sampling of r, alpha, and rho for different host sizes  
+
 # get ratio of infected hosts and shedding infected hosts     
 
 # change r and food 
