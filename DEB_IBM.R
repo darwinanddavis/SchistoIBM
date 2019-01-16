@@ -189,7 +189,8 @@ if(mac==0){
   install.packages("ggExtra")
 }
 ppp <- lapply(packages,require,character.only=T)
-if(any(ppp==F)){print("Check packages are loaded")}
+if(any(ppp==F)){cbind(packages,ppp);cat("\n\n\n ---> Check packages are loaded properly <--- \n\n\n")}
+
 cs <- list() # diagnostics list for checking NAs in create snails command  
 
 # load plot function 
