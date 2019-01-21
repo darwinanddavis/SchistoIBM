@@ -397,8 +397,8 @@ ifelse(testrun==1,n.ticks<-5,n.ticks<-120)
  
 # param space
 alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
-rho_pars <- c(10,20,50,100) # periodicity of resources (rhos)
-rg_pars <- c(0.1,0.25,1,2) # resource growth rates (rs)
+rho_pars <- c(0,seq(10,120,10)) # periodicity of resources (rhos)
+rg_pars <- seq(0.5,1.5,0.5) # resource growth rates (rs)
 me_pars <- seq(10,110,10) # molluscicide events (me)
 me_90 <- 2.3 # background hazard rate for 90% snail mortality from molluscicide event (per day) 
 Env_G = numeric() # create empty environment vector 
