@@ -140,12 +140,12 @@ to update-resources
   [
 ;  set dF F
   ]
+  ;set F F + dF ; change in food density
 
   if resource_type = "detritus"
   [
    ; set dF F
   ]
-  ;set F F + dF ; change in food density
 end
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------
