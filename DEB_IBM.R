@@ -6,6 +6,9 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
+# 24-1-19
+# changed ingestion of food from env to reflect individual snail deb updates to food  
+
 # 23-1-19
 # fixed individual snail deb update when using detritus: Food=environment[1]*(snail.update[,2]^2)/sum(snail.update[,2]^2), 
 # added detritus supply as food source  
@@ -290,7 +293,7 @@ if(mcmcplot==1){
 # get the best fit DEB parameters to match the data (using mcmc)
 read.csv("pars.txt",header=T,sep="/",fill=T,flush=T,strip.white=T,row.names=NULL)
 pars = as.vector(data.frame(samps)[max(which(data.frame(samps)$lpost >= max(data.frame(samps)$lpost) -0.001)),])
-pars["Fh"] = 0.25
+# pars["Fh"] = 0.25 # temporary f_scaled
 pars["ENV"] = 500 # Units: L
 pars["r"] = 1   # Units: day-1
 pars["step"] = 1  # Units: day
@@ -429,7 +432,7 @@ me_90 <- 2.3 # background hazard rate for 90% snail mortality from molluscicide 
 Env_G = numeric() # create empty environment vector 
 
 # set resource to cycle or be constant
-if(resources=="cyclical"){alpha_pars <- alpha_pars; rho_pars <- rho_pars ; rg_pars <- rg_pars}else{alpha_pars <- 0; rho_pars <- 1; rg_pars <- 0.5;cat("alphas = ",alpha_pars,"\n rhos = ",rho_pars,"\n rgs = ",rg_pars)}
+if(resources=="cyclical"){alpha_pars <- alpha_pars; rho_pars <- rho_pars ; rg_pars <- rg_pars}else{alpha_pars <- 0; rho_pars <- 10; rg_pars <- 1;cat("alphas = ",alpha_pars,"\n rhos = ",rho_pars,"\n rgs = ",rg_pars)}
 # set snail control events or none
 if(snail_control==1){me_pars <- me_pars}else{me_pars <- 1000000}; cat("Snail control will occur every ",max(me_pars)/me_pars[1]-1," days") 
 
@@ -473,10 +476,10 @@ plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
 par(mfrow=plot.matrix)
 
 ####################################  start netlogo sim ######################################## 
-for(me in me_pars){ # loop through mes (molluscicide events)
 for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
 	for(rho in rho_pars){ # loop through rhos (periodicity of food cycle)
 	  for(rg in rg_pars){ # loop through rgs (food growth rates)
+	    for(me in me_pars){ # loop through mes (molluscicide events)
 	      NLCommand("setup")
         for(t in 1:n.ticks){ # start nl sim  @netlogo
           snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
@@ -490,7 +493,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           # Update DEBS, HAZ=0 so survival probs are calculated for the current day
           snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
                                   P=snail.stats[,6], RP=snail.stats[,7], DAM=snail.stats[,8], Lp=snail.stats[,10], Food=environment[1]*(snail.stats[,2]^2)/sum(snail.stats[,2]^2), # update food availability per snail 
-                                  MoreArgs = list(step=1, HAZ=0, #Food=environment[1], constant food available (23-1-19)
+                                  MoreArgs = list(step=1, HAZ=0, #Food=environment[1],# constant food available (23-1-19)
                                                   iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], Fh=pars["Fh"], muD=pars["muD"],
                                                   DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
                                                   mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
@@ -508,7 +511,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           LG = snail.update[,"LG"] # host shell length  
           P = snail.update[,"P"] # parasite mass (sum within host)
           RP = snail.update[,"RP"] # parasite reproductive buffer  
-          ingestion = sum(environment[1] - snail.update[,"Food"]) # food intake by host from environment 
+          ingestion = environment[1] - sum(snail.update[,"Food"]) # food intake by host from environment 
           hl_list[t] <- L # get host lengths per model step
           pmass_list[t] <- P # get parasite mass per model step 
           
@@ -528,7 +531,7 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
           
           Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
           # if(resources == "cyclical"){ # start food dynamics @netlogo
-            #Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
+            # Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100])
             # F = K(F/F + K) - F * exp(- r + alpha * r * sin(2 * pi * t/rho) * s) - sum(F - uptake) # food growth eq. (19-12-18) 
             # r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/rho) # equilibrium resource dynamics (static)
             alpha <- alpha # amplitude of resources
@@ -539,9 +542,10 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
         	  if(resource_type == "detritus"){ # use detritus as food source
         	    Env_F = as.numeric(pars["r"]*pars["step"] - ingestion + pars["d_Z"]) # detritus production
         	  }else{
-        	    Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-rg_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (rg_t) (alphas [0,1])     
+			  # Env_F = -pars["iM"]*[scaled f]*sum(L_i^2) + r*F*(1-F/K)
+        	   Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-rg_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (rg_t) (alphas [0,1])     
         	  }# end detritus
-          	# } # end cyclical food 
+          	# } # end cyclical food dynamics  
           # Command back to NL @netlogo
           NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
           snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
@@ -593,86 +597,17 @@ for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
       #        )
         #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
         if(save_to_file==1){dev.off()}
-        } # --------------- end alphas
-	    } # ------------------------------ end rhos
-	  } # --------------------------------------------- end rgs
-  } # ----------------------------------------------------------- end mes
+        } # --------------- end mes
+	    } # ------------------------------ end rgs
+	  } # --------------------------------------------- end rhos
+  } # ----------------------------------------------------------- end alphas
 ####################################  end netlogo sim ######################################## 
   
 # results output 
+# save sim results to dir
 str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master))  
-
-##########################################  plots ############################################ 
-# define plot window
-plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
-par(mfrow=plot.matrix)
-
-#plot masters
-for(m in cerc_master){
-  for(f in food_master){
-  	plot(m,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(max(m)),
-  	#main = bquote("amplitude = " ~ .(alpha_pars[alpha])))
-  	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),xlab="Days",axes=T) 		
-  	text(which(m==max(m)),max(m),paste0("a= ",alpha," \np= ",rho,"\nr=",rg)#col=round(max(m)),
-  	)
-  	#points(f,type="l",las=1,bty="n",ylim=c(0,do.call(max,food_master)),col=round(max(f)),add=T)
-  	} # food master 
-} # cerc master
-
-# plot master with ggplot 
-y_m <- melt(cerc_master);head(y_m)
-ggplot() +
-  geom_line(data = y_m, aes(x = rep.int(1:n.ticks,max(L1)) , y = value, group = L1,
-	colour=factor(L1)),
-	linetype=y_m$L1) +
-  theme_tufte()
-# +  geom_text(x=,y=,label = max(value),check_overlap = TUE)
-
-# plot host properties
-par(mfrow=c(1,1))
-# get host length over time 
-plot(as.numeric(L_list),ylim=c(0,10),type="l")
-
-names(snail.stats)
-ss <- L #"L"
-ss <- as.numeric(ss)
-with(snail.stats,plot(who,ss,col=adjustcolor("pink",0.6),pch=20,cex=snail.stats$RPP*10^12,ylim=c(1,10))
-)
-plot(density(snail.stats$RPP))
-
-# hosts > N mm
-mm <- 6
-length(which(snail.stats$L>mm))
-
-  
-### plot param space  
-# get tbl_df tibble of (ORIGINAL)
-#   stationid   day  hour month  year  temp
- #1 T0001         1     0 Jan    2004  -1.7
-# 2 T0001         1     1 Jan    2004  -1.8
-# 3 T0001         1     2 Jan    2004  -1.8 
-
-#   Station  alpha  rho   rg   env_list  density
-#   <fct>     <int> <int> <ord> <dbl> <dbl>
- #1 T0001      0     10  0.1   cerc  -1.7
-# 2 T0001      0.25  20  0.25  food  -1.8
-# 3 T0001      0.5   50  1     infec -1.8
-
-master <- tbl_df(master)
-
-p <-ggplot(master,aes(day,hour,fill=temp))+
-  geom_tile(color= "white",size=0.1) +
-  scale_fill_viridis(name="Hrly Temps C",option ="magma")
-p <-p + facet_grid(year~month)
-p <-p + scale_y_continuous(trans = "reverse", breaks = unique(df$hour))
-p <-p + scale_x_continuous(breaks =c(1,10,20,31)) 
-p <- p + theme_tufte() + 
-  theme(legend.title=element_text(size=8)) +
-  labs(title= paste("Hourly Temps - Station",statno), x="Day", y="Hour Commencing") +
-  theme(legend.position = "bottom")
-p
-
-##########################################  plots ############################################ 
+global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master) 
+saveRDS(global_output,paste0(wd,"/global_output.R"))
 
 # NLQuit()
 

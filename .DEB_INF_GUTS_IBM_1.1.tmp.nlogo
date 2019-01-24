@@ -76,7 +76,7 @@ to setup
   ask  snails  [
     set L-min 4 ; 4 mm length
     set L-max 16 ; 16 mm length
-    set L L-min + random-float(L-max - L-min) ; random draw between min and max length
+    set L L-min + random-float(L-max - L-min) ; random draw between min and max length ; random-float 2 + 4
     set ee 0.9
     set D 0
     set RH 0
@@ -140,12 +140,12 @@ to update-resources
   [
 ;  set dF F
   ]
-  ;set F F + dF ; change in food density
 
   if resource_type = "detritus"
   [
    ; set dF F
   ]
+  ;set F F + dF ; change in food density
 end
 
 ; ------------------------------------------------------------------------------------------------------------------------------------------
@@ -197,8 +197,11 @@ to do-plots
 ; plot count snails with [D > 0]
 
 
-;  set-current-plot "shrinkage distribution"
- ; histogram [L / LG] of snails
+  set-current-plot "shrinkage distribution"
+  histogram [L / LG] of snails
+
+  set-current-plot "length"
+  histogram [L] of snails
 ;
 ;    set-current-plot "juv e distribution"
 ;  histogram [e_H] of snails with [D  < D_R]
@@ -307,7 +310,7 @@ shrinkage distribution
 size
 frequency
 0.0
-1.1
+50.0
 0.0
 10.0
 true
@@ -452,12 +455,63 @@ NIL
 0.0
 10.0
 0.0
-10.0
-true
+1.0
+false
 false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot mean [F] of patches"
+
+MONITOR
+1048
+206
+1182
+251
+NIL
+mean [F] of patches
+5
+1
+11
+
+PLOT
+528
+503
+728
+653
+length
+NIL
+NIL
+0.0
+100.0
+0.0
+10.0
+false
+false
+"set-histogram-num-bars 11" ""
+PENS
+"default" 1.0 0 -16777216 true "" ""
+
+MONITOR
+284
+568
+445
+613
+NIL
+mean [L] of snails
+5
+1
+11
+
+MONITOR
+279
+506
+412
+551
+NIL
+[L] of snail 5
+5
+1
+11
 
 @#$#@#$#@
 # Model Overview
