@@ -34,6 +34,10 @@ mR / TEXT
 yVE / TEXT
 ENV / TEXT
 Lp / TEXT
+SAtotal / TEXT
+r / TEXT
+K / TEXT
+Det / TEXT
 
 
 
