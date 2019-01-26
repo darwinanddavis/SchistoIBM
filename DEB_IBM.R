@@ -618,7 +618,7 @@ for(detr in detr_pars){ # loop through detritus inputs
 # save sim results to dir
 str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master))  
 global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master) 
-saveRDS(global_output,paste0(wd,"/global_output.R"))
+saveRDS(global_output,paste0(wd,"/global_output_",resource_type,".R"))
 
 # NLQuit()
 
