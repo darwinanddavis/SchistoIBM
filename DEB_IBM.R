@@ -11,7 +11,8 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
-
+# 28-1-19
+# reverted back to Food=environment[1] in snail update (eating by sum(L2)^2 snails is in C script)
 
 # 25-1-19 (v.1.2)
 # MCMC DEB params (full starve model Rda)
@@ -512,8 +513,8 @@ for(detr in detr_pars){ # loop through detritus inputs
             pars["Det"] <- detr # Units mg C/L-1 d-1 (detritus)
             # Update DEBS, HAZ=0 so survival probs are calculated for the current day
             snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
-                                    P=snail.stats[,6], RP=snail.stats[,7], DAM=snail.stats[,8], Lp=snail.stats[,10], Food=environment[1]*(snail.stats[,2]^2)/sum(snail.stats[,2]^2), # update food availability per snail 
-                                    MoreArgs = list(step=1, HAZ=0, #Food=environment[1],# constant food available (23-1-19)
+                                    P=snail.stats[,6], RP=snail.stats[,7], DAM=snail.stats[,8], Lp=snail.stats[,10], #Food=environment[1]*(snail.stats[,2]^2)/sum(snail.stats[,2]^2), # update food availability per snail 
+                                    MoreArgs = list(step=1, HAZ=0, Food=environment[1],# constant food available (23-1-19)
                                                     iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], Fh=pars["Fh"], muD=pars["muD"],
                                                     DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
                                                     mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
