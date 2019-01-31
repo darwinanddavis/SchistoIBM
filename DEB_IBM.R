@@ -206,7 +206,7 @@ installed.packages()["rJava","Version"]
 # get latest Java/Oracle version: https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html  
 
 # install relevant packages   
-packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","sp","RNetLogo","ggplot2","RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","reshape2","pse","sensitivity")  
+packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","sp","RNetLogo","ggplot2","RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","reshape2","pse","sensitivity","beepr")  
 if(require(packages)){
   install.packages(packages,dependencies = T)
 }
@@ -612,6 +612,7 @@ for(detr in detr_pars){ # loop through detritus inputs
   	    } # ------------------------------ end rgs
   	  } # --------------------------------------------- end rhos
     } # ----------------------------------------------------------- end alphas
+  replicate(50,{beep(rep(4),10)})
   } # ------------------------------------------------------------------------- end detritus
 ####################################  end netlogo sim ######################################## 
   
