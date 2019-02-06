@@ -77,7 +77,7 @@ Table 2. Definitions of model parameters of the simulation model environment. Di
 
 ## Disease transmission model (resource-dependent cercariae production)  
 
-![Transmission model equations.](epimodel_eqs.jpeg)            
+![Transmission model equations.](epimodel_eqs.jpeg)               
 
 ## Troubleshooting  
 ### :pig: For running Netlogo from `R` on Mac OSX. See the [Instructions for Mac OSX](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac) page for a detailed breakdown of the troubleshooting steps.  
