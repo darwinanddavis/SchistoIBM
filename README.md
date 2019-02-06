@@ -11,7 +11,7 @@
 Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalaria spp.* snail host population interactions based on dynamic energy budget (DEB) and transmission model. The model outlines how resource use by a size-structured host population influences population cycles of hosts and parasites. Host and parasite ecology and energetics are captured using a mechanistic energy budget model and interactions among hosts and parasites are captured by a disease tranmission model. Resource use by hosts and thus parasites is modelled by the IBM.  
 
 **Host**  
-Hosts incur costs from infection through damage density \delta and cumulative hazard rate _H_.      
+Hosts incur costs from infection through damage density _delta_ and cumulative hazard rate _H_.      
 
 **Parasite**  
 The number of free-living miracidia in the environment is based on a probability function (multinomial distribution) of surviving miracidia, miracidia that successfully infected hosts, and unsuccessful miracidia that died.       
@@ -48,18 +48,18 @@ Notation follows the standard DEB notation, except in the following aspects:
 - Rates are indicated with '_rate' rather than a dot  
 - '_ee_' is scaled reserve density of hosts in `Netlogo`    
 
-Table 1. Definitions of model parameters for individual hosts and **parasites**. Dimensions and units: -, dimensionless; cm, centimetres; J, Joules; L, length.    
+Table 1. Definitions of model parameters for individual hosts and **parasites**. Dimensions and units: -, dimensionless; cm, centimetres; d, days; J, joules; L, length.    
 
 | Parameter | Definition | Dimension<br/>(unit) | Environment |    
 | :---: | :--- | :---: | :--- |    
 | _L_ | structural length | cm | `NetLogo` |      
 | _ee_ | scaled reserve density | J (cm<sup>3</sup>) | `NetLogo` |  
-| _D_ | host development | ?? | `NetLogo` |    
+| _D_ | host development | mg C | `NetLogo` |    
 | _RH_ | energy in reproduction buffer| J | `NetLogo` |  
-| _DAM_ | starvation-related damage | ?? | `NetLogo` |  
-| _HAZ_ | starvation-related hazard rate | ?? | `NetLogo` |  
+| _DAM_ | starvation-related damage | t (d<sup>-1</sup>) | `NetLogo` |  
+| _HAZ_ | starvation-related hazard rate | t (d<sup>-1</sup>) | `NetLogo` |  
 | _LG_ |  shell length | L (cm) | `NetLogo` |  
-| age |  age of egg (hatches at 7 days) | t (days) | `NetLogo` |  
+| age |  age of egg (hatches at 7 days) | t (d<sup>-1</sup>) | `NetLogo` |  
 | **_P_** |  **parasite biomass** | **cm<sup>3</sup>** | **`NetLogo`** |    
 | **_RPP_** |  **energy in parasite reproduction** | **J** | **`NetLogo`** |    
 

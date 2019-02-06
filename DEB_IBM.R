@@ -312,7 +312,7 @@ if(mcmcplot==1){
 # get the best fit DEB parameters to match the data (using mcmc)
 read.csv("pars.txt",header=T,sep="/",fill=T,flush=T,strip.white=T,row.names=NULL)
 pars = as.vector(data.frame(samps)[max(which(data.frame(samps)$lpost >= max(data.frame(samps)$lpost) -0.001)),])
-# pars["Fh"] = 0.25 # temporary f_scaled (for v.1.1)
+pars["Fh"] = 2 # f_scaled 
 pars["ENV"] = 500 # Units: L
 pars["r"] = 1   # Units: day-1
 pars["step"] = 1  # Units: day
@@ -321,7 +321,7 @@ pars["sigma"] = 0.5
 pars["m_M"] = 1   # Units: day-1
 pars["m_Z"] = 1   # Units: day-1
 pars["M_in"] = 10
-pars["K"] = 1
+pars["K"] = 5 # Units: mg C/L-1 d-1
 pars["Det"] = 0.1 # Units mg C/L-1 d-1 (detritus)
 
 ####################################  solve deb eqs #######################################
