@@ -312,7 +312,7 @@ if(mcmcplot==1){
 # get the best fit DEB parameters to match the data (using mcmc)
 read.csv("pars.txt",header=T,sep="/",fill=T,flush=T,strip.white=T,row.names=NULL)
 pars = as.vector(data.frame(samps)[max(which(data.frame(samps)$lpost >= max(data.frame(samps)$lpost) -0.001)),])
-pars["Fh"] = 2 # f_scaled 
+pars["Fh"] = 2 # f_scaled    
 pars["ENV"] = 500 # Units: L
 pars["r"] = 1   # Units: day-1
 pars["step"] = 1  # Units: day
