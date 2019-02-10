@@ -1,4 +1,6 @@
-![](SchistoIBM_header.png)  
+![](SchistoIBM_header.png) 
+
+<img align="center" src="SchistoIBM_header2.png" alt="."> 
 
 # Individual-based Dynamic Energy Budget *Schistosoma* model (SIDEB)    
 
