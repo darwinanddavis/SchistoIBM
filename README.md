@@ -1,6 +1,6 @@
 # Individual-based Dynamic Energy Budget *Schistosoma* model (SIDEB)  
 
-![ ](SchistoIBM_header.jpeg)      
+![ ](/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM/docs/SchistoIBM_header.jpeg)      
 
 ## Matthew Malishev<sup>1*</sup> & David J Civitello<sup>1</sup>   
 
