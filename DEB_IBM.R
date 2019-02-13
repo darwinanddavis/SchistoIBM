@@ -661,36 +661,16 @@ for(detr in detr_pars){ # loop through detritus inputs
 str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master))  
 global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master) 
 saveRDS(global_output,paste0(wd,"/global_output_",resource_type,"_",resources,".R"))
-
 # read in saved sim results
 cat("order = cerc, food, juv, adult, infected, infected shedding, host length, parasite mass")
 cat("detritus =  ",seq(0,0.5,0.1))
-global_detritus = readRDS(paste0(model.path,"global_output_detritus.R"))
-cat("algae with rg = ",seq(1,2,0.1) )
-global_algae = readRDS(paste0(model.path,"global_output_algae_event.R"))
-global_algae_cyclical = readRDS(paste0(model.path,"global_output_algae_cyclical.R"))
+cat("algae with rg = ",seq(0,1,0.1))
 
-# for algae between 0 and 1
-global_output_algae_event_Fh05K05 = readRDS(paste0(model.path,"global_output_algae_event_Fh05K05.R"))
-global_output_algae_event_Fh05K1 = readRDS(paste0(model.path,"global_output_algae_event_Fh05K1.R"))
-global_output_algae_event_Fh05K3 = readRDS(paste0(model.path,"global_output_algae_event_Fh05K3.R"))
-global_output_algae_event_Fh1K1 = readRDS(paste0(model.path,"global_output_algae_event_Fh1K1.R"))
-global_output_algae_event_Fh1K2 = readRDS(paste0(model.path,"global_output_algae_event_Fh1K2.R"))
-global_output_algae_event_Fh1K5 = readRDS(paste0(model.path,"global_output_algae_event_Fh1K5.R"))
-global_output_algae_event_Fh2K05 = readRDS(paste0(model.path,"global_output_algae_event_Fh2K05.R"))
-global_output_algae_event_Fh2K1 = readRDS(paste0(model.path,"global_output_algae_event_Fh2K1.R"))
-global_output_algae_event_Fh2K2 = readRDS(paste0(model.path,"global_output_algae_event_Fh2K2.R"))
-global_output_algae_event_Fh2K3 = readRDS(paste0(model.path,"global_output_algae_event_Fh2K3.R"))
-global_output_algae_event_Fh2K5 = readRDS(paste0(model.path,"global_output_algae_event_Fh2K5.R"))
-global_output_algae_event_Fh3K5 = readRDS(paste0(model.path,"global_output_algae_event_Fh3K5.R"))
-
-global_output_detritus_event_Fh2K5 = readRDS(paste0(model.path,"global_output_detritus_event_Fh2K5.R"))
-global_output_detritus_event_Fh2K5_0to05 = readRDS(paste0(model.path,"global_output_detritus_event_Fh2K5_0to05.R")) 
-global_output_detritus_event_Fh2K5_500days = readRDS(paste0(model.path,"global_output_detritus_event_Fh2K5_500days.R"))
+# ------------------------- select results to plot 
+fh = "global_output_algae_event"
 
 # ------------------------- plot individual outputs -------------------------
-mm_ = global_algae  # choose sim results to plot 
-
+mm_ = readRDS(paste0(model.path,fh,".R"))
 layout(matrix(c(1:16),4,4,byrow=T))
 cat("order = cerc, food, juv, adult, infected, infected shedding, host length, parasite mass")
 # plot master
@@ -743,14 +723,6 @@ for(g in 1:length(global_sim_plot)){
 }
 # +  geom_text(x=,y=,label = max(value),check_overlap = TUE)
 do.call(grid.arrange,gspl) # plot in one window 
-
-
-# ------------------------- plot dist
-# plot adult dist
-for(d in global_output_algae_event_Fh1K1[[2]]){
-  plot(density(d),col=rainbow(50)[tail(d,1)])
-  par(new=T)
-}
 
 # NLQuit()
 
