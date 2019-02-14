@@ -671,7 +671,6 @@ fh = "global_output_algae_event"
 
 # ------------------------- plot individual outputs -------------------------
 mm_ = readRDS(paste0(model.path,fh,".R"))
-layout(matrix(c(1:16),4,4,byrow=T))
 cat("order = cerc, food, juv, adult, infected, infected shedding, host length, parasite mass")
 # plot master
 mm <- mm_[[2]]
@@ -685,7 +684,8 @@ ggplot() +
 
 
 #------------------------- plot all sim results in one window -------------------------
-#require(gridExtra)
+require(gridExtra)
+layout(matrix(c(1:16),4,4,byrow=T))
 gspl <- list()
 K_pars = c(0.5, 1, 2, 3) 
 Fh_pars = c(0.5, 1, 1.5, 2)
