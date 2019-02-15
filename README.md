@@ -10,13 +10,7 @@
 
 ## Overview    
 
-Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalaria spp.* snail host population interactions based on dynamic energy budget (DEB) and transmission model. The model outlines how resource use by a size-structured host population influences population cycles of hosts and parasites. Host and parasite ecology and energetics are captured using a mechanistic energy budget model and interactions among hosts and parasites are captured by a disease tranmission model. Resource use by hosts and thus parasites is modelled by the IBM.  
-
-**Host**  
-Hosts incur costs from infection through damage density _delta_ and cumulative hazard rate _H_.      
-
-**Parasite**  
-The number of free-living miracidia in the environment is based on a probability function (multinomial distribution) of surviving miracidia, miracidia that successfully infected hosts, and unsuccessful miracidia that died.       
+Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalaria glabrata* snail host population interactions based on a dynamic energy budget (DEB) and exposure and transmission model. Host and parasite individual-level energetics and their ecology are captured via the mechanistic energy budget model and interactions among hosts and parasites are captured by the disease tranmission model. The global model simulates how resource use by a size-structured host population influences metabolism and thus population structure of hosts and parasites over time.      
 
 *Files:*      
 
@@ -48,7 +42,13 @@ Download the instructions for your operating system
 ### Individual 
 Notation follows the standard DEB notation, except in the following aspects:  
 - Rates are indicated with '_rate' rather than a dot  
-- '_ee_' is scaled reserve density of hosts in `Netlogo`    
+- '_ee_' is scaled reserve density of hosts in `Netlogo`  
+
+**Host**  
+Hosts incur costs from infection through damage density _delta_ and cumulative hazard rate _H_.      
+
+**Parasite**  
+The number of free-living miracidia in the environment is based on a probability function (multinomial distribution) of surviving miracidia, miracidia that successfully infected hosts, and unsuccessful miracidia that died.      
 
 Table 1. Definitions of model parameters for individual hosts and **parasites**. Dimensions and units: -, dimensionless; cm, centimetres; d, days; J, joules; L, length.    
 

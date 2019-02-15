@@ -593,9 +593,9 @@ for(detr in detr_pars){ # loop through detritus inputs
             
             Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
             # Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100]) (original r growth equation)
-            # F = K(F/F + K) - F * exp(- r + alpha * r * sin(2 * pi * t/rho) * s) - sum(F - uptake) # food growth eq. (19-12-18) 
-            # r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/rho) # equilibrium resource dynamics (static)
             # Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-rg_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (rg_t) (alphas [0,1]) (for v.1.1)     
+            # F = F * exp(- r + alpha * r * sin(2 * pi * t/rho) * s) * (1 - F/K) - f(i_{M} * sum(L^2) # v. 1.2 algae and detritus with cyclical algal growth
+            # r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/rho) # equilibrium resource dynamics (static)
             Env_F = max(0.001, snail.update[1,"Food"]) # algal or detritus food sources (for v.1.2)
             # Command back to NL @netlogo
             NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
@@ -667,7 +667,7 @@ cat("detritus =  ",seq(0,0.5,0.1))
 cat("algae with rg = ",seq(0,1,0.1))
 
 # ------------------------- select results to plot 
-fh = "global_output_algae_event"
+fh = "global_output_detritus"
 
 # ------------------------- plot individual outputs -------------------------
 mm_ = readRDS(paste0(model.path,fh,".R"))
