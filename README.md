@@ -1,5 +1,4 @@
-![](SchistoIBM_header.png)     
-<img src="https://raw.githubusercontent.com/darwinanddavis/SchistoIBM/master/SchistoIBM_header.png" alt=" " width=1000 height=200>  
+<img src="https://raw.githubusercontent.com/darwinanddavis/SchistoIBM/master/SchistoIBM_header.png" alt=" " width=1000 height=500>  
 
 # Individual-based Dynamic Energy Budget *Schistosoma* model (SIDEB)    
 
