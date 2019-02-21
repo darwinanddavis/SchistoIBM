@@ -84,7 +84,7 @@ Table 2. Definitions of model parameters of the simulation model environment. Di
 ## :pig: Troubleshooting    
 ### For running Netlogo from `R` on Mac OSX. See the [Instructions for Mac OSX](https://github.com/darwinanddavis/SchistoIBM/tree/master/mac) page for a detailed breakdown of the troubleshooting steps.  
 :one: [Installing compiler toolchain for Mac OSX](https://thecoatlessprofessor.com/programming/r-compiler-tools-for-rcpp-on-macos/)    
-:two: If you get an rJava error, run the following in terminal:      
+:two: If you get an rJava error, run the following in Terminal:      
 ``` {bash}
 sudo ln -s $(/usr/libexec/java_home)/jre/lib/server/libjvm.dylib /usr/local/lib 
 ```  
