@@ -12,6 +12,13 @@ linkcolor: blue
 urlcolor: blue
 citecolor: red
 output:
+  html_document:
+    highlight: tango
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    number_sections: no
+    toc_float: yes
   pdf_document:
     includes:
       in_header: # add .tex file with header content
@@ -27,13 +34,6 @@ output:
     citation_package: biblatex # natbib
     latex_engine: xelatex #pdflatex # lualatex
     keep_tex: true # keep .tex file in dir 
-  html_document:
-    highlight: tango
-    code_folding: hide
-    toc: yes
-    toc_depth: 3
-    number_sections: no
-    toc_float: yes
   word_document:
     highlight: tango
     keep_md: yes
@@ -47,7 +47,7 @@ tags:
 - nothing
 - nothingness
 params: 
-  dir: "/Users/malishev/Documents/Emory/admin/postdocs/postdoc_meetups"
+  dir: "/Users/malishev/Documents/Emory/research/schisto_ibm/SchistoIBM/docs/literature"
   date: !r Sys.Date()
   session: !r sessionInfo()  
   version: !r getRversion()
@@ -121,7 +121,7 @@ Aim: To account for time lag in population cycles based on things like resources
 
 [Southgate VR (1997) Schistosomiasis in the Senegal River Basin: Before and after the construction of the dams at Diama, Senegal and Manantali, Mali and future pros- pects. J Helminthol 71(2):125–132.](Southgate VR (1997) Schistosomiasis in the Senegal River Basin: Before and after the construction of the dams at Diama, Senegal and Manantali, Mali and future pros- pects. J Helminthol 71(2):125–132)    
 
-> From Sokolow et al 2015 PNAS   
+> From Sokolow et al 2015 PNAS  
 
 \newpage  
 
@@ -252,6 +252,19 @@ Sukhdeo (2004) Trematode behaviours and the perceptual worlds of parasites
 > 'Reinfection after treatment is a problem that plagues efforts to control parasites with complex transmission pathways, such as schistosomiasis, which affects at least 220 million people worldwide and requires an obligate snail intermediate host.'     
 
 > 
+
+\newpage  
+
+## Detritus and algae  
+
+K. R. Reddy & W. F. DeBusk. 1991. Decomposition of water hyacinth detritus in eutrophic lake water.  Hydrobiologib 211: 101-109.  
+
+> Detritus production rates    
+
+
+K. K. Moorhead, K. R. Reddy & D. A. Graetz 1988 Water hyacinth productivity and detritus accumulation. Hydrobiologia 157: 179-185.  
+
+> Detritus production rates   
 
 
 

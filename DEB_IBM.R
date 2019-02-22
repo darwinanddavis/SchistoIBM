@@ -242,6 +242,7 @@ if(mac==0){
   install.packages("tidyr")
   install.packages("ggthemes")
   install.packages("ggExtra")
+  install.packages("beepr")
 }
 ppp <- lapply(packages,require,character.only=T)
 if(any(ppp==F)){cbind(packages,ppp);cat("\n\n\n ---> Check packages are loaded properly <--- \n\n\n")}
@@ -652,7 +653,6 @@ for(detr in detr_pars){ # loop through detritus inputs
   	    } # ------------------------------ end rgs
   	  } # --------------------------------------------- end rhos
     } # ----------------------------------------------------------- end alphas
-  harwell(7,1,2)
   } # ------------------------------------------------------------------------- end detritus
 ####################################  end netlogo sim ######################################## 
 
