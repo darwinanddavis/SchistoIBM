@@ -473,10 +473,10 @@ if(save_to_file==1){pdf(paste0(wd,"/master_sim.pdf"),onefile=T,paper="a4")}
 ifelse(testrun==1,n.ticks<-5,n.ticks<-500)
 
 # param spaces
-detr_pars <- seq(0,0.5,0.1) # detritus input (mg L^-1 day^-1)
+detr_pars <- seq(0,0.5,0.05) # detritus input (mg L^-1 day^-1)
 alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
 rho_pars <- c(1,seq(10,120,10)) # periodicity of resources (rhos)
-rg_pars <- seq(0.5,1.5,0.5) # resource growth rates (rs)
+rg_pars <- seq(0,1,0.1) # resource growth rates (rs)
 me_pars <- seq(10,110,10) # molluscicide events (me)
 me_90 <- 2.3 # background hazard rate for 90% snail mortality from molluscicide event (per day) 
 Env_G = numeric() # create empty environment vector 
