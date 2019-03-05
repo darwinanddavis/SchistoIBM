@@ -11,6 +11,9 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
+# 28-2-19
+# added hb test
+
 # 11-2-19
 # added harwell script
 # updated Fh and K pars
@@ -192,7 +195,7 @@ if(snab==1){
 n.ticks <- 120 # set number of days to simulate
 day <- 1 # number of days to run simulation  
 resources <- "cyclical" # set resources: "cyclical" or "event"
-resource_type <- "detritus" # set resource type as "algae" or "detritus"
+resource_type <- "algae" # set resource type as "algae" or "detritus"
 
 ####################################  set model paths #######################################
 # load files
@@ -440,7 +443,11 @@ if(gui==0){
 NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model  
 # if java.lang error persists on Mac, try copying all .jar files from the 'Java' folder where Netlogo is installed into the main Netlogo folder   	
 
-resource_type="algae"
+################################################################################################
+####################################  start netlogo sim ######################################## 
+################################################################################################
+
+resource_type="detritus"
 resources="event"
 
 # set type of resource input @netlogo
@@ -454,10 +461,6 @@ set_resources<-function(resources){ # set resource input in env
 set_resources(resources) # set resources: "cyclical" or "event"  @netlogo
 cat("\nResource type = ",resource_type,"\nResources = ",resources)
 
-################################################################################################
-####################################  start netlogo sim ######################################## 
-################################################################################################
-
 # OG scenario
 # Fh = c(0.5,1,2,5)
 # K = c(1,2,5,10) 
@@ -466,26 +469,42 @@ cat("\nResource type = ",resource_type,"\nResources = ",resources)
 # Fh = c(0.5, 1, 1.5, 2)
 # K = c(0.5, 1, 2, 3) 
 
-testrun <- 1 # do a quick testrun to see plots
+testrun <- 0 # do a quick testrun to see plots
 snail_control <- 0 # 1 = add molluscicide event
 
 if(save_to_file==1){pdf(paste0(wd,"/master_sim.pdf"),onefile=T,paper="a4")}
-ifelse(testrun==1,n.ticks<-5,n.ticks<-500)
+ifelse(testrun==1,n.ticks<-20,n.ticks<-120)
 
-# param spaces
-detr_pars <- seq(0,0.5,0.05) # detritus input (mg L^-1 day^-1)
-alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
-rho_pars <- c(1,seq(10,120,10)) # periodicity of resources (rhos)
-rg_pars <- seq(0,1,0.1) # resource growth rates (rs)
+# snail control params
 me_pars <- seq(10,110,10) # molluscicide events (me)
 me_90 <- 2.3 # background hazard rate for 90% snail mortality from molluscicide event (per day) 
-Env_G = numeric() # create empty environment vector 
 
-# set detritus params
-if(resource_type=="detritus"){detr_pars <- detr_pars;alpha_pars <- 0; rho_pars <- 10; rg_pars <- 0;cat("detritus input = ",detr_pars)}else{detr_pars <- 0;cat("detritus input = ", detr_pars)}
+# sicb sims 
+# detr and algae values for reasonable cerc outputs
+# detr_pars <- 0.25 # detritus input (mg L^-1 day^-1)
+# rg_pars <- 0.5
+
+# algae params
+rg_pars <- seq(0,1,0.1) # resource growth rates (rs)
+alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
+rho_pars <- c(1,seq(10,120,10)) # periodicity of resources (rhos)
+
+# detritus params
+detr_pars <- seq(0,0.5,0.05) # detritus input (mg L^-1 day^-1)
+
+# mortality params 
+hb_pars <- c(0.0001, 0.001, 0.002, 0.004, 0.006, 0.008, 0.01, 0.02); hb_pars
+
+me_pars <- 0 # set molluscicide events to 0 
+if(resource_type=="detritus"){
+  detr_pars <- detr_pars;alpha_pars <- 0; rho_pars <- 10; rg_pars <- 0;cat("detritus input = ",detr_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)
+  }else{detr_pars <- 0;cat("detritus input = ", detr_pars,"\nrg = ",rg_pars)}
 # set resource to cycle or be constant
-if(resource_type=="algae"){if(resources=="cyclical"){alpha_pars <- alpha_pars; rho_pars <- rho_pars ; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars)}else{alpha_pars <- 0; rho_pars <- 10; rg_pars <- seq(0,1,0.1);cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars)}}
-# set snail control events or none
+if(resource_type=="algae"){
+  if(resources=="cyclical"){alpha_pars <- alpha_pars; rho_pars <- rho_pars ; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars)
+  }else{alpha_pars <- 0; rho_pars <- 10; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars,"\nhb = ", hb_pars)}}
+
+Env_G = numeric() # create empty environment vector 
 if(snail_control==1){me_pars <- me_pars}else{me_pars <- 1000000}; cat("Snail control will occur every ",max(me_pars)/me_pars[1]-1," days") 
 
 # # define param sample space with LHS
@@ -528,6 +547,7 @@ plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
 par(mfrow=plot.matrix)
 
 ####################################  start netlogo sim ######################################## 
+for(hb in hb_pars){
 for(detr in detr_pars){ # loop through detritus inputs 
   for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
     for(rho in rho_pars){ # loop through rhos (periodicity of food cycle)
@@ -559,9 +579,10 @@ for(detr in detr_pars){ # loop through detritus inputs
                                                     DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
                                                     mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
                                                     kk=pars["kk"], 
-                                                    if(snail_control==1){
-                                                      if(day==me){hb <- me_90}
-                                                    }else{hb <- pars["hb"]},
+                                                    #if(snail_control==1){
+                                                    # if(day==me){hb <- me_90}
+                                                    # }else{hb <- pars["hb"]},
+                                                    hb=hb, # hb pars test
                                                     theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], SAtotal= sum(snail.stats[,2]^2), 
                                                     ENV=pars["ENV"], r=pars["r"], K=pars["K"], 
                                                     Det=pars["Det"]))) # detritus (Det) defined in C file
@@ -654,13 +675,14 @@ for(detr in detr_pars){ # loop through detritus inputs
   	  } # --------------------------------------------- end rhos
     } # ----------------------------------------------------------- end alphas
   } # ------------------------------------------------------------------------- end detritus
+} # end hb pars 
 ####################################  end netlogo sim ######################################## 
 
 # results output 
 # save sim results to dir 
 str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master))  
 global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master) 
-saveRDS(global_output,paste0(wd,"/global_output_",resource_type,"_",resources,".R"))
+saveRDS(global_output,paste0(wd,"/global_output_",resource_type,"_",resources,"_hbs.R"))
 # read in saved sim results
 cat("order = cerc, food, juv, adult, infected, infected shedding, host length, parasite mass")
 cat("detritus =  ",seq(0,0.5,0.1))
