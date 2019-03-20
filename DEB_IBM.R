@@ -11,6 +11,9 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
+# 5-3-19
+# updated hb rates for sicb paper 
+
 # 28-2-19
 # added hb test
 
@@ -254,11 +257,11 @@ cs <- list() # diagnostics list for checking NAs in create snails command
 
 # load plot function 
 script <- getURL("https://raw.githubusercontent.com/darwinanddavis/plot_it/master/plot_it.R", ssl.verifypeer = FALSE)
-eval(parse(text = script))
+eval(parse(text = script))    
 display.brewer.all()
 # Set global plotting parameters
 cat("plot_it( \n0 for presentation, 1 for manuscript, \nset colour for background, \nset colour palette 1. use 'display.brewer.all()', \nset colour palette 2. use 'display.brewer.all()', \nset alpha for colour transperancy, \nset font style \n)")
-plot_it(0,"blue","YlOrRd","Greens",1,"mono") # set plot function params       
+plot_it(0,"blue","Spectral","Greens",1,"mono") # set plot function params       
 plot_it_gg("white") # same as above for ggplot     
 
 # load harwell script
@@ -402,7 +405,7 @@ Infection = function(snail.stats, miracidia, parameters){
   P.dead = (1 - P.left.in.water)*(m_M/(m_M+sum.exp.rates)) + sum((1 - P.left.in.water)*((1-sigma)*exp.rates/(m_M+sum.exp.rates)))
   
   prob.vector = c(P.infects.this.snail, P.left.in.water, P.dead)
-  
+   
   # Multinomial outcome from number of miracidia in env based on their survival probability
   rmultinom(n=1, size=miracidia, prob=prob.vector)
   #sum(P.left.in.water, P.invades.this.snail, P.dead)
