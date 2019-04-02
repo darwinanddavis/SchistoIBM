@@ -11,6 +11,10 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
+# 2-4-19 
+# changed hb pars to match sicb paper
+# added file name (global_output_fh) to before sim
+
 # 5-3-19
 # updated hb rates for sicb paper 
 
@@ -496,7 +500,7 @@ rho_pars <- c(1,seq(10,120,10)) # periodicity of resources (rhos)
 detr_pars <- seq(0,0.5,0.05) # detritus input (mg L^-1 day^-1)
 
 # mortality params 
-hb_pars <- c(0.0001, 0.001, 0.002, 0.004, 0.006, 0.008, 0.01, 0.02); hb_pars
+hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1); hb_pars
 
 me_pars <- 0 # set molluscicide events to 0 
 if(resource_type=="detritus"){
@@ -548,6 +552,9 @@ pmass_master <- list() # master list for parasite biomass
 # define plot window
 plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
 par(mfrow=plot.matrix)
+
+# file name to save results
+global_output_fh = paste0(wd,"/global_output_",resource_type,"_",resources,"_hb_sicb_cercs_sicbpost_hb1.R")
 
 ####################################  start netlogo sim ######################################## 
 for(hb in hb_pars){
@@ -685,11 +692,10 @@ for(detr in detr_pars){ # loop through detritus inputs
 # save sim results to dir 
 str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master))  
 global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master) 
-saveRDS(global_output,paste0(wd,"/global_output_",resource_type,"_",resources,"_hbs.R"))
+saveRDS(global_output,global_output_fh) # save to dir 
+cat("Output saved in ", global_output_fh)
 # read in saved sim results
 cat("order = cerc, food, juv, adult, infected, infected shedding, host length, parasite mass")
-cat("detritus =  ",seq(0,0.5,0.1))
-cat("algae with rg = ",seq(0,1,0.1))
 
 # ------------------------- select results to plot 
 fh = "global_output_detritus"
