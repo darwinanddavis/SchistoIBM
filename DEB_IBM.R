@@ -11,15 +11,19 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
+# 9-4-19
+# added molluscicide events
+# changed yRP to 0.824 to match 2 hour hangover period  
+
 # 2-4-19 
 # changed hb pars to match sicb paper
 # added file name (global_output_fh) to before sim
 
+# 25-3-19
+# added 0.04 to hb param range 
+
 # 5-3-19
 # updated hb rates for sicb paper 
-
-# 28-2-19
-# added hb test
 
 # 11-2-19
 # added harwell script
@@ -360,6 +364,7 @@ pars["m_Z"] = 1   # Units: day-1
 pars["M_in"] = 10
 pars["K"] = 5
 pars["Det"] = 0.1 # Units mg C/L-1 d-1 (detritus)
+pars["yRP"] = 0.824 # new  0.0471 * (1/0.4) * 7 [expected shedding output per week * (snails shed 40% of their total cercariae during 9-11 AM.) * 7 days] 
 
 ####################################  solve deb eqs #######################################
 # display list of param definitions
@@ -454,7 +459,7 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 ####################################  start netlogo sim ######################################## 
 ################################################################################################
 
-resource_type="detritus"
+resource_type="algae"
 resources="event"
 
 # set type of resource input @netlogo
@@ -477,14 +482,11 @@ cat("\nResource type = ",resource_type,"\nResources = ",resources)
 # K = c(0.5, 1, 2, 3) 
 
 testrun <- 0 # do a quick testrun to see plots
-snail_control <- 0 # 1 = add molluscicide event
+snail_control <- 1 # 1 = add molluscicide event
+me_event <- 1 # 1, 2, or 3. pick molluscicide event to simulate (defined below)
 
 if(save_to_file==1){pdf(paste0(wd,"/master_sim.pdf"),onefile=T,paper="a4")}
 ifelse(testrun==1,n.ticks<-20,n.ticks<-120)
-
-# snail control params
-me_pars <- seq(10,110,10) # molluscicide events (me)
-me_90 <- 2.3 # background hazard rate for 90% snail mortality from molluscicide event (per day) 
 
 # sicb sims 
 # detr and algae values for reasonable cerc outputs
@@ -502,6 +504,11 @@ detr_pars <- seq(0,0.5,0.05) # detritus input (mg L^-1 day^-1)
 # mortality params 
 hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1); hb_pars
 
+# algae params for me events
+rg_pars <- c(0.1,0.25,0.5) # resource growth rates (rs)
+# detritus params for me events
+detr_pars <- c(0.1,0.25,0.4) # detritus input (mg L^-1 day^-1)
+
 me_pars <- 0 # set molluscicide events to 0 
 if(resource_type=="detritus"){
   detr_pars <- detr_pars;alpha_pars <- 0; rho_pars <- 10; rg_pars <- 0;cat("detritus input = ",detr_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)
@@ -512,22 +519,25 @@ if(resource_type=="algae"){
   }else{alpha_pars <- 0; rho_pars <- 10; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars,"\nhb = ", hb_pars)}}
 
 Env_G = numeric() # create empty environment vector 
-if(snail_control==1){me_pars <- me_pars}else{me_pars <- 1000000}; cat("Snail control will occur every ",max(me_pars)/me_pars[1]-1," days") 
 
 # # define param sample space with LHS
-# lhsmodel <- function(params){  
+# require(sp)
+# require(pse)
+# require(lhs)
+# lhsmodel <- function(params){
 #   params <- factors_space[[2]]*factors_space[[3]]*factors_space[[4]]
 # }
-# factors <- c("alpha","rho","rg","me") # name of params 
+# factors <- c("alpha","rho","rg","me") # name of params
 # factors_space <- list(alpha_pars,rho_pars,rg_pars,me_pars)
-# q <- rep("qnorm",length(factors)) # apply the dist to be used 
+# q <- rep("qnorm",length(factors)) # apply the dist to be used
 # q.arg <- list(list(alpha_pars),list(rho_pars),list(rg_pars),list(me_pars)) # inputs for dist q
 # # list(list(mean=1.7, sd=0.3), list(mean=40, sd=1),list(min=1, max=50) )
-# N <- prod(as.numeric(summary(factors_space)[,1]))  
+# N <- prod(as.numeric(summary(factors_space)[,1]))
 # lhs_model <- LHS(model=lhsmodel,factors=factors,N=N,q=q,q.arg=q.arg,nboot=100)
 # lhs_data <- get.data(lhs_model) # param space from LHS
 # lhs_results <- get.results(lhs_model)
-# get.N(lhs_model) # get the number of output points in hypercube 
+# get.N(lhs_model) # get the number of output points in hypercube
+# lhs_data
 
 # individual outputs
 cerc_list <- list() # cercariae   
@@ -553,139 +563,157 @@ pmass_master <- list() # master list for parasite biomass
 plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
 par(mfrow=plot.matrix)
 
+# rep test (sicb) 27-3-19
+# hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1)
+# rg_pars = c(0, 0, 0)#c(0.1,0.25,0.5)
+# detr_pars = seq(0,0.5,0.05)#c(0.1,0.2,0.5)
+
+# molluscicide events (me)
+me_90 <- 2.3 # background hazard rate for 90% snail mortality from molluscicide event (per day) 
+# me1
+me_pars <- seq(30,120,30) # every 30 days
+# me2
+# The dry seasons in Kenya are generally from mid-June to October, 
+# and from late-December to mid-March
+me_pars <- seq(10,120,10) #  When transmission is seasonal, it is recommended to carry out regular applications of molluscicide (WHO 2017)
+# me3
+me_pars <- XX # when infected snails appear 
+
+if(snail_control==1){me_pars <- me_pars; hb_pars <- 0.03}else{me_pars <- 1000000; hb_pars <- hb_pars}; cat("Snail control will occur every ",max(me_pars)/me_pars[1]-1," days \n Mortality is ",hb_pars) 
+cat("algae:",rg_pars,"\ndetritus:",detr_pars,"\nrho:",rho_pars,"\nalpha:",alpha_pars,"\nmortality:",hb_pars,"\nmolluscicide:",me_pars)
+
 # file name to save results
-global_output_fh = paste0(wd,"/global_output_",resource_type,"_",resources,"_hb_sicb_cercs_sicbpost_hb1.R")
+global_output_fh = paste0(wd,"/global_output_",resource_type,"_",resources,"_hb03_me1.R")
 
 ####################################  start netlogo sim ######################################## 
 for(hb in hb_pars){
-for(detr in detr_pars){ # loop through detritus inputs 
-  for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
-    for(rho in rho_pars){ # loop through rhos (periodicity of food cycle)
-  	  for(rg in rg_pars){ # loop through rgs (food growth rates)
-  	    for(me in me_pars){ # loop through mes (molluscicide events)
-  	      NLCommand("setup")
-  	      for(t in 1:n.ticks){ # start nl sim  @netlogo
-  	        snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
-            N.snails = length(snail.stats[,"L"])
-            environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches")) # calc food, free miracidia, cercariae released, and eggs, per patch
-      
-            # Infect snails
-            Infection.step = as.vector(Infection(snail.stats, environment[2], pars)) # Who gets infected
-            snail.stats[which(Infection.step[1:N.snails] > 0),"P"] = snail.stats[which(Infection.step[1:N.snails] > 0),"P"] + 2.85e-5 # add biomass of one miracidia
-            
-            # define food dynamics for cyclical algal (logistic food growth equation) or detritus food sources
-            alpha <- alpha # amplitude of resources
-            rho <- rho  # periodicity (time range of resource cycles)  
-            rg <- rg # resource growth rate 
-            rg_t <- rg + alpha * rg * sin(2 * pi * t/rho) # equilibrium cyclical resource dynamics (19-12-18)
-            pars["r"] <- rg_t # set resource growth rate 
-            pars["Det"] <- detr # Units mg C/L-1 d-1 (detritus)
-            # Update DEBS, HAZ=0 so survival probs are calculated for the current day
-            snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
-                                    P=snail.stats[,6], RP=snail.stats[,7], DAM=snail.stats[,8], Lp=snail.stats[,10],# Food=environment[1]*(snail.stats[,2]^2)/sum(snail.stats[,2]^2), # update food availability per snail 
-                                    MoreArgs = list(step=1, HAZ=0, Food=environment[1],# constant food available (23-1-19)
-                                                    iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], Fh=pars["Fh"], 
-                                                    muD=pars["muD"],
-                                                    DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
-                                                    mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
-                                                    kk=pars["kk"], 
-                                                    #if(snail_control==1){
-                                                    # if(day==me){hb <- me_90}
-                                                    # }else{hb <- pars["hb"]},
-                                                    hb=hb, # hb pars test
-                                                    theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], SAtotal= sum(snail.stats[,2]^2), 
-                                                    ENV=pars["ENV"], r=pars["r"], K=pars["K"], 
-                                                    Det=pars["Det"]))) # detritus (Det) defined in C file
-            L = snail.update[,"L"] # host structural length
-            e = snail.update[,"e"] # host scaled reserve density    
-            D = snail.update[,"D"] # host development 
-            RH = snail.update[,"RH"] # host energy to reproduction buffer  
-            DAM = snail.update[,"DAM"] # host damage from starvation  
-            HAZ = snail.update[,"HAZ"] # host hazard rate from starvation   
-            LG = snail.update[,"LG"] # host shell length  
-            P = snail.update[,"P"] # parasite mass (sum within host)
-            RP = snail.update[,"RP"] # parasite reproductive buffer  
-            # ingestion = environment[1] - sum(snail.update[,"Food"]) # food intake by host from environment (for v.1.1)
-            hl_list[t] <- L # get host lengths per model step
-            pmass_list[t] <- P # get parasite mass per model step 
-            
-            Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
-            # if(day==me){Eggs <- Eggs[1:round(0.1*length(Eggs))]} # kill off 90% of snail eggs in water with molluscicide event  
-            RH = RH %% 0.015        # Remove released cercariae from the buffer
-            Cercs = floor(RP/4e-5)  # Figure out how many (whole) cercs are released
-            RP = RP %% 4e-5         # Remove released cercariae from buffer
-            Eggs = as.integer(Eggs); Cercs = as.integer(Cercs)
-            
-            # Update environment 
-            Env_M = as.numeric(Infection.step[N.snails + 1] + pars["M_in"]) # total miracidia density 
-            Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"]) # total cerc density
-            Env_G = as.integer(Env_G) # set pop density outputs to integer to pass into Env_G and rbinom func
-            # ifelse(day==me,Env_G[day] <- max(0, 0.1*sum(Eggs),na.rm=T),Env_G[day] <- max(0, sum(Eggs),na.rm=T)) # kill off 90% of snail eggs in water with molluscicide event 
-            Env_G[day] <- max(0, sum(Eggs),na.rm=T)
-            
-            Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
-            # Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100]) (original r growth equation)
-            # Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-rg_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (rg_t) (alphas [0,1]) (for v.1.1)     
-            # F = F * exp(- r + alpha * r * sin(2 * pi * t/rho) * s) * (1 - F/K) - f(i_{M} * sum(L^2) # v. 1.2 algae and detritus with cyclical algal growth
-            # r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/rho) # equilibrium resource dynamics (static)
-            Env_F = max(0.001, snail.update[1,"Food"]) # algal or detritus food sources (for v.1.2)
-            # Command back to NL @netlogo
-            NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
-            snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
-            NLCommand(snail.commands) 
-            if(day > 10){
-              if(snail_control==1){ # kill off 90% of snail eggs in water with molluscicide event  
-                if(day==me){create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.1)}
-              }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}
-              NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
-            } # end create snails
-            NLCommand("go") # run @netlogo sim steps
-            #cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
-            day = day + 1 
-            if(testrun==1){
-              cerc_list[t] <- Env_F + rho # use to test plot outputs quickly (plots food + rho value as mock output to show amplitude)  
-              }else{
-                # results outputs
-                cerc_list[t] <- Env_Z # get cercariae density 
-    		        food_list[t] <- Env_F # get food growth
-    		        juv_list[t] <- length(which(snail.stats$RH==0)) # get juvenile hosts
-    		        adult_list[t] <- length(which(snail.stats$RH>0)) # get adult hosts
-    		        infec_list[t] <- length(which(snail.stats$P>0)) # get just infected hosts
-    		        infec_shed_list[t] <- length(which(snail.stats$RP>0)) # get infected hosts that are shedding
-    		        } # end testrun
-            } # --------------------------------------- end nl sim
-  	      # save individual outputs 
-  	      cerc_list <- as.numeric(cerc_list) 
-    	    food_list <- as.numeric(food_list)
-    	    juv_list <- as.numeric(juv_list)
-    	    adult_list <- as.numeric(adult_list)
-          infec_list <- as.numeric(infec_list)
-          infec_shed_list <- as.numeric(infec_shed_list)
-          hl_list <- as.numeric(hl_list)
-          pmass_list <- as.numeric(pmass_list)
-          # save master outputs 
-          cerc_master[[length(cerc_master)+1]] <- cerc_list # cerc master list
-          food_master[[length(food_master)+1]] <- food_list # food master list
-          juv_master[[length(juv_master)+1]] <- juv_list # juv pop master list
-          adult_master[[length(adult_master)+1]] <- adult_list # adult pop master list
-          infec_master[[length(infec_master)+1]] <- infec_list # infected host pop master list
-          infec_shed_master[[length(infec_shed_master)+1]] <- infec_shed_list # infected shedding host pop master list
-          hl_master[[length(hl_master)+1]] <- hl_list # host length master
-          pmass_master[[length(pmass_master)+1]] <- pmass_list # host length master
-          ### plot outputs 
-        #   plot(cerc_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(do.call(max,cerc_master)),
-        # 	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),ylab="Cercariae density",xlab="Days") 
-        #   paste0(expression("alpha = ",alpha, "; rho = ", rho, "; r = ", rg)) 
-        #   text(which(cerc_list==max(cerc_list)),max(cerc_list),paste0("a= ",alpha," \n p= ",rho)#,col=max(cerc_list),
-        #        )
-          #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
-          if(save_to_file==1){dev.off()}
-          } # --------------- end mes
-  	    } # ------------------------------ end rgs
-  	  } # --------------------------------------------- end rhos
-    } # ----------------------------------------------------------- end alphas
-  } # ------------------------------------------------------------------------- end detritus
-} # end hb pars 
+  for(detr in detr_pars){ # loop through detritus inputs 
+    for(alpha in alpha_pars){ # loop through alphas (amplitude in food cycle)
+      for(rho in rho_pars){ # loop through rhos (periodicity of food cycle)
+    	  for(rg in rg_pars){ # loop through rgs (food growth rates)
+    	    for(me in me_pars){ # loop through mes (molluscicide events)
+    	      NLCommand("setup")
+    	      for(t in 1:n.ticks){ # start nl sim  @netlogo
+    	        snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
+              N.snails = length(snail.stats[,"L"])
+              environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches")) # calc food, free miracidia, cercariae released, and eggs, per patch
+        
+              # Infect snails
+              Infection.step = as.vector(Infection(snail.stats, environment[2], pars)) # Who gets infected
+              snail.stats[which(Infection.step[1:N.snails] > 0),"P"] = snail.stats[which(Infection.step[1:N.snails] > 0),"P"] + 2.85e-5 # add biomass of one miracidia
+              
+              # define food dynamics for cyclical algal (logistic food growth equation) or detritus food sources
+              alpha <- alpha # amplitude of resources
+              rho <- rho  # periodicity (time range of resource cycles)  
+              rg <- rg # resource growth rate 
+              rg_t <- rg + alpha * rg * sin(2 * pi * t/rho) # equilibrium cyclical resource dynamics (19-12-18)
+              pars["r"] <- rg_t # set resource growth rate 
+              pars["Det"] <- detr # Units mg C/L-1 d-1 (detritus)
+              # Update DEBS, HAZ=0 so survival probs are calculated for the current day
+              snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
+                                      P=snail.stats[,6], RP=snail.stats[,7], DAM=snail.stats[,8], Lp=snail.stats[,10],# Food=environment[1]*(snail.stats[,2]^2)/sum(snail.stats[,2]^2), # update food availability per snail 
+                                      MoreArgs = list(step=1, HAZ=0, Food=environment[1],# constant food available (23-1-19)
+                                                      iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], Fh=pars["Fh"], 
+                                                      muD=pars["muD"],
+                                                      DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
+                                                      mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
+                                                      kk=pars["kk"], 
+                                                      if(snail_control==1){
+                                                        if(day==me){hb <- me_90}
+                                                      }else{hb <- hb},
+                                                      theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], SAtotal= sum(snail.stats[,2]^2), 
+                                                      ENV=pars["ENV"], r=pars["r"], K=pars["K"], 
+                                                      Det=pars["Det"]))) # detritus (Det) defined in C file
+              L = snail.update[,"L"] # host structural length
+              e = snail.update[,"e"] # host scaled reserve density    
+              D = snail.update[,"D"] # host development 
+              RH = snail.update[,"RH"] # host energy to reproduction buffer  
+              DAM = snail.update[,"DAM"] # host damage from starvation  
+              HAZ = snail.update[,"HAZ"] # host hazard rate from starvation   
+              LG = snail.update[,"LG"] # host shell length  
+              P = snail.update[,"P"] # parasite mass (sum within host)
+              RP = snail.update[,"RP"] # parasite reproductive buffer  
+              # ingestion = environment[1] - sum(snail.update[,"Food"]) # food intake by host from environment (for v.1.1)
+              # hl_list[t] <- L # get host lengths per model step
+              # pmass_list[t] <- P # get parasite mass per model step 
+              
+              Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
+              # if(day==me){Eggs <- Eggs[1:round(0.1*length(Eggs))]} # kill off 90% of snail eggs in water with molluscicide event  
+              RH = RH %% 0.015        # Remove released cercariae from the buffer
+              Cercs = floor(RP/4e-5)  # Figure out how many (whole) cercs are released
+              RP = RP %% 4e-5         # Remove released cercariae from buffer
+              Eggs = as.integer(Eggs); Cercs = as.integer(Cercs)
+              
+              # Update environment 
+              Env_M = as.numeric(Infection.step[N.snails + 1] + pars["M_in"]) # total miracidia density 
+              Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"]) + sum(Cercs)/pars["ENV"]) # total cerc density
+              Env_G = as.integer(Env_G) # set pop density outputs to integer to pass into Env_G and rbinom func
+              # ifelse(day==me,Env_G[day] <- max(0, 0.1*sum(Eggs),na.rm=T),Env_G[day] <- max(0, sum(Eggs),na.rm=T)) # kill off 90% of snail eggs in water with molluscicide event 
+              Env_G[day] <- max(0, sum(Eggs),na.rm=T)
+              
+              Env_G[is.na(Env_G)] <- 0 # turn NAs to 0 to feed into rbinom function  
+              # Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion (alphas [1,100]) (original r growth equation)
+              # Env_F = max(0.001, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-rg_t*pars["step"])) - ingestion)) # Analytical soln to logistic - ingestion with equilibrium resource growth wave (rg_t) (alphas [0,1]) (for v.1.1)     
+              # F = F * exp(- r + alpha * r * sin(2 * pi * t/rho) * s) * (1 - F/K) - f(i_{M} * sum(L^2) # v. 1.2 algae and detritus with cyclical algal growth
+              # r_t <- pars["r"] + alpha * pars["r"] * sin(2 * pi * t/rho) # equilibrium resource dynamics (static)
+              Env_F = max(0.001, snail.update[1,"Food"]) # algal or detritus food sources (for v.1.2)
+              # Command back to NL @netlogo
+              NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
+              snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
+              NLCommand(snail.commands) 
+              if(day > 10){
+                if(snail_control==1){ # kill off 90% of snail eggs in water with molluscicide event  
+                  if(day==me){create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.1)}
+                }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}
+                NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
+              } # end create snails
+              NLCommand("go") # run @netlogo sim steps
+              #cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
+              day = day + 1 
+              if(testrun==1){
+                cerc_list[t] <- Env_F + rho # use to test plot outputs quickly (plots food + rho value as mock output to show amplitude)  
+                }else{
+                  # results outputs
+                  cerc_list[t] <- Env_Z # get cercariae density 
+      		        food_list[t] <- Env_F # get food growth
+      		        juv_list[t] <- length(which(snail.stats$RH==0)) # get juvenile hosts
+      		        adult_list[t] <- length(which(snail.stats$RH>0)) # get adult hosts
+      		        infec_list[t] <- length(which(snail.stats$P>0)) # get just infected hosts
+      		        infec_shed_list[t] <- length(which(snail.stats$RP>0)) # get infected hosts that are shedding
+      		        } # end testrun
+              } # --------------------------------------- end nl sim
+    	      # save individual outputs 
+    	      cerc_list <- as.numeric(cerc_list) 
+      	    food_list <- as.numeric(food_list)
+      	    juv_list <- as.numeric(juv_list)
+      	    adult_list <- as.numeric(adult_list)
+            infec_list <- as.numeric(infec_list)
+            infec_shed_list <- as.numeric(infec_shed_list)
+            hl_list <- as.numeric(hl_list)
+            pmass_list <- as.numeric(pmass_list)
+            # save master outputs 
+            cerc_master[[length(cerc_master)+1]] <- cerc_list # cerc master list
+            food_master[[length(food_master)+1]] <- food_list # food master list
+            juv_master[[length(juv_master)+1]] <- juv_list # juv pop master list
+            adult_master[[length(adult_master)+1]] <- adult_list # adult pop master list
+            infec_master[[length(infec_master)+1]] <- infec_list # infected host pop master list
+            infec_shed_master[[length(infec_shed_master)+1]] <- infec_shed_list # infected shedding host pop master list
+            hl_master[[length(hl_master)+1]] <- hl_list # host length master
+            pmass_master[[length(pmass_master)+1]] <- pmass_list # host length master
+            ### plot outputs 
+          #   plot(cerc_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(do.call(max,cerc_master)),
+          # 	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),ylab="Cercariae density",xlab="Days") 
+          #   paste0(expression("alpha = ",alpha, "; rho = ", rho, "; r = ", rg)) 
+          #   text(which(cerc_list==max(cerc_list)),max(cerc_list),paste0("a= ",alpha," \n p= ",rho)#,col=max(cerc_list),
+          #        )
+            #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
+            if(save_to_file==1){dev.off()}
+            } # --------------- end mes
+    	    } # ------------------------------ end rgs
+    	  } # --------------------------------------------- end rhos
+      } # ----------------------------------------------------------- end alphas
+    } # ------------------------------------------------------------------------- end detritus
+  } # end hb pars 
 ####################################  end netlogo sim ######################################## 
 
 # results output 
