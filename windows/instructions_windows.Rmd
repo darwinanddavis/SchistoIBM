@@ -91,7 +91,7 @@ knitr::opts_knit$set(root.dir=paste0(params$dir,"/")) # set working dir
 setwd(paste0(params$dir,"/")) # for running just in R not knitr
 ```
 
-\newpage   
+\newpage    
 
 Date: `r params$date`  
 R version: `r params$version`  
