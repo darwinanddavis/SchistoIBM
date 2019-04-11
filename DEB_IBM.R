@@ -721,6 +721,7 @@ for(hb in hb_pars){
 # save sim results to dir 
 str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master))  
 global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master) 
+# global_output <- cerc_master # save just cercs
 saveRDS(global_output,global_output_fh) # save to dir 
 cat("Output saved in ", global_output_fh)
 # read in saved sim results
