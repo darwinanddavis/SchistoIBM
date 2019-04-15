@@ -99,6 +99,10 @@
 
 ###### TO DO ######
 
+# for me events 
+# - get average biomass (L * chi * L^3, then average)  
+# - get abundance
+
 # for new snail deb feeding 
     ## in new C file
 ### redefine dFdf (dfdt = -iM * f * sum(L^2) + rF(1-K/F) + Det)  
@@ -548,6 +552,7 @@ infec_list <- list() # infected hosts
 infec_shed_list <- list() # infected shedding hosts
 hl_list <- list() # host length
 pmass_list <- list() # parasite biomass 
+host_biomass_list <- list() # host biomass list 
 
 # master outputs
 cerc_master <- list() # master list for cerc density (Env_Z) 
@@ -558,6 +563,7 @@ infec_master <- list() # master list for infected host pop ()
 infec_shed_master <- list() # master list for infected shedding host pop
 hl_master <- list() # master list for host length
 pmass_master <- list() # master list for parasite biomass 
+host_biomass_master <- list() # master list for host biomass
 
 # define plot window
 plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
@@ -635,8 +641,13 @@ for(hb in hb_pars){
               P = snail.update[,"P"] # parasite mass (sum within host)
               RP = snail.update[,"RP"] # parasite reproductive buffer  
               # ingestion = environment[1] - sum(snail.update[,"Food"]) # food intake by host from environment (for v.1.1)
-              # hl_list[t] <- L # get host lengths per model step
-              # pmass_list[t] <- P # get parasite mass per model step 
+              
+              chi <- pars["M"]/(1 + pars["EM"]) # length to volume conversion factor for getting biomass
+              host_biomass <- L * chi * L^3 # get host biomass
+              
+              hl_list[t] <- L # get host lengths per model step
+              pmass_list[t] <- P # get parasite mass per model step
+              host_biomass_list <- host_biomass # get host mass per model step
               
               Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
               # if(day==me){Eggs <- Eggs[1:round(0.1*length(Eggs))]} # kill off 90% of snail eggs in water with molluscicide event  
@@ -692,6 +703,8 @@ for(hb in hb_pars){
             infec_shed_list <- as.numeric(infec_shed_list)
             hl_list <- as.numeric(hl_list)
             pmass_list <- as.numeric(pmass_list)
+            host_biomass_list <- as.numeric(host_biomass_list)
+            
             # save master outputs 
             cerc_master[[length(cerc_master)+1]] <- cerc_list # cerc master list
             food_master[[length(food_master)+1]] <- food_list # food master list
@@ -700,7 +713,8 @@ for(hb in hb_pars){
             infec_master[[length(infec_master)+1]] <- infec_list # infected host pop master list
             infec_shed_master[[length(infec_shed_master)+1]] <- infec_shed_list # infected shedding host pop master list
             hl_master[[length(hl_master)+1]] <- hl_list # host length master
-            pmass_master[[length(pmass_master)+1]] <- pmass_list # host length master
+            pmass_master[[length(pmass_master)+1]] <- pmass_list # parasite mass master
+            host_biomass_master[[length(host_biomass_master)+1]] <- host_biomass_list # host biomass master
             ### plot outputs 
           #   plot(cerc_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(do.call(max,cerc_master)),
           # 	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),ylab="Cercariae density",xlab="Days") 
