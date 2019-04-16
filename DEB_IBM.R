@@ -11,6 +11,9 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
+# 15-4-19
+# added chi param and host biomass, mean host length, and summed parasite mass to master output  
+
 # 9-4-19
 # added molluscicide events
 # changed yRP to 0.824 to match 2 hour hangover period  
@@ -643,10 +646,10 @@ for(hb in hb_pars){
               # ingestion = environment[1] - sum(snail.update[,"Food"]) # food intake by host from environment (for v.1.1)
               
               chi <- pars["M"]/(1 + pars["EM"]) # length to volume conversion factor for getting biomass
-              host_biomass <- L * chi * L^3 # get host biomass
+              host_biomass <- sum(chi * L^3) # get total host biomass
               
-              hl_list[t] <- L # get host lengths per model step
-              pmass_list[t] <- P # get parasite mass per model step
+              hl_list[t] <- mean(L) # get average host lengths per model step 
+              pmass_list[t] <- sum(P) # get total parasite mass per model step
               host_biomass_list <- host_biomass # get host mass per model step
               
               Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
@@ -733,13 +736,13 @@ for(hb in hb_pars){
 
 # results output 
 # save sim results to dir 
-str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master))  
-global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master) 
+str(list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master,host_biomass_master))  
+global_output <- list(cerc_master,food_master,juv_master, adult_master,infec_master,infec_shed_master,hl_master,pmass_master,host_biomass_master) 
 # global_output <- cerc_master # save just cercs
 saveRDS(global_output,global_output_fh) # save to dir 
 cat("Output saved in ", global_output_fh)
 # read in saved sim results
-cat("order = cerc, food, juv, adult, infected, infected shedding, host length, parasite mass")
+cat("order = cerc, food, juv, adult, infected, infected shedding, mean host length, mean parasite mass, summed host biomass")
 
 # ------------------------- select results to plot 
 fh = "global_output_detritus"
