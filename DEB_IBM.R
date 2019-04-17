@@ -526,6 +526,7 @@ if(resource_type=="algae"){
   }else{alpha_pars <- 0; rho_pars <- 10; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars,"\nhb = ", hb_pars)}}
 
 Env_G = numeric() # create empty environment vector 
+day <- 1 # set days to simulate 
 
 # # define param sample space with LHS
 # require(sp)
@@ -629,8 +630,7 @@ for(hb in hb_pars){
                                                       kk=pars["kk"], 
                                                       if(snail_control==1){
                                                         if(day==me){hb <- me_90}
-                                                        else{hb <- hb}
-                                                      },
+                                                      }else{hb <- hb},
                                                       theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], SAtotal= sum(snail.stats[,2]^2), 
                                                       ENV=pars["ENV"], r=pars["r"], K=pars["K"], 
                                                       Det=pars["Det"]))) # detritus (Det) defined in C file
