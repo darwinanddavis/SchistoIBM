@@ -1,6 +1,20 @@
 ## DEB IBM 
 # check bottom of page for diagnostics for running netlogo in rstudio
 
+if snails
+  kill eggs too with me event
+
+if no snails
+  no mira loss due to infection
+  No cerc shedding
+  no host eggs
+  food grows
+
+# version 1.3 (post sicb ver with molluscicide)
+# DEB_INF_GUTS_IBM_1.1.nlogo
+# IndividualModel_IBM3.c (generates .o and .so files)  
+# FullStarve_shrink_dilute_damage3.Rda
+    
 # version 1.2
 # DEB_INF_GUTS_IBM_1.1.nlogo
 # IndividualModel_IBM3.c (generates .o and .so files)  
@@ -10,6 +24,9 @@
 # DEB_INF_GUTS_IBM_1.1.nlogo
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
+
+# 18-4-19 (v. 1.3)
+# fixed snail control and NL agentset errors
 
 # 15-4-19
 # added chi param and host biomass, mean host length, and summed parasite mass to master output  
@@ -607,7 +624,7 @@ for(hb in hb_pars){
               snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
               N.snails = length(snail.stats[,"L"])
               environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches")) # calc food, free miracidia, cercariae released, and eggs, per patch
-              
+              print(length(snail.stats$L))
               # Infect snails
               Infection.step = as.vector(Infection(snail.stats, environment[2], pars)) # Who gets infected
               snail.stats[which(Infection.step[1:N.snails] > 0),"P"] = snail.stats[which(Infection.step[1:N.snails] > 0),"P"] + 2.85e-5 # add biomass of one miracidia
@@ -623,21 +640,21 @@ for(hb in hb_pars){
               if(snail_control==1){
                 if(day==me){hb <- me_90}else{hb <- hb_pars}
               }else{hb <- hb_pars}
-              if(N.snails>0){
-                # Update DEBS, HAZ=0 so survival probs are calculated for the current day
-                snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
-                                        P=snail.stats[,6], RP=snail.stats[,7], DAM=snail.stats[,8], Lp=snail.stats[,10],# Food=environment[1]*(snail.stats[,2]^2)/sum(snail.stats[,2]^2), # update food availability per snail 
-                                        MoreArgs = list(step=1, HAZ=0, Food=environment[1],# constant food available (23-1-19)
-                                                        iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], Fh=pars["Fh"], 
-                                                        muD=pars["muD"],
-                                                        DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
-                                                        mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
-                                                        kk=pars["kk"], 
-                                                        hb=hb,
-                                                        theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], SAtotal= sum(snail.stats[,2]^2), 
-                                                        ENV=pars["ENV"], r=pars["r"], K=pars["K"], 
-                                                        Det=pars["Det"]))) # detritus (Det) defined in C file
-              } # end DEB update
+              
+              # Update DEBS, HAZ=0 so survival probs are calculated for the current day
+              snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
+                                      P=snail.stats[,6], RP=snail.stats[,7], DAM=snail.stats[,8], Lp=snail.stats[,10],# Food=environment[1]*(snail.stats[,2]^2)/sum(snail.stats[,2]^2), # update food availability per snail 
+                                      MoreArgs = list(step=1, HAZ=0, Food=environment[1],# constant food available (23-1-19)
+                                                      iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], Fh=pars["Fh"], 
+                                                      muD=pars["muD"],
+                                                      DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
+                                                      mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], 
+                                                      kk=pars["kk"], 
+                                                      hb=hb,
+                                                      theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], SAtotal= sum(snail.stats[,2]^2), 
+                                                      ENV=pars["ENV"], r=pars["r"], K=pars["K"], 
+                                                      Det=pars["Det"]))) # detritus (Det) defined in C file
+              
               cat("day =", day,"\n")
               cat("hb = ", hb,"\n")
               L = snail.update[,"L"] # host structural length
@@ -688,6 +705,7 @@ for(hb in hb_pars){
                 }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}
                 NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
               } # end create snails
+              
               NLCommand("go") # run @netlogo sim steps
               #cs[t] <- rbinom(n=1, size=Env_G[day - 10], prob=0.5) # list to check 'create snails' output doesn't produce NAs
               day = day + 1 
@@ -733,11 +751,11 @@ for(hb in hb_pars){
             #        )
             #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
             if(save_to_file==1){dev.off()}
-          } # --------------- end mes
-        } # ------------------------------ end rgs
-      } # --------------------------------------------- end rhos
-    } # ----------------------------------------------------------- end alphas
-  } # ------------------------------------------------------------------------- end detritus
+        } # --------------- end mes
+      } # ------------------------------ end rgs
+    } # --------------------------------------------- end rhos
+  } # ----------------------------------------------------------- end alphas
+} # ------------------------------------------------------------------------- end detritus
 } # end hb pars 
 ####################################  end netlogo sim ######################################## 
 
