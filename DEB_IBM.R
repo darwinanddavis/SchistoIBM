@@ -16,6 +16,8 @@
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
 
+# 1-5-19
+# fixed create-snails error for me days 
 
 # 22-4-19 (v. 1.3)
 # NL agentset error (v. 1.3)
@@ -730,7 +732,8 @@ for(hb in hb_pars){
                 # kill snail eggs with molluscicide event  
                 if(day > 10){
                   if(snail_control==1){ 
-                    if(day==me){create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.1)}
+                    if(day==me){create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.1)
+                    }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}
                   }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}
                   NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
                 } # end create snails
