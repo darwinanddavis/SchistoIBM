@@ -5,8 +5,8 @@
 # DEB_INF_GUTS_IBM_1.1.nlogo
 # IndividualModel_IBM3.c (generates .o and .so files)  
 # FullStarve_shrink_dilute_damage3.Rda
-    
-# version 1.2
+
+# version 1.2 (25-1-19)
 # DEB_INF_GUTS_IBM_1.1.nlogo
 # IndividualModel_IBM3.c (generates .o and .so files)  
 # FullStarve_shrink_dilute_damage3.Rda
@@ -15,6 +15,10 @@
 # DEB_INF_GUTS_IBM_1.1.nlogo
 # IndividualModel_IBM2.c
 # ILL_shrink_damageA5.Rda
+
+# 2-5-19
+# added rep number for sicb fig 3
+# made sim input section user-defined 
 
 # 1-5-19
 # fixed create-snails error for me days 
@@ -53,15 +57,9 @@
 
 # 11-2-19
 # added harwell script
-# updated Fh and K pars
-# merged snab version with mac version 
 
 # 4-2-19
 # added multi-panel plots for sim outputs 
-
-
-# 28-1-19
-# reverted back to Food=environment[1] in snail update (eating by sum(L2)^2 snails is in C script)
 
 # 25-1-19 (v.1.2)
 # MCMC DEB params (full starve model Rda)
@@ -94,7 +92,7 @@
 
 #18-12-18
 # changed p to rho
-# added rgrowth (pars[“r”]) (rg)
+# added rgrowth (pars rg) (rg)
 # added master lists for total and infected hosts 
 # changed resource wave eq to r = r + alpha * r * sin(2 * pi * t/rho)  
 
@@ -125,12 +123,8 @@
 
 ###### TO DO ######
 
-# for me events 
-# - get average biomass (L * chi * L^3, then average)  
-# - get abundance
-
 # for new snail deb feeding 
-    ## in new C file
+## in new C file
 ### redefine dFdf (dfdt = -iM * f * sum(L^2) + rF(1-K/F) + Det)  
 
 
@@ -138,10 +132,10 @@
 # get ratio of infected hosts and shedding infected hosts     
 
 # change r and food 
-  # - plot food against r as heatmap
+# - plot food against r as heatmap
 # define 
-	# - starvation-related hazard rate
-	# - pars and debfunction
+# - starvation-related hazard rate
+# - pars and debfunction
 # find papers on periodicity in resource loads in pops (Nisbet, Gurney, daphnia, etc)
 # E.g. Nisbet Gurney Population dynamics in a periodically varying environment
 # verify what volume of food density is reasonable  (F)
@@ -210,8 +204,8 @@ if(mac==1){
 # "FullStarve_shrink_dilute_damage3.Rda"
 
 # set user outputs
-snab <- 0 # 1 = use remote access (snab comp), 0 = run model on your comp 
-mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
+snab <- 1 # 1 = use remote access (snab comp), 0 = run model on your comp 
+mac <- 0 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 0 # display the gui? 1 = yes, 0 = no
 pck <- 0 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
 save_to_file <- 0 # 1 = save simulation outputs to local dir, 0 = plot in current R session
@@ -236,7 +230,7 @@ if(snab==1){
 n.ticks <- 120 # set number of days to simulate
 day <- 1 # number of days to run simulation  
 resources <- "cyclical" # set resources: "cyclical" or "event"
-resource_type <- "algae" # set resource type as "algae" or "detritus"
+resource_type <- "detritus" # set resource type as "algae" or "detritus"
 
 ####################################  set model paths #######################################
 # load files
@@ -262,15 +256,12 @@ if(pck==1){
     install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
   }
 }
+require(RNetLogo)
+require(rJava)
 
 # check pck versions
 installed.packages()["RNetLogo","Version"] 
 installed.packages()["rJava","Version"]
-
-# check rJava version  
-.jinit()
-.jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
-# get latest Java/Oracle version: https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html  
 
 # install relevant packages   
 packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","sp","RNetLogo","ggplot2","RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","reshape2","pse","sensitivity","beepr")  
@@ -295,11 +286,11 @@ cs <- list() # diagnostics list for checking NAs in create snails command
 
 # load plot function 
 script <- getURL("https://raw.githubusercontent.com/darwinanddavis/plot_it/master/plot_it.R", ssl.verifypeer = FALSE)
-eval(parse(text = script))    
+eval(parse(text = script))
 display.brewer.all()
 # Set global plotting parameters
 cat("plot_it( \n0 for presentation, 1 for manuscript, \nset colour for background, \nset colour palette 1. use 'display.brewer.all()', \nset colour palette 2. use 'display.brewer.all()', \nset alpha for colour transperancy, \nset font style \n)")
-plot_it(0,"blue","Spectral","Greens",1,"mono") # set plot function params       
+plot_it(0,"blue","YlOrRd","Greens",1,"mono") # set plot function params       
 plot_it_gg("white") # same as above for ggplot     
 
 # load harwell script
@@ -315,7 +306,7 @@ if(mac==1){ #### Mac OSX
   rtools <- "/usr/local/clang6/bin"
   gcc <- paste0("usr/local/clang6/gcc-",ver_gcc,"/bin")
   # Mac OSX
-  }else{ #### Windows 
+}else{ #### Windows 
   rtools <- "C:\\Rtools\\bin"
   gcc <- paste0("C:\\Rtools\\gcc-",ver_gcc,"\\bin")
 }
@@ -327,12 +318,12 @@ new_path <- new_path[!duplicated(tolower(new_path))]
 Sys.setenv(PATH = paste(new_path, collapse = ";"))
 
 if(mac==1){
-    # dyn.unload("IndividualModel_IBM3.so") # unLoad .so (Mac OSX
-    system(paste0("R CMD SHLIB ",deb_compile,".c")) # generates .o and .so files 
-    dyn.load(paste0(deb_compile,".so")) # Load .so (Mac OSX)
+  # dyn.unload("IndividualModel_IBM3.so") # unLoad .so (Mac OSX
+  system(paste0("R CMD SHLIB ",deb_compile,".c")) # generates .o and .so files 
+  dyn.load(paste0(deb_compile,".so")) # Load .so (Mac OSX)
 }else{
   # compile model from C definition
-  #dyn.unload(paste0(deb_compile,".dll")) # unload dll (Windows only)
+  # dyn.unload(paste0(deb_compile,".dll")) # unload dll (Windows only)
   system(paste0("R CMD SHLIB ",deb_compile,".c"))
   dyn.load(paste0(deb_compile,".dll"))# Load dll (Windows only)
 }
@@ -363,21 +354,21 @@ traceplot(sampsvar,smooth=T,type="l",lwd=0.3,xlim=c(0,length(sampsvar)),col=colv
 
 if(mcmcplot==1){
   par(mfrow=c(1,1))
-	plotlist <- list()
-	pdf("mcmc_vars.pdf",onefile = T,paper="a4")
-	for(i in colnames(samps)){
-	  par(bty="n", las = 1)
-		if(traceplot==1){
-		traceplot(sampsvar,smooth=T,type="l",xlim=c(0,length(sampsvar)),col=colv[2],xlab=paste0("Iterations"),ylab=paste0("Sampled values"),main=paste0("Sampled values over iterations for ",svar)) # iterations vs sampled valued per variable
-		  }
-	  svar <- i # select variable 
-  	sampsvar <- samps[,svar] # pull from mcmc
-  	den <- density(sampsvar) # get AUC
-  	densplot(sampsvar, show.obs = F,type="n",main=paste0("Density estimate of ",i)) # density estimate of each variable
-  	polygon(den, col=adjustcolor(colv,alpha=0.5),border=colv) # fill AUC 
-  	}
-	dev.off()
-	} # end mcmcplot
+  plotlist <- list()
+  pdf("mcmc_vars.pdf",onefile = T,paper="a4")
+  for(i in colnames(samps)){
+    par(bty="n", las = 1)
+    if(traceplot==1){
+      traceplot(sampsvar,smooth=T,type="l",xlim=c(0,length(sampsvar)),col=colv[2],xlab=paste0("Iterations"),ylab=paste0("Sampled values"),main=paste0("Sampled values over iterations for ",svar)) # iterations vs sampled valued per variable
+    }
+    svar <- i # select variable 
+    sampsvar <- samps[,svar] # pull from mcmc
+    den <- density(sampsvar) # get AUC
+    densplot(sampsvar, show.obs = F,type="n",main=paste0("Density estimate of ",i)) # density estimate of each variable
+    polygon(den, col=adjustcolor(colv,alpha=0.5),border=colv) # fill AUC 
+  }
+  dev.off()
+} # end mcmcplot
 # ----------
 
 # get the best fit DEB parameters to match the data (using mcmc)
@@ -393,7 +384,7 @@ pars["m_M"] = 1   # Units: day-1
 pars["m_Z"] = 1   # Units: day-1
 pars["M_in"] = 10
 pars["K"] = 5
-pars["Det"] = 0.1 # Units mg C/L-1 d-1 (detritus)
+pars["Det"] = 0.1 # Units mg C/L-1 d-1 (detritus) 
 pars["yRP"] = 0.824 # new  0.0471 * (1/0.4) * 7 [expected shedding output per week * (snails shed 40% of their total cercariae during 9-11 AM.) * 7 days] 
 
 ####################################  solve deb eqs #######################################
@@ -413,13 +404,13 @@ DEB = function(step, Food, L, e, D, RH, P, RP, DAM, HAZ, iM, k, M, EM,
                    initfunc = "initmod",  nout=2, outnames=c("Survival", "LG"), maxsteps=500000,
                    as.numeric(parameters),  rtol=1e-6, atol=1e-6, hmax=1)
   DEBstep[2, 2:12] # 12 = survival
-  } # end deb model
+} # end deb model
 
 ### deb output for each timestep 
 result = DEB(step=1, Food=5, L=10, e=0.9, D=as.numeric(pars["DR"]), RH=0, P=0, RP=0, DAM=0, HAZ=0, iM=pars["iM"], k=pars["k"], M=pars["M"], EM=pars["EM"], 
-    Fh=pars["Fh"], muD=pars["muD"], DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
-    mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], kk=pars["kk"], hb=pars["hb"],
-    theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], ENV=pars["ENV"], Lp=10,SAtotal=7007.822, r=pars["r"], K=pars["K"], Det=pars["Det"]) 
+             Fh=pars["Fh"], muD=pars["muD"], DR=pars["DR"], yRP=pars["yRP"], ph=pars["ph"], yPE=pars["yPE"], iPM=pars["iPM"], eh=pars["eh"],
+             mP=pars["mP"], alpha=pars["alpha"], yEF=pars["yEF"], LM=pars["LM"], kd=pars["kd"], z=pars["z"], kk=pars["kk"], hb=pars["hb"],
+             theta=pars["theta"], mR=pars["mR"], yVE=pars["yVE"], ENV=pars["ENV"], Lp=10,SAtotal=7007.822, r=pars["r"], K=pars["K"], Det=pars["Det"]) 
 
 ### Exposure submodel
 # pass the deb state vars into infection model 
@@ -444,7 +435,7 @@ Infection = function(snail.stats, miracidia, parameters){
   P.dead = (1 - P.left.in.water)*(m_M/(m_M+sum.exp.rates)) + sum((1 - P.left.in.water)*((1-sigma)*exp.rates/(m_M+sum.exp.rates)))
   
   prob.vector = c(P.infects.this.snail, P.left.in.water, P.dead)
-   
+  
   # Multinomial outcome from number of miracidia in env based on their survival probability
   rmultinom(n=1, size=miracidia, prob=prob.vector)
   #sum(P.left.in.water, P.invades.this.snail, P.dead)
@@ -461,7 +452,7 @@ update.snails = function(who, new.L, new.e, new.D, new.RH, new.P, new.RP, new.DA
         "set RPP", new.RP,       
         "set DAM", new.DAM,
         "set HAZ", new.HAZ,
-		"set LG", new.LG, # new max length
+        "set LG", new.LG, # new max length
         "]")
 } # end host update
 
@@ -478,9 +469,9 @@ geterrmessage() # check if there were any error messages
 # working NLStart in RStudio. works with gui=F (2018/09/24)
 if(gui==0){
   NLStart(nl.path,gui=F,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo without a gui  
-  }else{
-    NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
-  }
+}else{
+  NLStart(nl.path,nl.jarname = paste0("netlogo-",ver_nl,".jar")) # open netlogo
+}
 
 NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model  
 # if java.lang error persists on Mac, try copying all .jar files from the 'Java' folder where Netlogo is installed into the main Netlogo folder   	
@@ -489,8 +480,12 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 ####################################  start netlogo sim ######################################## 
 ################################################################################################
 
-resource_type="algae"
-resources="event"
+sicb_sims = 1 # run sicb sims? # 2-5-19
+fig2 <- 0 # run fig 2 in sicb? 0 = fig 3
+snail_control = 0 # run molluscicide sims? 
+resource_type="algae" # set resource type
+resources="event" # set resource cycles
+rep_num <- 3 # number of replications for fig 3 
 
 # set type of resource input @netlogo
 set_resource_type<-function(resource_type){ # set resource input in env  
@@ -513,38 +508,80 @@ cat("\nResource type = ",resource_type,"\nResources = ",resources)
 
 if(save_to_file==1){pdf(paste0(wd,"/master_sim.pdf"),onefile=T,paper="a4")}
 
-# sicb sims (31-3-19)
-# detr and algae values for reasonable cerc outputs
-# detr_pars <- c(0.1,0.25, 0.4) # detritus input (mg L^-1 day^-1)
-# rg_pars <- c(0.1,0.25,0.5)
+if(sicb_sims == 1){
+  # sicb sims (31-3-19)
+  # detr and algae values for reasonable cerc outputs
+  # FIG 2
+  # detr_pars <- c(0.1,0.25, 0.5) # detritus input (mg L^-1 day^-1)
+  # rg_pars <- c(0.1,0.25,0.5)
+  # hb_pars <- 0.001
+  # FIG 3
+  # detr_pars <- c(0.1,0.25, 0.5) # detritus input (mg L^-1 day^-1)
+  # rg_pars <- c(0.1,0.25,0.5)
+  # hb_pars <- 0.001
+  # hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1)
+  
+  # rep test (sicb) 27-3-19
+  # hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1)
+  # rg_pars = c(0, 0, 0)#c(0.1,0.25,0.5)
+  # detr_pars = seq(0,0.5,0.05)#c(0.1,0.2,0.5)
+  
+  if(fig2 == 1){ # sicb fig 2
+    
+    # algae params
+    rg_pars <- 1 # resource growth rates (rs)
+    
+    # detritus params
+    detr_pars <- 0.5 # detritus input (mg L^-1 day^-1)
+    
+    # mortality params 
+    hb_pars <- 0.001
+    
+  }else{ # sicb fig 3
+    
+    replication = 1 # run reps for fig 3
+    
+    # algae params
+    rg_pars <- c(0.1,0.25,0.5) # resource growth rates (rs)
+    
+    # detritus params
+    detr_pars <- c(0.1,0.25,0.5) # detritus input (mg L^-1 day^-1)
+    
+    # mortality params 
+    hb_pars <- c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1) ; hb_pars
+    
+  }
+  
+  me_pars <- 0 # set molluscicide events to 0 
+  if(resource_type=="detritus"){
+    detr_pars <- detr_pars; alpha_pars <- 0; rho_pars <- 1; rg_pars <- 0;cat("detritus input = ",detr_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)
+  }else{detr_pars <- 0;cat("detritus input = ", detr_pars,"\nrg = ",rg_pars)}
+  # set resource to cycle or be constant
+  if(resource_type=="algae"){
+    if(resources=="cyclical"){alpha_pars <- alpha_pars; rho_pars <- rho_pars ; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars)
+    }else{alpha_pars <- 0; rho_pars <- 1; rg_pars <- rg_pars;cat("\nalphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)}
+  }
+  
+}else{
+  
+  # algae params
+  rg_pars <- c(0.1,0.25,0.5) # resource growth rates (rs)
+  alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
+  rho_pars <- c(1,seq(10,120,10)) # periodicity of resources (rhos)
+  
+  # detritus params
+  detr_pars <- c(0.1,0.25,0.5) # detritus input (mg L^-1 day^-1)
+  
+  # mortality params 
+  hb_pars <- c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1); hb_pars
+  
+} # end sicb sims
 
-# algae params
-rg_pars <- c(0.1,0.25,0.5) # resource growth rates (rs)
-alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
-rho_pars <- c(1,seq(10,120,10)) # periodicity of resources (rhos)
-
-# detritus params
-detr_pars <- c(0.1,0.25,0.4) # detritus input (mg L^-1 day^-1)
-
-# mortality params 
-hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1); hb_pars
-
-# rep test (sicb) 27-3-19
-# hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1)
-# rg_pars = c(0, 0, 0)#c(0.1,0.25,0.5)
-# detr_pars = seq(0,0.5,0.05)#c(0.1,0.2,0.5)
-
-me_pars <- 0 # set molluscicide events to 0 
-if(resource_type=="detritus"){
-  detr_pars <- detr_pars;alpha_pars <- 0; rho_pars <- 10; rg_pars <- 0;cat("detritus input = ",detr_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)
-}else{detr_pars <- 0;cat("detritus input = ", detr_pars,"\nrg = ",rg_pars)}
-# set resource to cycle or be constant
-if(resource_type=="algae"){
-  if(resources=="cyclical"){alpha_pars <- alpha_pars; rho_pars <- rho_pars ; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars)
-  }else{alpha_pars <- 0; rho_pars <- 10; rg_pars <- rg_pars;cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars,"\nhb = ", hb_pars)}}
-
-Env_G = numeric() # create empty environment vector 
-day <- 1 # reset sim days 
+# replication # use either detr or algae loop as rep number  
+if(replication==1){
+  if(resource_type=="algae"){detr_pars <- rep(0,rep_num); cat("reps = ", length(detr_pars))}
+  if(resource_type=="detritus"){rg_pars <- rep(0,rep_num); cat("reps = ", length(rg_pars))}
+}
 
 # # define param sample space with LHS
 # require(sp)
@@ -564,6 +601,9 @@ day <- 1 # reset sim days
 # lhs_results <- get.results(lhs_model)
 # get.N(lhs_model) # get the number of output points in hypercube
 # lhs_data
+
+Env_G = numeric() # create empty environment vector 
+day <- 1 # reset sim days 
 
 # individual outputs
 cerc_list <- list() # cercariae   
@@ -591,34 +631,35 @@ host_biomass_master <- list() # master list for host biomass
 plot.matrix <- matrix(c(length(alpha_pars),length(rho_pars)))
 par(mfrow=plot.matrix)
 
-snail_control <- 1 # 1 = add molluscicide event
-me_event <- 1 # 1, 2, or 3. pick molluscicide event to simulate (defined below)
-
-# molluscicide events (me)
-me_im_pars <- c(0.001, 0.1, 0.2, 2.3) # 2.3 = 90% snail mortality from molluscicide event (per day) 
-# me1
-me_pars <- seq(30,120,30) # every 30 days
-# me2
-# The dry seasons in Kenya are generally from mid-June to October, 
-# and from late-December to mid-March
-# me_pars <- seq(10,120,10) #  When transmission is seasonal, it is recommended to carry out regular applications of molluscicide (WHO 2017)
-# me3
-# me_pars <- XX # when infected snails appear 
-# me_pars = 1000000
-
-rg_pars <- 0.5 
-hb_pars = 0.001
-detr_pars = 0.4
-me_im <- 2.3
-me_im_pars <- me_im
-
-
-if(snail_control==1){me_pars <- me_pars; hb_pars <- 0.001}else{me_pars <- 1000000; hb_pars <- hb_pars}; cat("Snail control will occur every ",max(me_pars)/length(me_pars)," days \n Mortality is ",me_im) 
-if(resource_type=="algae"){detr_pars <- 0; algae <- rg_pars}else{detr_pars <- detr_pars; rg_pars <- 0}
-cat("algae:",rg_pars,"\ndetritus:",detr_pars,"\nrho:",0,"\nalpha:",alpha_pars,"\nmortality (if not mollusciciding):",hb_pars,"\nmolluscicide days:",me_pars, "\nmolluscicide impact: ",me_im)
+if(snail_control == 1){
+  
+  me_event <- 1 # 1, 2, or 3. pick molluscicide event to simulate (defined below)
+  
+  # molluscicide events (me)
+  me_im_pars <- c(0.001, 0.1, 0.2, 2.3) # 2.3 = 90% snail mortality from molluscicide event (per day) 
+  # me1
+  me_pars <- seq(30,120,30) # every 30 days#
+  # me2
+  # The dry seasons in Kenya are generally from mid-June to October, 
+  # and from late-December to mid-March
+  # me_pars <- seq(10,120,10) #  When transmission is seasonal, it is recommended to carry out regular applications of molluscicide (WHO 2017)
+  # me3
+  # me_pars <- XX # when infected snails appear 
+  # me_pars = 1000000
+  
+  rg_pars <- 0.5 
+  hb_pars = 0.001
+  detr_pars = 0.4
+  me_im <- 2.3
+  me_im_pars <- me_im
+  
+  if(snail_control==1){me_pars <- me_pars; hb_pars <- 0.001}else{me_pars <- 1000000; hb_pars <- hb_pars}; cat("Snail control will occur every ",max(me_pars)/length(me_pars)," days \n Mortality is ",me_im) 
+  if(resource_type=="algae"){detr_pars <- 0; algae <- rg_pars}else{detr_pars <- detr_pars; rg_pars <- 0}
+  cat("algae:",rg_pars,"\ndetritus:",detr_pars,"\nrho:",0,"\nalpha:",alpha_pars,"\nmortality (if not mollusciciding):",hb_pars,"\nmolluscicide days:",me_pars, "\nmolluscicide impact: ",me_im)
+}
 
 # file name to save results
-global_output_fh = paste0(wd,"/global_output_",resource_type,"_",resources,"_me_test.R")
+global_output_fh = paste0(wd,"/global_output_",resource_type,"_",resources,"_sicb_final_fig3.R"); global_output_fh
 
 ####################################  start netlogo sim ######################################## 
 for(hb in hb_pars){
@@ -643,15 +684,15 @@ for(hb in hb_pars){
                 if(snail_control==1){
                   if(day==me){
                     hb <- me_im
-                    cat("------------------------------ DEAD SNAILS \ndays = ", day,"\nnumber of snails = ", length(snail.stats$L))
+                    cat("---------- DEAD SNAILS \ndays = ", day,"\nnumber of snails = ", length(snail.stats$L))
                   }else{
-                    hb <- hb_pars}
-                }else{hb <- hb_pars}
+                    hb <- hb}
+                }else{hb <- hb}
                 
                 # set environment variables 
                 environment = as.numeric(NLGetAgentSet(c("F", "M", "Z", "G"), "patches")) # calc food, free miracidia, cercariae released, and eggs, per patch
                 
-                # if there are hosts 
+                # ----------------------------------- if there are hosts 
                 if(NLReport("count snails") > 0){
                   # set host variables
                   snail.stats = NLGetAgentSet(c("who", "L", "ee", "D", "RH", "P", "RPP", "DAM", "HAZ", "LG"), "snails")
@@ -717,14 +758,14 @@ for(hb in hb_pars){
                   snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
                   NLCommand(snail.commands) 
                   
-                }else{ # if there are no hosts 
-                  print("everyone is dead"); print(day)
+                }else{ # ----------------------------------- if there are no hosts 
+                  
                   Env_M = as.numeric(environment[2]*exp(-pars["m_M"]*pars["step"]) + pars["M_in"]) # total miracidia density 
                   Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"])) # total cerc density
                   Env_G = as.integer(Env_G) # set pop density outputs to integer to pass into Env_G and rbinom func
                   Env_G[day] <- 0
                   Env_F = ifelse(pars["Det"] == 0, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"]))), environment[1] + pars["Det"])
-                }
+                } # end no hosts
                 
                 # update patch variables 
                 NLCommand("ask patch 0 0 [set F", Env_F, "set M", Env_M, "set Z", Env_Z, "set G", Env_G[day], "]")
@@ -732,7 +773,9 @@ for(hb in hb_pars){
                 # kill snail eggs with molluscicide event  
                 if(day > 10){
                   if(snail_control==1){ 
-                    if(day==me){create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.1)
+                    if(day==me){
+                      # Env_G[day - 10, day-1] <- round(0.1*Env_G[day - 10, day-1]) # mollusciciding kills eggs
+                      create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.1)
                     }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}
                   }else{create_snails <- rbinom(n=1, size=Env_G[day - 10], prob=0.5)}
                   NLCommand("create-snails ", create_snails, "[set L 0.75 set ee 0.9 set D 0 set RH 0 set P 0 set RPP 0 set DAM 0 set HAZ 0 set LG 0.75]")
@@ -817,7 +860,7 @@ mm_ = readRDS(global_output_fh)
 layout(matrix(c(1:16),4,4,byrow=T))
 cat("order = cerc, food, juv, adult, infected, infected shedding, host length, parasite mass, host biomass")
 # plot master
-mm <- mm_[[3]]
+mm <- mm_[[1]] # 1=cercs, 2=food
 y_m <- melt(mm);y_m
 ggplot() +
   geom_point(data = y_m, aes(x = rep.int(1:n.ticks,max(L1)) , y = value, group = L1, colour=factor(L1)), ) +
@@ -832,7 +875,7 @@ for(pp in seq(10,110,8)){
 }
 
 #------------------------- plot all sim results in one window -------------------------
-sim_type <- "me" # "detritus" # "algae"
+sim_type <- "algae" # "detritus" # "algae"
 
 require(gridExtra)
 gspl <- list()
@@ -878,6 +921,7 @@ for(g in 1:length(global_sim_plot)){
 # +  geom_text(x=,y=,label = max(value),check_overlap = TUE)
 do.call(grid.arrange,gspl[1:8]) # plot in one window 
 
+global_output_fh
 # NLQuit()
 
 #################################################################################################
