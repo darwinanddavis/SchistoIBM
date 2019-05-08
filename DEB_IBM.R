@@ -919,7 +919,7 @@ for(g in 1:length(global_sim_plot)){
     } 
 }
 # +  geom_text(x=,y=,label = max(value),check_overlap = TUE)
-do.call(grid.arrange,gspl[1:8]) # plot in one window 
+do.call(grid.arrange,gspl[1:8]) # plot in one window    
 
 global_output_fh
 # NLQuit()
