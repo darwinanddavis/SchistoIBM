@@ -204,8 +204,8 @@ if(mac==1){
 # "FullStarve_shrink_dilute_damage3.Rda"
 
 # set user outputs
-snab <- 1 # 1 = use remote access (snab comp), 0 = run model on your comp 
-mac <- 0 # mac or windows system? 1 = mac, 0 = windows 
+snab <- 0 # 1 = use remote access (snab comp), 0 = run model on your comp 
+mac <- 1 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 0 # display the gui? 1 = yes, 0 = no
 pck <- 0 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
 save_to_file <- 0 # 1 = save simulation outputs to local dir, 0 = plot in current R session
@@ -483,7 +483,7 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 sicb_sims = 1 # run sicb sims? # 2-5-19
 fig2 <- 0 # run fig 2 in sicb? 0 = fig 3
 snail_control = 0 # run molluscicide sims? 
-resource_type="algae" # set resource type
+resource_type="detritus" # set resource type
 resources="event" # set resource cycles
 rep_num <- 3 # number of replications for fig 3 
 
@@ -539,7 +539,7 @@ if(sicb_sims == 1){
     
   }else{ # sicb fig 3
     
-    replication = 1 # run reps for fig 3
+    replication = 1 # run reps for fig 3; 1 = yes, 0 = no
     
     # algae params
     rg_pars <- c(0.1,0.25,0.5) # resource growth rates (rs)
@@ -658,8 +658,13 @@ if(snail_control == 1){
   cat("algae:",rg_pars,"\ndetritus:",detr_pars,"\nrho:",0,"\nalpha:",alpha_pars,"\nmortality (if not mollusciciding):",hb_pars,"\nmolluscicide days:",me_pars, "\nmolluscicide impact: ",me_im)
 }
 
+# final detritus hb=0.1 sims
+hb_pars <- 0.1 ; hb_pars
+detr_pars = c(0.1,0.25,0.5)
+me_im_pars <- 1
+
 # file name to save results
-global_output_fh = paste0(wd,"/global_output_",resource_type,"_",resources,"_sicb_final_fig3.R"); global_output_fh
+global_output_fh = paste0(wd,"/global_output_",resource_type,"_",resources,"_sicb_final_fig3_finalhb.R"); global_output_fh
 
 ####################################  start netlogo sim ######################################## 
 for(hb in hb_pars){
@@ -764,7 +769,7 @@ for(hb in hb_pars){
                   Env_Z = as.numeric(environment[3]*exp(-pars["m_Z"]*pars["step"])) # total cerc density
                   Env_G = as.integer(Env_G) # set pop density outputs to integer to pass into Env_G and rbinom func
                   Env_G[day] <- 0
-                  Env_F = ifelse(pars["Det"] == 0, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"]))), environment[1] + pars["Det"])
+                  Env_F = ifelse(pars["Det"] == 0, as.numeric(pars["K"]*environment[1]/(environment[1] + (pars["K"] - environment[1])*exp(-pars["r"]*pars["step"]))), as.numeric(environment[1] + pars["Det"]))
                 } # end no hosts
                 
                 # update patch variables 
