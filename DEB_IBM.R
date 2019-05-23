@@ -802,6 +802,11 @@ for(hb in hb_pars){
                 infec_list[t] <- length(which(snail.stats$P>0)) # get just infected hosts
                 infec_shed_list[t] <- length(which(snail.stats$RP>0)) # get infected hosts that are shedding
               } # --------------------------------------- end nl sim
+              
+              # turn NULLs into NAs to get numeric values below (14-5-19. error: cannot coerce double)
+              hl_list <- lapply(hl_list, function(x) ifelse(x == "NULL", NA, x))
+              pmass_list <- lapply(pmass_list, function(x) ifelse(x == "NULL", NA, x))
+              
               # save individual outputs 
               cerc_list <- as.numeric(cerc_list) 
               food_list <- as.numeric(food_list)
