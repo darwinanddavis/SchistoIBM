@@ -740,10 +740,6 @@ for(hb in hb_pars){
                   chi <- pars["M"]/(1 + pars["EM"]) # length to volume conversion factor for getting biomass
                   host_biomass <- sum(chi * L^3) # get total host biomass
                   
-                  hl_list[t] <- mean(L) # get average host lengths per model step 
-                  pmass_list[t] <- sum(P) # get total parasite mass per model step
-                  host_biomass_list <- host_biomass # get host mass per model step
-                  
                   Eggs = floor(RH/0.015)  # Figure out how many (whole) eggs are released  
                   # if(day==me){Eggs <- Eggs[1:round(0.1*length(Eggs))]} # kill off 90% of snail eggs in water with molluscicide event  
                   RH = RH %% 0.015        # Remove released cercariae from the buffer
@@ -767,6 +763,10 @@ for(hb in hb_pars){
                   # Command back to NL @netlogo
                   snail.commands = paste(mapply(update.snails, who=snail.stats[,"who"], new.L=L, new.e=e, new.D=D, new.RH=RH, new.P=P, new.RP=RP, new.DAM=DAM, new.HAZ=HAZ, new.LG=LG), collapse=" ")
                   NLCommand(snail.commands) 
+                  
+                  hl_list[t] <- mean(L) # get average host lengths per model step 
+                  pmass_list[t] <- sum(P) # get total parasite mass per model step
+                  host_biomass_list[t] <- host_biomass # get host mass per model step
                   
                 }else{ # ----------------------------------- if there are no hosts 
                   
