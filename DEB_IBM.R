@@ -22,7 +22,11 @@
 # ILL_shrink_damageA5.Rda
 
 # 15-7-19
-# updated 
+# new deb starvation params (samps_new)
+
+# 10-7-19
+# cleaned user input
+# added pred vars for biocontrol sims 
 
 # 27-6-19
 # created individual me_days for day30, monthly, bimonthly, skip30, 60, 90, 120, and hailmary events
@@ -211,6 +215,7 @@
 ### Files required  
 # "DEB_IBM.R"
 # "DEB_INF_GUTS_IBM.nlogo"
+# "Starvation_parameters.Rda"
 # "FullStarve_shrink_dilute_damage3.Rda"
 # "IndividualModel_IBM3.c"
 # "IndividualModel_IBM3.so" # Mac OSX. generated from C
