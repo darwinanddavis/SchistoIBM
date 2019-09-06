@@ -29,6 +29,10 @@
 
 # ver updates -------------------------------------------------------------
 
+# 6-9-19
+# pre adding hb vector @hb
+# lowered values for new pred_ps vector: (0.0001 : 0.25) # predator population density
+
 # 3-9-19
 # fixed ggplot gspl (error with color levels)
 # added bio_list for saving biocontrol outputs
@@ -624,7 +628,7 @@ init_host_pop_vec <- c(50,100,200,500,1000)
 pred_a <- 50 # predator attack rate (from sokolow etal 2014 acta tropica)
 pred_h <- 0.1 # pred handling time # 0.1 = 10 snails per day
 # pred_p <- 0.05  # predator population density
-pred_ps <- c(0.001,0.005,0.01,0.05,0.1,0.25,0.3,0.5) # predator population density
+pred_ps <- c(0.0001,0.0005,0.001,0.005,0.01,0.05,0.1,0.25) # predator population density 
 
 rep_num <- 1 # number of replications
 
@@ -1214,9 +1218,10 @@ ggplot() +
 
 # plot all biocontrol outputs ---------------------------------------------
 graphics.off()
+require(dplyr)
 be_event = 1 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
 init_host_pop = 50 # 50 100 200 500 1000
-pred_p = pred_ps  # 0.001 0.005 0.010 0.050 0.100 0.250 0.300 0.500
+pred_p = c(0.001, 0.005, 0.010, 0.050, 0.100, 0.250, 0.300, 0.500)
 pred_p = pred_p * 1000 
 par(mfrow=c(2,2))
 
@@ -1227,8 +1232,6 @@ if(be_event==4){snail_snack = 18:22}
 cat("\nHost size class eaten = ",snail_snack, " mm",
     "\nInitial host size = ", init_host_pop,
     "\nNum of predators (500 L-1) = ", pred_p /1000) 
-
-plot_outs = paste0("algae_be",be_event,"_hostpop",init_host_pop,"_predpop",pred_p,".R")
 sc = 1 # colvec counter
 legkey = list(be_event,init_host_pop,pred_p) # combine user inputs
 legkey = unlist(legkey[[which.max(lapply(legkey,length))]]) # get one with largest length
@@ -1258,30 +1261,32 @@ for(fh in dfile){
   # lapply(1:5,PLOT) # plot random subset
 }
 
+# apply plot function to user files 
+plot_outs = paste0("algae_all_hostpop",init_host_pop,"_predpop",pred_p,".R")
 lapply(plot_outs,PLOT) # apply function to list elements specified in plot_outs
 
 
-
-init_host_pop_vec
 # plot by pred density for each host size class from bio_list
-
-ttl_list <- c("4-7 mm","8-10 mm", "12-15 mm", "18-22 mm")
 legend_pars <- pred_ps
 legend_ttl <- "Predator density"
+be_event = "all" #"all"#
+init_host_pop = 200
 
 require(gridExtra)
-graphics.off()
-layout(matrix(c(1:6),3,2,byrow=T))
+ifelse(be_event=="all",ttl_list <- "No size class preference",ttl_list <-  c("4-7 mm","8-10 mm", "12-15 mm", "18-22 mm"))
 gspl <- list() # empty list for storing final plots 
 global_sim_plot = list()
-for(be_event in 1:4){
-  fh = paste0("algae_be",be_event,"_hostpop",init_host_pop,"_predpop",pred_p,".R")
+for(be in be_event){
+  # fh = paste0("algae_be",be,"_hostpop",init_host_pop,"_predpop",pred_p,".R")
+  fh = paste0("algae_",be,"_hostpop",init_host_pop,"_predpop",pred_p,".R")
   plot_outs = bio_list[fh]
   names(plot_outs) = pred_p /1000
-  global_sim_plot[[be_event]] = plot_outs 
-}
-require(viridis)
+  global_sim_plot[[be]] = plot_outs 
+};fh
 
+global_sim_plot %>% glimpse
+require(viridis)
+ifelse(be_fh=="all",layout(matrix(c(1),1,1,byrow=T)),layout(matrix(c(1:6),3,2,byrow=T)))
 for(g in 1:length(global_sim_plot)){
   par(bty="n", las = 1)
   mm <- global_sim_plot[[g]]
@@ -1291,7 +1296,8 @@ for(g in 1:length(global_sim_plot)){
                       aes(x = rep.int(1:length(mm[[1]]),length(unique((L1)))) , 
                           y = value, group = L1, colour=factor(L1))) +
     geom_point() +
-    geom_line() +
+    geom_line(size=1) +
+    lims(x=c(0,150),y=c(0,150)) +
     scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
                        labels = legend_pars,
                        values = magma(length(mm))) +
@@ -1309,9 +1315,9 @@ for(g in 1:length(global_sim_plot)){
     } 
 }
 # +  geom_text(x=,y=,label = max(value),check_overlap = T)
-
 bio_finalplots = do.call(grid.arrange,gspl) # plot in one window 
-ggsave("plots/inithost50.pdf",bio_finalplots,device="pdf",width=11,height=8.5)
+
+ggsave(paste0("plots/inithost",init_host_pop,"_all.pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
 
 
 
@@ -1407,6 +1413,7 @@ for(i in c(1:4,6,10,11,12)){
 
 
 # NLQuit()
+
 
 
 #################################################################################################
