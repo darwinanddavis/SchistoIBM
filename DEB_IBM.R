@@ -29,6 +29,9 @@
 
 # ver updates -------------------------------------------------------------
 
+# 17-9-19
+# added snail_snack_min_vec and snail_snack_max_vec
+
 # 16-9-19
 # changed pred_ps > 1
 # converted results in global_output to equal lengths 
@@ -656,10 +659,10 @@ init_host_pop_vec <- c(50,100)
 pred_a <- 50 # predator attack rate (from sokolow etal 2014 acta tropica)
 pred_h <- 0.1 # pred handling time # 0.1 = 10 snails per day
 # pred_p <- 0.05  # predator population density
-pred_ps <- c(0.5,1,2,5,10,15) #c(0.001,0.005,0.01,0.025,0.05,0.1,0.25) # predator population density
+pred_ps <- c(0,0.5,1,2,5,10,15) #c(0.001,0.005,0.01,0.025,0.05,0.1,0.25) # predator population density
 fh_buff = 10 # buffer to convert pred_ps digits into integer for saving file handle
-snail_snack_min <- 0 # min size host to eat
-snail_snack_max <- 0 # max size host to eat
+snail_snack_min_vec <- c(5,10) # min size host to eat
+snail_snack_max_vec <- 20 # max size host to eat
 # •	0-5 mm
 # •	0-10
 # •	0-15
@@ -668,8 +671,8 @@ snail_snack_max <- 0 # max size host to eat
 # •	20+
 
 
-for(snail_snack_min in snail_snack_min){
-  for(snail_snack_max in c(0,5,10,15)){
+for(snail_snack_min in snail_snack_min_vec){
+  for(snail_snack_max in snail_snack_max_vec){
     be_fh = paste0(snail_snack_min,"_",snail_snack_max);be_fh # file handle for bio
     
     rep_num <- 1 # number of replications
@@ -1393,90 +1396,90 @@ ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/inithost",
 
 # option 2 ----------------------------------------------------------------
 # plot each output to multiplot panel by size class 
-be_fh  = "0_15"
-# for(be_fh in c("0_5","0_10","0_15","5_20","10_20")){
-graphics.off()
-require(dplyr)
-be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
-init_host_pop = 100 # 50 100 200 500 1000
-pred_p = pred_ps
-pred_p = pred_p * fh_buff 
-outs = c("cerc", "food", "juv", "adult", "infected", "infected shedding", "mean host length", "mean parasite mass", "summed host biomass", "summed host eggs", "mean host eggs", "infected host length")
-
-# make list of pred densities (fh) within each out (cerc, food, etc)
-setwd(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/",init_host_pop,"/"))
-bio_list = list()
-hm = c()
-for(out in outs){
-  for(pred_p in pred_ps*fh_buff){
-    hm <- readRDS(paste0("algae_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,".R"))
-    names(hm) <- outs
-    hm <- hm[out][[1]] # get cercs (as list) use mes$"cerc"[[1]] for numeric 
-    names(hm) = pred_p
-    bio_list = c(bio_list, hm)
-  } 
-}
-
-# split up list by outs 
-u <- length(unique(names(bio_list)))
-n <- length(bio_list)/u
-bio_list = split(bio_list, rep(1:n, each=u))  
-names(bio_list) = outs
-bio_list %>% glimpse
-
-# fill in shorter vecs with 0s to match length
-fillvec = function(x){
-  nv = lapply(x,`length<-`, n.ticks) # fill remaining vec with NAs to match total length
-  rapply(nv, f=function(x) ifelse(is.na(x),0,x), how="replace" ) # replace NAs with 0s
-}
-bio_list = lapply(bio_list,fillvec) # apply fillvec to list
-
-##### plot by pred density for each host size class from bio_list
-require(gridExtra)
-ifelse(be_fh=="all",ttl_list <- "No size class preference",ttl_list <-  names(bio_list))
-subttl = paste0(be_fh, " mm , pop = ",init_host_pop)
-legend_pars <- pred_ps
-legend_ttl <- "Predator density"
-gspl <- list() # empty list for storing final plots 
-global_sim_plot = bio_list
-global_sim_plot %>% glimpse
-
-require(viridis)
-require(reshape2)
-ifelse(be_fh=="all",layout(matrix(c(1),1,1,byrow=T)),layout(matrix(c(1:9),3,3,byrow=T)))
-for(g in 1:length(global_sim_plot)){
-  par(bty="n", las = 1)
-  mm <- global_sim_plot[[g]]
-  y_m <- melt(mm);y_m
-  y_m$L1 <- y_m$L1 %>% as.numeric
-  gspl[[g]] <- ggplot(data = y_m, 
-                      aes(x = rep.int(1:length(mm[[1]]),length(unique((L1)))) , 
-                          y = value, group = L1, colour=factor(L1))) +
-    geom_point() +
-    geom_line(size=1) +
-    # lims(x=xlim,y=ylim) +
-    scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
-                       labels = legend_pars,
-                       values = magma(length(mm))) +
-    # scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
-    #                    labels = legend_pars,
-    #                    values = 1:length(unique(y_m$L1))) +
-    #linetype=y_m$L1) +
-    theme_tufte() +
-    theme(legend.position = "bottom") +
-    theme(legend.key.size = unit(0.5, "cm")) +
-    labs(title=paste("",ttl_list[g]),subtitle = subttl, x="",y="") + 
-    if(g==length(global_sim_plot)){
-      labs(x="Time") 
-    }else{
-      theme(legend.position="none")
+# be_fh  = "0_10"
+for(be_fh in c("0_5","0_10","0_15")){
+  graphics.off()
+  require(dplyr)
+  be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
+  init_host_pop = 100 # 50 100 200 500 1000
+  pred_p = pred_ps
+  pred_p = pred_p * fh_buff 
+  outs = c("cerc", "food", "juv", "adult", "infected", "infected shedding", "mean host length", "mean parasite mass", "summed host biomass", "summed host eggs", "mean host eggs", "infected host length")
+  
+  # make list of pred densities (fh) within each out (cerc, food, etc)
+  setwd(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/",init_host_pop,"/"))
+  bio_list = list()
+  hm = c()
+  for(out in outs){
+    for(pred_p in pred_ps*fh_buff){
+      hm <- readRDS(paste0("algae_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,".R"))
+      names(hm) <- outs
+      hm <- hm[out][[1]] # get cercs (as list) use mes$"cerc"[[1]] for numeric 
+      names(hm) = pred_p
+      bio_list = c(bio_list, hm)
     } 
+  }
+  
+  # split up list by outs 
+  u <- length(unique(names(bio_list)))
+  n <- length(bio_list)/u
+  bio_list = split(bio_list, rep(1:n, each=u))  
+  names(bio_list) = outs
+  bio_list %>% glimpse
+  
+  # fill in shorter vecs with 0s to match length
+  fillvec = function(x){
+    nv = lapply(x,`length<-`, n.ticks) # fill remaining vec with NAs to match total length
+    rapply(nv, f=function(x) ifelse(is.na(x),0,x), how="replace" ) # replace NAs with 0s
+  }
+  bio_list = lapply(bio_list,fillvec) # apply fillvec to list
+  
+  ##### plot by pred density for each host size class from bio_list
+  require(gridExtra)
+  ifelse(be_fh=="all",ttl_list <- "No size class preference",ttl_list <-  names(bio_list))
+  subttl = paste0(be_fh, " mm , pop = ",init_host_pop)
+  legend_pars <- pred_ps
+  legend_ttl <- "Predator density"
+  gspl <- list() # empty list for storing final plots 
+  global_sim_plot = bio_list
+  global_sim_plot %>% glimpse
+  
+  require(viridis)
+  require(reshape2)
+  ifelse(be_fh=="all",layout(matrix(c(1),1,1,byrow=T)),layout(matrix(c(1:9),3,3,byrow=T)))
+  for(g in 1:length(global_sim_plot)){
+    par(bty="n", las = 1)
+    mm <- global_sim_plot[[g]]
+    y_m <- melt(mm);y_m
+    y_m$L1 <- y_m$L1 %>% as.numeric
+    gspl[[g]] <- ggplot(data = y_m, 
+                        aes(x = rep.int(1:length(mm[[1]]),length(unique((L1)))) , 
+                            y = value, group = L1, colour=factor(L1))) +
+      geom_point() +
+      geom_line(size=1) +
+      # lims(x=xlim,y=ylim) +
+      scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
+                         labels = legend_pars,
+                         values = magma(length(mm))) +
+      # scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
+      #                    labels = legend_pars,
+      #                    values = 1:length(unique(y_m$L1))) +
+      #linetype=y_m$L1) +
+      theme_tufte() +
+      theme(legend.position = "bottom") +
+      theme(legend.key.size = unit(0.5, "cm")) +
+      labs(title=paste("",ttl_list[g]),subtitle = subttl, x="",y="") + 
+      if(g==length(global_sim_plot)){
+        labs(x="Time") 
+      }else{
+        theme(legend.position="none")
+      } 
+  }
+  # +  geom_text(x=,y=,label = max(value),check_overlap = T)
+  bio_finalplots = do.call(grid.arrange,gspl[c(1:4,6,7,10,11,12)]) # plot in one window 
+  
+  ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/inithost",init_host_pop,"_",be_fh,".pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
 }
-# +  geom_text(x=,y=,label = max(value),check_overlap = T)
-bio_finalplots = do.call(grid.arrange,gspl[c(1:4,6,7,10,11,12)]) # plot in one window 
-
-ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/inithost",init_host_pop,"_",be_fh,"mm_pred75_10.pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
-# }
 
 
 
