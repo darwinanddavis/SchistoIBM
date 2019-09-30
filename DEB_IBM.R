@@ -635,7 +635,7 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 # enable me_pars loop in sim model and closing bracket
 # disable three @hailmary instances in sim model
 
-resource_type="algae" # detritus # set resource type
+resource_type="detritus" # detritus # set resource type
 snail_control <- 0 # run molluscicide sims?
 hailmary <- 0 # run hailmary sims separately to other molluscicide sims
 detr_impact = 0 # run detritus impact?
@@ -661,14 +661,14 @@ pred_h <- 0.1 # pred handling time # 0.1 = 10 snails per day
 # pred_p <- 0.05  # predator population density
 pred_ps <- c(0,0.5,1,2,5,10,15) #c(0.001,0.005,0.01,0.025,0.05,0.1,0.25) # predator population density
 fh_buff = 10 # buffer to convert pred_ps digits into integer for saving file handle
-snail_snack_min_vec <- c(5,10) # min size host to eat
-snail_snack_max_vec <- 20 # max size host to eat
+snail_snack_min_vec <- c(15) # min size host to eat
+snail_snack_max_vec <- c(30) # max size host to eat
 # •	0-5 mm
 # •	0-10
 # •	0-15
 # •	5-20
 # •	10-20
-# •	20+
+# •	15+
 
 
 for(snail_snack_min in snail_snack_min_vec){
@@ -1262,7 +1262,7 @@ for(snail_snack_min in snail_snack_min_vec){
 } #  snail_snack_max
 
 # ------------------------- plot individual outputs -------------------------
-global_output_fh = "R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/50/algae_0_10_hostpop50_predpop1e+06.R"
+# global_output_fh = "R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/50/algae_0_10_hostpop50_predpop1e+06.R"
 mm_ = readRDS(global_output_fh)
 layout(matrix(c(1:16),4,4,byrow=T))
 # plot master
@@ -1352,7 +1352,7 @@ global_sim_plot = list()
 
 # rename 
 be_fh
-fh = paste0("algae_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,".R")
+fh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,".R")
 plot_outs = bio_list[fh]
 names(plot_outs) = pred_p /fh_buff
 global_sim_plot[[be_fh]] = plot_outs 
@@ -1391,17 +1391,17 @@ for(g in 1:length(global_sim_plot)){
 # +  geom_text(x=,y=,label = max(value),check_overlap = T)
 bio_finalplots = do.call(grid.arrange,gspl) # plot in one window 
 
-ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/inithost",init_host_pop,"_",out,"_",be_fh,".pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
+ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots",resource_type,"_inithost_",init_host_pop,"_",out,"_",be_fh,".pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
 
 
 # option 2 ----------------------------------------------------------------
 # plot each output to multiplot panel by size class 
-# be_fh  = "0_10"
+# be_fh  = "0_5"
 for(be_fh in c("0_5","0_10","0_15")){
   graphics.off()
   require(dplyr)
   be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
-  init_host_pop = 100 # 50 100 200 500 1000
+  init_host_pop = 50 # 50 100 200 500 1000
   pred_p = pred_ps
   pred_p = pred_p * fh_buff 
   outs = c("cerc", "food", "juv", "adult", "infected", "infected shedding", "mean host length", "mean parasite mass", "summed host biomass", "summed host eggs", "mean host eggs", "infected host length")
@@ -1412,7 +1412,7 @@ for(be_fh in c("0_5","0_10","0_15")){
   hm = c()
   for(out in outs){
     for(pred_p in pred_ps*fh_buff){
-      hm <- readRDS(paste0("algae_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,".R"))
+      hm <- readRDS(paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,".R"))
       names(hm) <- outs
       hm <- hm[out][[1]] # get cercs (as list) use mes$"cerc"[[1]] for numeric 
       names(hm) = pred_p
@@ -1478,7 +1478,7 @@ for(be_fh in c("0_5","0_10","0_15")){
   # +  geom_text(x=,y=,label = max(value),check_overlap = T)
   bio_finalplots = do.call(grid.arrange,gspl[c(1:4,6,7,10,11,12)]) # plot in one window 
   
-  ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/inithost",init_host_pop,"_",be_fh,".pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
+  ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/",resource_type,"_inithost_",init_host_pop,"_",be_fh,".pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
 }
 
 
