@@ -29,6 +29,10 @@
 
 # ver updates -------------------------------------------------------------
 
+# 17-10-19
+# changed pred_a to 0.6
+# added lower pred_ps values to param range
+
 # 17-9-19
 # added snail_snack_min_vec and snail_snack_max_vec
 
@@ -303,6 +307,7 @@ if(mac==1){
 snab <- 1 # 1 = use remote access (snab comp), 0 = run model on your comp 
 mac <- 0 # mac or windows system? 1 = mac, 0 = windows 
 gui <- 0 # display the gui? 1 = yes, 0 = no
+old_install <- 0 # 1 = use non pacman package install method
 pck <- 1 # if not already, install rnetlogo and rjava from source? 1 = yes, 0 = already installed 
 save_to_file <- 0 # 1 = save simulation outputs to local dir, 0 = plot in current R session
 mcmcplot <- 0 # 1 = save mcmc plots to dir
@@ -346,10 +351,19 @@ model.path <- paste0(wd,"/"); model.path # set path to Netlogo model
 
 ####################################  load packages #######################################
 # new installation method (11-9-19)
+
+# try pacman method again without concurrent r session running (15-10-19)
+
 install.packages("pacman")
 require(pacman)
+packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","sp","RNetLogo","ggplot2","RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","reshape2","pse","sensitivity","beepr")  
 p_load(Matrix,deSolve,mvtnorm,LaplacesDemon,coda,adaptMCMC,sp,RNetLogo,ggplot2,RCurl,RColorBrewer,Interpol.T,lubridate,ggExtra,tidyr,ggthemes,reshape2,pse,sensitivity,beepr)
+p_load(packages)
 
+# install dev versions of rjava and rnetlogo
+install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
+install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
+require(rJava,RNetLogo)
 
 #TS for RCurl package on Windows 
 remove.packages("httr")
@@ -358,43 +372,52 @@ remove.packages("curl")
 install.packages("RCurl")
 library(RCurl)
 
+ppp <- lapply(packages,require,character.only=T)
+names(ppp) <- packages
+if(any(ppp==F)){cbind(packages,ppp);cat("\n\n\n ---> Check packages are loaded properly <--- \n\n\n")}
 
 
 # old installation method  --------------------------------------------------------
 
-# if already loaded, uninstall RNetlogo and rJava
-if(pck==1){
-  p<-c("rJava", "RNetLogo"); remove.packages(p)
-  # then install rJava and RNetLogo from source
-  if(mac==1){
-    install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
-    install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
-    # check pck versions
-    installed.packages()["RNetLogo","Version"] 
-    installed.packages()["rJava","Version"]
+if(old_install==1){
+  
+  # if already loaded, uninstall RNetlogo and rJava
+  if(pck==1){
+    p<-c("rJava", "RNetLogo"); remove.packages(p)
+    # then install rJava and RNetLogo from source
+    if(mac==1){
+      install.packages("rJava", repos = "https://cran.r-project.org/", type="source"); library(rJava)
+      install.packages("RNetLogo", repos = "https://cran.r-project.org/", type="source"); library(RNetLogo)
+      require(rJava,RNetLogo)
+      # check pck versions
+      installed.packages()["RNetLogo","Version"] 
+      installed.packages()["rJava","Version"]
+    }
+    
+    
+    # install relevant packages   
+    packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","sp","RNetLogo","ggplot2","RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","reshape2","pse","sensitivity","beepr")  
+    if(require(packages)){
+      install.packages(packages,dependencies = T)
+    }
+    # load annoying packages manually because they're stubborn 
+    
+    install.packages("RNetLogo")
+    install.packages("RCurl")
+    install.packages("Interpol.T")
+    install.packages("lubridate")
+    install.packages("tidyr")
+    install.packages("ggthemes")
+    install.packages("ggExtra")
+    install.packages("beepr")
+    install.packages("Rcpp")
+    install.packages("rlang")
+    
   }
-  
-  
-  # install relevant packages   
-  packages <- c("Matrix","deSolve","mvtnorm","LaplacesDemon","coda","adaptMCMC","sp","RNetLogo","ggplot2","RCurl","RColorBrewer","Interpol.T","lubridate","ggExtra","tidyr","ggthemes","reshape2","pse","sensitivity","beepr")  
-  if(require(packages)){
-    install.packages(packages,dependencies = T)
-  }
-  # load annoying packages manually because they're stubborn 
-  
-  install.packages("RNetLogo")
-  install.packages("RCurl")
-  install.packages("Interpol.T")
-  install.packages("lubridate")
-  install.packages("tidyr")
-  install.packages("ggthemes")
-  install.packages("ggExtra")
-  install.packages("beepr")
-  
-}
-ppp <- lapply(packages,require,character.only=T)
-names(ppp) <- packages
-if(any(ppp==F)){cbind(packages,ppp);cat("\n\n\n ---> Check packages are loaded properly <--- \n\n\n")}
+  ppp <- lapply(packages,require,character.only=T)
+  names(ppp) <- packages
+  if(any(ppp==F)){cbind(packages,ppp);cat("\n\n\n ---> Check packages are loaded properly <--- \n\n\n")}
+} # old install method
 
 cs <- list() # diagnostics list for checking NAs in create snails command  
 
@@ -405,7 +428,7 @@ display.brewer.all()
 # Set global plotting parameters
 cat("plot_it( \n0 for presentation, 1 for manuscript, \nset colour for background, \nset colour palette 1. use 'display.brewer.all()', \nset colour palette 2. use 'display.brewer.all()', \nset alpha for colour transperancy, \nset font style \n)")
 plot_it(0,"blue","YlOrRd","Greens",1,"mono") # set plot function params       
-plot_it_gg("white") # same as above for ggplot     
+plot_it_gg("white","black") # same as above for ggplot     
 
 # load harwell script
 script <- getURL("https://raw.githubusercontent.com/darwinanddavis/harwell/master/harwell.R", ssl.verifypeer = FALSE)
@@ -635,7 +658,21 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 # enable me_pars loop in sim model and closing bracket
 # disable three @hailmary instances in sim model
 
-resource_type="detritus" # detritus # set resource type
+
+# 15-10-19
+# to run 
+
+# det 15_30
+# pred_ps <- c(0,0.5,1,2,5,10,15)
+
+# algae and det for all snack sizes
+# pred_ps <- c(1.5,2.5,3,3.5,4,4.5)
+
+# det for snail_snack_min_vec = 0 and snail_snack_max_vec = 50
+# pred_ps <- (0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15) 
+
+
+resource_type="algae" # detritus # set resource type
 snail_control <- 0 # run molluscicide sims?
 hailmary <- 0 # run hailmary sims separately to other molluscicide sims
 detr_impact = 0 # run detritus impact?
@@ -654,28 +691,29 @@ detr_impact_days = c(5,15,30,60) # days for each detritus impact sim
 # biocontrol
 be_event <- 0 # 1 2 3 select biocontrol event (different snail snack size)
 init_host_pop = 50 # initial population size
-init_host_pop_vec <- c(50,100)
+init_host_pop_vec <- c(50)
 # functional pred feeding response: fN = aNP / 1 + ahN
-pred_a <- 50 # predator attack rate (from sokolow etal 2014 acta tropica)
+pred_a <- 0.6 # predator attack rate (from sokolow etal 2014 acta tropica)
 pred_h <- 0.1 # pred handling time # 0.1 = 10 snails per day
 # pred_p <- 0.05  # predator population density
-pred_ps <- c(0,0.5,1,2,5,10,15) #c(0.001,0.005,0.01,0.025,0.05,0.1,0.25) # predator population density
+# pred_ps <- c(0,0.5,1,2,5,10,15) #c(0.001,0.005,0.01,0.025,0.05,0.1,0.25) # predator population density
+pred_ps <- c(0.01,0.05,0.1,0.2,0.3,0.4,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
 fh_buff = 10 # buffer to convert pred_ps digits into integer for saving file handle
-snail_snack_min_vec <- c(15) # min size host to eat
-snail_snack_max_vec <- c(30) # max size host to eat
-# •	0-5 mm
-# •	0-10
-# •	0-15
-# •	5-20
-# •	10-20
-# •	15+
+snail_snack_min_vec <- c(0) # min size host to eat
+snail_snack_max_vec <- c(5,10,15) # max size host to eat
+# .	0-5 mm
+# .	0-10
+# .	0-15
+# .	5-20
+# .	10-20
+# .	15+
 
 
 for(snail_snack_min in snail_snack_min_vec){
   for(snail_snack_max in snail_snack_max_vec){
     be_fh = paste0(snail_snack_min,"_",snail_snack_max);be_fh # file handle for bio
     
-    rep_num <- 1 # number of replications
+    rep_num <- 5 # number of replications
     
     if(hailmary==1){me_pars <- seq(10,140,10); me_event <- 8}else{me_pars <- n.ticks + 1} # set hailmary file handle
     #  save multiple sims to dir ---------------------------------------
@@ -936,8 +974,8 @@ for(snail_snack_min in snail_snack_min_vec){
                 global_output_fh = paste0(wd,"/detr_impact_sims/",fhh,".R")
               }
               if(biocontrol==1){
-                fhh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p*fh_buff);fhh
-                global_output_fh = paste0(wd,"/biocontrol_sims/",init_host_pop,"/",fhh,".R") 
+                fhh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p*fh_buff,"_rep",rn);fhh
+                global_output_fh = paste0(wd,"/biocontrol_sims/",init_host_pop,"/new_pred_a/",fhh,".R") 
                 
               }  
               
@@ -1262,7 +1300,7 @@ for(snail_snack_min in snail_snack_min_vec){
 } #  snail_snack_max
 
 # ------------------------- plot individual outputs -------------------------
-# global_output_fh = "R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/50/algae_0_10_hostpop50_predpop1e+06.R"
+# global_output_fh =  "R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/50/algae_10_20_hostpop50_predpop150_rep1.R"
 mm_ = readRDS(global_output_fh)
 layout(matrix(c(1:16),4,4,byrow=T))
 # plot master
@@ -1396,90 +1434,91 @@ ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots",resource_
 
 # option 2 ----------------------------------------------------------------
 # plot each output to multiplot panel by size class 
-# be_fh  = "0_5"
-for(be_fh in c("0_5","0_10","0_15")){
-  graphics.off()
-  require(dplyr)
-  be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
-  init_host_pop = 50 # 50 100 200 500 1000
-  pred_p = pred_ps
-  pred_p = pred_p * fh_buff 
-  outs = c("cerc", "food", "juv", "adult", "infected", "infected shedding", "mean host length", "mean parasite mass", "summed host biomass", "summed host eggs", "mean host eggs", "infected host length")
-  
-  # make list of pred densities (fh) within each out (cerc, food, etc)
-  setwd(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/",init_host_pop,"/"))
-  bio_list = list()
-  hm = c()
-  for(out in outs){
-    for(pred_p in pred_ps*fh_buff){
-      hm <- readRDS(paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,".R"))
-      names(hm) <- outs
-      hm <- hm[out][[1]] # get cercs (as list) use mes$"cerc"[[1]] for numeric 
-      names(hm) = pred_p
-      bio_list = c(bio_list, hm)
-    } 
-  }
-  
-  # split up list by outs 
-  u <- length(unique(names(bio_list)))
-  n <- length(bio_list)/u
-  bio_list = split(bio_list, rep(1:n, each=u))  
-  names(bio_list) = outs
-  bio_list %>% glimpse
-  
-  # fill in shorter vecs with 0s to match length
-  fillvec = function(x){
-    nv = lapply(x,`length<-`, n.ticks) # fill remaining vec with NAs to match total length
-    rapply(nv, f=function(x) ifelse(is.na(x),0,x), how="replace" ) # replace NAs with 0s
-  }
-  bio_list = lapply(bio_list,fillvec) # apply fillvec to list
-  
-  ##### plot by pred density for each host size class from bio_list
-  require(gridExtra)
-  ifelse(be_fh=="all",ttl_list <- "No size class preference",ttl_list <-  names(bio_list))
-  subttl = paste0(be_fh, " mm , pop = ",init_host_pop)
-  legend_pars <- pred_ps
-  legend_ttl <- "Predator density"
-  gspl <- list() # empty list for storing final plots 
-  global_sim_plot = bio_list
-  global_sim_plot %>% glimpse
-  
-  require(viridis)
-  require(reshape2)
-  ifelse(be_fh=="all",layout(matrix(c(1),1,1,byrow=T)),layout(matrix(c(1:9),3,3,byrow=T)))
-  for(g in 1:length(global_sim_plot)){
-    par(bty="n", las = 1)
-    mm <- global_sim_plot[[g]]
-    y_m <- melt(mm);y_m
-    y_m$L1 <- y_m$L1 %>% as.numeric
-    gspl[[g]] <- ggplot(data = y_m, 
-                        aes(x = rep.int(1:length(mm[[1]]),length(unique((L1)))) , 
-                            y = value, group = L1, colour=factor(L1))) +
-      geom_point() +
-      geom_line(size=1) +
-      # lims(x=xlim,y=ylim) +
-      scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
-                         labels = legend_pars,
-                         values = magma(length(mm))) +
-      # scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
-      #                    labels = legend_pars,
-      #                    values = 1:length(unique(y_m$L1))) +
-      #linetype=y_m$L1) +
-      theme_tufte() +
-      theme(legend.position = "bottom") +
-      theme(legend.key.size = unit(0.5, "cm")) +
-      labs(title=paste("",ttl_list[g]),subtitle = subttl, x="",y="") + 
-      if(g==length(global_sim_plot)){
-        labs(x="Time") 
-      }else{
-        theme(legend.position="none")
-      } 
-  }
-  # +  geom_text(x=,y=,label = max(value),check_overlap = T)
-  bio_finalplots = do.call(grid.arrange,gspl[c(1:4,6,7,10,11,12)]) # plot in one window 
-  
-  ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/",resource_type,"_inithost_",init_host_pop,"_",be_fh,".pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
+be_fh  = "15_30"
+# for(be_fh in c("5_20","10_20")){
+graphics.off()
+require(dplyr)
+be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
+init_host_pop = 50 # 50 100 200 500 1000
+pred_p = pred_ps
+pred_p = pred_p * fh_buff 
+rn = 1
+outs = c("cerc", "food", "juv", "adult", "infected", "infected shedding", "mean host length", "mean parasite mass", "summed host biomass", "summed host eggs", "mean host eggs", "infected host length")
+
+# make list of pred densities (fh) within each out (cerc, food, etc)
+setwd(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/",init_host_pop,"/new_pred_a/"))
+bio_list = list()
+hm = c()
+for(out in outs){
+  for(pred_p in pred_ps*fh_buff){
+    hm <- readRDS(paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p,"_rep",rn,".R"))
+    names(hm) <- outs
+    hm <- hm[out][[1]] # get cercs (as list) use mes$"cerc"[[1]] for numeric 
+    names(hm) = pred_p
+    bio_list = c(bio_list, hm)
+  } 
 }
+
+# split up list by outs 
+u <- length(unique(names(bio_list)))
+n <- length(bio_list)/u
+bio_list = split(bio_list, rep(1:n, each=u))  
+names(bio_list) = outs
+bio_list %>% glimpse
+
+# fill in shorter vecs with 0s to match length
+fillvec = function(x){
+  nv = lapply(x,`length<-`, n.ticks) # fill remaining vec with NAs to match total length
+  rapply(nv, f=function(x) ifelse(is.na(x),0,x), how="replace" ) # replace NAs with 0s
+}
+bio_list = lapply(bio_list,fillvec) # apply fillvec to list
+
+##### plot by pred density for each host size class from bio_list
+require(gridExtra)
+ifelse(be_fh=="all",ttl_list <- "No size class preference",ttl_list <-  names(bio_list))
+subttl = paste0(be_fh, " mm , pop = ",init_host_pop, " , pred_a = ", pred_a)
+legend_pars <- pred_ps
+legend_ttl <- "Predator density"
+gspl <- list() # empty list for storing final plots 
+global_sim_plot = bio_list
+global_sim_plot %>% glimpse
+
+require(viridis)
+require(reshape2)
+ifelse(be_fh=="all",layout(matrix(c(1),1,1,byrow=T)),layout(matrix(c(1:9),3,3,byrow=T)))
+for(g in 1:length(global_sim_plot)){
+  par(bty="n", las = 1)
+  mm <- global_sim_plot[[g]]
+  y_m <- melt(mm);y_m
+  y_m$L1 <- y_m$L1 %>% as.numeric
+  gspl[[g]] <- ggplot(data = y_m, 
+                      aes(x = rep.int(1:length(mm[[1]]),length(unique((L1)))) , 
+                          y = value, group = L1, colour=factor(L1))) +
+    geom_point() +
+    geom_line(size=1) +
+    # lims(x=xlim,y=ylim) +
+    scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
+                       labels = legend_pars,
+                       values = magma(length(mm))) +
+    # scale_color_manual(name=legend_ttl, # stupid ggplot legend @ggplotlegend  # http://r-statistics.co/Complete-Ggplot2-Tutorial-Part2-Customizing-Theme-With-R-Code.html
+    #                    labels = legend_pars,
+    #                    values = 1:length(unique(y_m$L1))) +
+    #linetype=y_m$L1) +
+    theme_tufte() +
+    theme(legend.position = "bottom") +
+    theme(legend.key.size = unit(0.5, "cm")) +
+    labs(title=paste("",ttl_list[g]),subtitle = subttl, x="",y="") + 
+    if(g==length(global_sim_plot)){
+      labs(x="Time") 
+    }else{
+      theme(legend.position="none")
+    } 
+}
+# +  geom_text(x=,y=,label = max(value),check_overlap = T)
+bio_finalplots = do.call(grid.arrange,gspl[c(1:4,6,7,10,11,12)]) # plot in one window 
+
+ggsave(paste0("R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/plots/new_pred_a/",resource_type,"_inithost",init_host_pop,"_",be_fh,".pdf"),bio_finalplots,device="pdf",width=11,height=8.5)
+# }
 
 
 
