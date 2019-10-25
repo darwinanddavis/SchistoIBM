@@ -108,7 +108,7 @@ params$session
 
 \newpage  
 
-## Overview
+## Overview  
 
 Follow the instructions to run the simulation model from `R` or `RStudio`. All reports and bugs should be addressed to matthew.malishev@gmail.com.   
 
