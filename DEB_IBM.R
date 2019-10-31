@@ -1338,7 +1338,7 @@ be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
 init_host_pop = 50 # 50 100 200 500 1000
 pred_p = pred_ps
 pred_p = pred_p * fh_buff 
-rn = 1
+rn = 1 
 outs = c("cerc", "food", "juv", "adult", "infected", "infected shedding", "mean host length", "mean parasite mass", "summed host biomass", "summed host eggs", "mean host eggs", "infected host length")
 
 # make list of pred densities (fh) within each out (cerc, food, etc)

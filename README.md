@@ -10,8 +10,16 @@
 
 ## Overview    
 
-Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalaria glabrata* snail host population interactions based on a dynamic energy budget (DEB) and exposure and transmission model. Host and parasite individual-level energetics and their ecology are captured via the mechanistic energy budget model and interactions among hosts and parasites are captured by the disease tranmission model. The global model simulates how resource use by a size-structured host population influences metabolism and thus population structure of hosts and parasites over time.      
+Individual-based model (IBM) for *Schistosoma mansoni* parasite and *Biomphalaria glabrata* snail host population infection based on a within-host dynamic energy budget (DEB) model and a between host exposure and transmission model.   
 
+Host and parasite individual-level energetics and their ecology are captured by the mechanistic energy budget model and interactions among hosts and parasites are captured by the disease tranmission model. The global model simulates how resource use by a size-structured host population drives timing and severity of human-infectious parasite output throughout the schistosomiasis transmission season.     
+
+Outputs for the model:  
+
+* **Malishev M** and Civitello DJ (2019) Linking bioenergetics and parasite transmission models suggests mismatch between snail host density and production of human schistosomes, Integrative and Comparative Biology, [icz058.](https://academic.oup.com/icb/advance-article/doi/10.1093/icb/icz058/5497795)          
+* **Malishev M** and Civitello DJ (2019) Modelling how resource competition among snail hosts affects the mollusciciding frequency and intensity needed to control human schistosomes. In review.   
+* **Malishev M** and Civitello DJ (2019) [Fewer, fatter snail hosts make more human schistosome parasites than many, starved ones](https://www.elsevier.com/events/conferences/international-society-for-ecological-modelling-global-conference/programme), International Society for Ecological Modelling 2019, ISEM2019, Oct 1–5, Salzburg, Austria.       
+  
 *Files:*      
 
 .R    
