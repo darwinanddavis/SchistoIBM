@@ -16,7 +16,7 @@ Host and parasite individual-level energetics and their ecology are captured by 
 
 Outputs for the model:  
 
-**[Malishev M** and Civitello DJ (2019) Linking bioenergetics and parasite transmission models suggests mismatch between snail host density and production of human schistosomes, Integrative and Comparative Biology, icz058.](https://academic.oup.com/icb/advance-article/doi/10.1093/icb/icz058/5497795)            
+**Malishev M** and Civitello DJ (2019) [Linking bioenergetics and parasite transmission models suggests mismatch between snail host density and production of human schistosomes](https://academic.oup.com/icb/advance-article/doi/10.1093/icb/icz058/5497795), Integrative and Comparative Biology, icz058.              
 
 **Malishev M** and Civitello DJ. Modelling how resource competition among snail hosts affects the mollusciciding frequency and intensity needed to control human schistosomes. In review.  
 
