@@ -677,7 +677,7 @@ snail_control <- 0 # run molluscicide sims?
 hailmary <- 0 # run hailmary sims separately to other molluscicide sims
 detr_impact = 0 # run detritus impact?
 biocontrol = 1 # run biocontrol?
-snail_snack_window = 0 # run biocontrol for sliding window of snail size classes
+snail_snack_window = 1 # run biocontrol for sliding window of snail size classes
 no_control <- 0 # run normal no control sims
 
 # snail control
@@ -702,7 +702,7 @@ pred_h <- 0.1 # pred handling time # 0.1 = 10 snails per day
 pred_ps <- c(0.01,0.05,0.1,0.2,0.3,0.4,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
 fh_buff = 10 # buffer to convert pred_ps digits into integer for saving file handle
 snail_snack_min_vec <- c(0) # min size host to eat
-snail_snack_max_vec <- c(15) # max size host to eat
+snail_snack_max_vec <- c(50) # max size host to eat
 # .	0-5 mm
 # .	0-10
 # .	0-15
@@ -1336,8 +1336,9 @@ pred_ps = c(0,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
 
 # option 1 ----------------------------------------------------------------
 # plot each output to multiplot panel by size class 
-# be_fh  = "0_10"
-be_fh_vec = ifelse(snail_snack_window == 1, be_fh_vec <- paste(rep(snail_snack_min_vec,length(snail_snack_max_vec)), snail_snack_max_vec,sep="_"), be_fh_vec <- "exp"); be_fh_vec
+snail_snack_window = 1
+be_fh_vec  = "5_10"
+# be_fh_vec = ifelse(snail_snack_window == 1, be_fh_vec <- paste(rep(snail_snack_min_vec,length(snail_snack_max_vec)), snail_snack_max_vec,sep="_"), be_fh_vec <- "exp"); be_fh_vec
 for(be_fh in be_fh_vec){
   graphics.off()
   require(dplyr)
