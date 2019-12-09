@@ -29,6 +29,9 @@
 
 # ver updates -------------------------------------------------------------
 
+# 9-12-19
+# removed sicb fig2 and fig 3 user inputs and cleaned up user input
+
 # 18-11-19
 # added exponential predation rate (snail_snack_window = 0) (biocontrol)
 
@@ -665,19 +668,25 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 # enable me_pars loop in sim model and closing bracket
 # disable three @hailmary instances in sim model
 
-
 # 11-8-19
 # to run 
 # algae and det 5 reps 0-15 mm pred_p c(0,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
 # algae and det 5 reps 5+ mm
 
+resource_type="algae" # detritus # set resource type
+# these can both be > 0 (both are toggled on/off below)
+# algae params
+rg_pars <- c(0.01,0.05,0.1,0.25,0.5,0.75,1) # resource growth rates (r)
+# detritus params
+detr_pars <- 0.25 # detritus input (mg L^-1 day^-1)
+# mortality params 
+hb_pars <- 0.001
 
-resource_type="detritus" # detritus # set resource type
 snail_control <- 0 # run molluscicide sims?
 hailmary <- 0 # run hailmary sims separately to other molluscicide sims
 detr_impact = 0 # run detritus impact?
 biocontrol = 1 # run biocontrol?
-snail_snack_window = 1 # run biocontrol for sliding window of snail size classes
+snail_snack_window = 0 # 1 = run biocontrol for sliding window of snail size classes
 no_control <- 0 # run normal no control sims
 
 # snail control
@@ -710,14 +719,13 @@ snail_snack_max_vec <- c(50) # max size host to eat
 # .	10-20
 # .	15+
 
+rep_num <- 1 # number of replications
 
 for(snail_snack_min in snail_snack_min_vec){
   for(snail_snack_max in snail_snack_max_vec){
     
     # file handle for bio
     ifelse(snail_snack_window==1, be_fh <- paste0(snail_snack_min,"_",snail_snack_max), be_fh <- "exp")
-    
-    rep_num <- 5 # number of replications
     
     if(hailmary==1){me_pars <- seq(10,140,10); me_event <- 8}else{me_pars <- n.ticks + 1} # set hailmary file handle
     #  save multiple sims to dir ---------------------------------------
@@ -730,13 +738,10 @@ for(snail_snack_min in snail_snack_min_vec){
           for(me_im_event in me_im_events){ # 1:5 # me impact (0.69, 1.39, 2.3 ...)
             for(me_event in me_events){ # 1:7 # run all me event scenarios and save to file.
               
-              # for hailmary, uncomment below and comment out me_pars loop below (line ) 
+              # for hailmary, uncomment below and comment out me_pars loop below
               # for(me in me_pars){ # loop through mes (molluscicide events) for saving one me event per sim to dir (hailmary)
               
               resources="event" # set resource cycles
-              sicb_sims = 0 # run sicb sims? # 2-5-19
-              fig2 <- 0 # run fig 2 in sicb? 0 = fig 3
-              
               alpha_pars = 0
               rho_pars = 1
               
@@ -754,78 +759,20 @@ for(snail_snack_min in snail_snack_min_vec){
               # set initial pop size @netlogo
               NLCommand("set init_host_pop", init_host_pop)
               
-              # OG scenario
-              # Fh = c(0.5,1,2,5)
-              # K = c(1,2,5,10) 
-              
               if(save_to_file==1){pdf(paste0(wd,"/master_sim.pdf"),onefile=T,paper="a4")}
               
-              if(sicb_sims == 1){
-                # sicb sims (31-3-19)
-                # detr and algae values for reasonable cerc outputs
-                # FIG 2
-                # detr_pars <- c(0.1,0.25, 0.5) # detritus input (mg L^-1 day^-1)
-                # rg_pars <- c(0.1,0.25,0.5)
-                # hb_pars <- 0.001
-                # FIG 3
-                # detr_pars <- c(0.1,0.25, 0.5) # detritus input (mg L^-1 day^-1)
-                # rg_pars <- c(0.1,0.25,0.5)
-                # hb_pars <- 0.001
-                # hb_pars = c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1)
-                
-                if(fig2 == 1){ # sicb fig 2
-                  
-                  # algae params
-                  rg_pars <- 1 # resource growth rates (rs)
-                  
-                  # detritus params
-                  detr_pars <- 0.25 # detritus input (mg L^-1 day^-1)
-                  
-                  # mortality params 
-                  hb_pars <- 0.001
-                  
-                }else{ # sicb fig 3
-                  
-                  replication = 1 # run reps for fig 3
-                  
-                  # algae params
-                  rg_pars <- c(0.1,0.25,0.5) # resource growth rates (rs)
-                  
-                  # detritus params
-                  detr_pars <- c(0.1,0.25,0.5) # detritus input (mg L^-1 day^-1)
-                  
-                  # mortality params 
-                  hb_pars <- c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1) ; hb_pars
-                  
-                }
-                
-                me_pars <- 0 # set molluscicide events to 0 
-                if(resource_type=="detritus"){
-                  detr_pars <- detr_pars; alpha_pars <- 0; rho_pars <- 1; rg_pars <- 0;cat("detritus input = ",detr_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)
-                }else{detr_pars <- 0;cat("detritus input = ", detr_pars,"\nrg = ",rg_pars)}
-                # set resource to cycle or be constant
-                if(resource_type=="algae"){
-                  if(resources=="cyclical"){
-                    rg_pars <- rg_pars # resource growth rates (rs)
-                    alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
-                    rho_pars <- c(1,seq(10,n.ticks,10)) # periodicity of resources (rhos)
-                    cat("alphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars)
-                  }else{alpha_pars <- 0; rho_pars <- 1; rg_pars <- rg_pars;cat("\nalphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)}
-                }
-                
-              }else{
-                
-                # algae params
-                rg_pars <- 0.25 # resource growth rates (rs)
-                
-                # detritus params
-                detr_pars <- 0.25 # detritus input (mg L^-1 day^-1)
-                
-                # mortality params 
-                hb <- 0.001
-                hb_pars <- c(0.001, 0.005, 0.01, 0.02, 0.03, 0.04, 0.05, 0.1); hb_pars
-                
-              } # end sicb sims
+              if(resource_type=="detritus"){
+                detr_pars <- detr_pars; alpha_pars <- 0; rho_pars <- 1; rg_pars <- 0;cat("\ndetritus input = ",detr_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)
+              }else{detr_pars <- 0;cat("detritus input = ", detr_pars,"\nrg = ",rg_pars)}
+              # set resource to cycle or be constant
+              if(resource_type=="algae"){
+                if(resources=="cyclical"){
+                  rg_pars <- rg_pars # resource growth rates (rs)
+                  alpha_pars <- c(0,0.25,0.5,0.75,1) # amplitude of resources (alphas)
+                  rho_pars <- c(1,seq(10,n.ticks,10)) # periodicity of resources (rhos)
+                  cat("\nalphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrgs = ",rg_pars)
+                }else{alpha_pars <- 0; rho_pars <- 1; rg_pars <- rg_pars;cat("\nalphas = ",alpha_pars,"\nrhos = ",rho_pars,"\nrg = ",rg_pars,"\nhb = ", hb_pars)}
+              }
               
               # # define param sample space with LHS
               # require(sp)
@@ -925,7 +872,7 @@ for(snail_snack_min in snail_snack_min_vec){
                 me_im_pars <- 0
                 me_im <- 0
                 hb_pars <- 0.001#hb_pars
-                cat("Snail control will occur every ",max(me_pars)/length(me_pars)," days \n Mortality is ",hb_pars) 
+                cat("\nSnail control will occur every ",max(me_pars)/length(me_pars)," days \n Mortality is ",hb_pars) 
               }
               
               cat("Mollusciding on day", me_pars)
@@ -938,10 +885,7 @@ for(snail_snack_min in snail_snack_min_vec){
               # rho_pars <- 1
               me_im_pars
               
-              # file name to save results
-              # global_output_fh = paste0(wd,"/nih_grant_sims/global_output_",resource_type,"_",resources,"_me",me_event,"_meim",me_im_event,"_rep",rn,".R"); global_output_fh
-              
-              if(resource_type=="algae"){detr =0; rg = 0.25;detr_impact=0;detr_impact_days=n.ticks+1}else{detr=0.25;rg=0; alpha_pars=1; rho_pars = 1}
+              # if(resource_type=="algae"){detr =0; rg = 0.25;detr_impact=0;detr_impact_days=n.ticks+1}else{detr=0.25;rg=0; alpha_pars=1; rho_pars = 1}
               
               # @detr_impact
               if(detr_impact==1){
@@ -978,8 +922,8 @@ for(snail_snack_min in snail_snack_min_vec){
                 global_output_fh = paste0(wd,"/detr_impact_sims/",fhh,".R")
               }
               if(biocontrol==1){
-                fhh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p*fh_buff,"_rep",rn);fhh
-                global_output_fh = paste0(wd,"/biocontrol_sims/",init_host_pop,"/new_new_pred_a/",fhh,".R") 
+                fhh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p*fh_buff,"_rg",rg,"_rep",rn);fhh
+                global_output_fh = paste0(wd,"/biocontrol_sims/",init_host_pop,"/new_new_pred_a/productivity/",fhh,".R") 
                 
               }  
               
