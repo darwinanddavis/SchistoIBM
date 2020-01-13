@@ -1,6 +1,12 @@
 ## DEB IBM 
 # check bottom of page for diagnostics for running netlogo in rstudio
 
+# version 1.6 (19-12-19) 
+# biocontrol, biocontrol with productivity
+# DEB_INF_GUTS_IBM_1.1.nlogo with user-defined create-snails
+# IndividualModel_IBM3.c (generates .o and .so files)  
+# FullStarve_shrink_dilute_damage3.Rd
+
 # version 1.5 (17-8-19)
 # new yRP, new DEB params from starvation exp, nocontrol event
 # DEB_INF_GUTS_IBM_1.1.nlogo with user-defined create-snails
@@ -28,6 +34,18 @@
 # ILL_shrink_damageA5.Rda
 
 # ver updates -------------------------------------------------------------
+
+# 1-13-20
+# added pred_ps = c(0,0.01,0.05,seq(0.1,1.5,0.1),2,2.5,3,3.5,4,4.5,5,10,15)
+# added lower and upper snack size limits for heatmap (biocontrol)
+# added highpred/ folder (biocontrol)
+
+# 19-12-19
+# removed old biocontrol toggles (be_event == 1)
+# changed file handle from rg0.75_rep1.R to prod0.75_rep1.R for productivity sims
+
+# 16-12-19
+# added productivity to biocontrol (productivity == 1 and productivity fh)
 
 # 9-12-19
 # removed sicb fig2 and fig 3 user inputs and cleaned up user input
@@ -668,17 +686,43 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 # enable me_pars loop in sim model and closing bracket
 # disable three @hailmary instances in sim model
 
-# 11-8-19
+
+#run 20200113
+# 1.2
+snail_snack_min_vec <- c(0) # min size host to eat
+snail_snack_max_vec <- c(2.5) # max size host to eat
+# 0.6 and 1.2
+snail_snack_min_vec <- c(0) # min size host to eat
+snail_snack_max_vec <- c(seq(5,20,2.5),60) # max size host to eat
+# detritus
+# 0_50 and pred_ps = c(0.6,0.7,0.8,0.9,1.1,1.2,1.3,1.4)
+
+
+
+# 19-12-19
 # to run 
 # algae and det 5 reps 0-15 mm pred_p c(0,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
 # algae and det 5 reps 5+ mm
 
+
+# pred_ps sims 10-01-2020
+pred_ps <- c(0,0.01,0.05,seq(0.1,1.5,0.1),2,2.5,3,3.5,4,4.5,5,10,15)
+# per L
+pred_ps / 50 
+# per m^2
+pred_ps / 50 * 500
+
+# - -----------------------------------------------------------------------
+
+
 resource_type="algae" # detritus # set resource type
-# these can both be > 0 (both are toggled on/off below)
+# these can both be > 0 (both are toggled on/off in sim code)
 # algae params
-rg_pars <- c(0.01,0.05,0.1,0.25,0.5,0.75,1) # resource growth rates (r)
+# rg_pars <- c(0.01,0.05,0.1,0.25,0.5) # resource growth rates (r)
+rg_pars <- 0.25
 # detritus params
-detr_pars <- 0.25 # detritus input (mg L^-1 day^-1)
+# detr_pars <- c(0.01,0.05,0.1,0.25,0.5) # detritus input (mg L^-1 day^-1)
+detr_pars <- 0.25
 # mortality params 
 hb_pars <- 0.001
 
@@ -686,7 +730,8 @@ snail_control <- 0 # run molluscicide sims?
 hailmary <- 0 # run hailmary sims separately to other molluscicide sims
 detr_impact = 0 # run detritus impact?
 biocontrol = 1 # run biocontrol?
-snail_snack_window = 0 # 1 = run biocontrol for sliding window of snail size classes
+snail_snack_window = 1 # 1 = run biocontrol for sliding window of snail size classes, 0 = exp predation rate 
+productivity <- 0 # 1 = run biocontrol with varying productivity levels (rg and detr)
 no_control <- 0 # run normal no control sims
 
 # snail control
@@ -699,19 +744,20 @@ detr_im <- c(0.1,0.25,0.5,0.9,0.99) # percent reduction in detritus for detritus
 detr_impact_days = c(5,15,30,60) # days for each detritus impact sim 
 
 # biocontrol
-be_event <- 0 # 1 2 3 select biocontrol event (different snail snack size)
 init_host_pop = 50 # initial population size
 init_host_pop_vec <- c(50)
 # functional pred feeding response: fN = aNP / 1 + ahN
 pred_a <- 0.1 # predator attack rate: 50L sweeped / day or 8.33 * 6 L tanks (from sokolow etal 2014 acta tropica)
 pred_h <- 0.1 # pred handling time # 0.1 = 10 snails per day
 # pred_p <- 0.05  # predator population density
-# pred_ps = c(0,0.01,0.05,0.1,0.2,0.3,0.4,0.5)
-# pred_ps = c(0,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
-pred_ps <- c(0.01,0.05,0.1,0.2,0.3,0.4,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
+# pred_ps <- c(0.6,1.2)
+pred_ps <- 1.5
+# pred_ps <- c(0,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
 fh_buff = 10 # buffer to convert pred_ps digits into integer for saving file handle
 snail_snack_min_vec <- c(0) # min size host to eat
-snail_snack_max_vec <- c(50) # max size host to eat
+snail_snack_max_vec <- c(5,7.5,10,15,60) # max size host to eat
+
+
 # .	0-5 mm
 # .	0-10
 # .	0-15
@@ -719,7 +765,12 @@ snail_snack_max_vec <- c(50) # max size host to eat
 # .	10-20
 # .	15+
 
-rep_num <- 1 # number of replications
+rep_num <- 5 # number of replications
+
+# for productivity == 1
+### need to comment out rg and detr in next loop    
+# for(rg in rg_pars){ # loop through rgs (food growth rates)
+# for(det in detr_pars){ # loop through det (food growth rates)  
 
 for(snail_snack_min in snail_snack_min_vec){
   for(snail_snack_max in snail_snack_max_vec){
@@ -730,7 +781,6 @@ for(snail_snack_min in snail_snack_min_vec){
     if(hailmary==1){me_pars <- seq(10,140,10); me_event <- 8}else{me_pars <- n.ticks + 1} # set hailmary file handle
     #  save multiple sims to dir ---------------------------------------
     for(init_host_pop in init_host_pop_vec){
-      #for(be_event in 5){ # 1:4
       for(pred_p in pred_ps){
         # for(detr_impact_days in detr_impact_days){
         for(rn in 1:rep_num){
@@ -738,7 +788,7 @@ for(snail_snack_min in snail_snack_min_vec){
           for(me_im_event in me_im_events){ # 1:5 # me impact (0.69, 1.39, 2.3 ...)
             for(me_event in me_events){ # 1:7 # run all me event scenarios and save to file.
               
-              # for hailmary, uncomment below and comment out me_pars loop below
+              # for hailmary, uncomment below and comment out me_pars loop in next loop
               # for(me in me_pars){ # loop through mes (molluscicide events) for saving one me event per sim to dir (hailmary)
               
               resources="event" # set resource cycles
@@ -853,16 +903,6 @@ for(snail_snack_min in snail_snack_min_vec){
                 if(me_im_event==4){me_im_pars = me_im_pars[4]}
                 if(me_im_event==5){me_im_pars = me_im_pars[5]}
                 
-                # molluscicide events (me)
-                # me_pars <- c(7, 14, 28, 56) # every x^2 days
-                # me2
-                # The dry seasons in Kenya are generally from mid-June to October, 
-                # and from late-December to mid-March
-                # me_pars <- seq(10,n.ticks,10) #  When transmission is seasonal, it is recommended to carry out regular applications of molluscicide (WHO 2017)
-                # me3
-                # me_pars <- XX # when infected snails appear 
-                # me_pars = 1000000
-                
                 hb_pars <- 0.001
                 if(resource_type=="algae"){detr_pars <- 0; algae <- rg_pars}else{detr_pars <- detr_pars; rg_pars <- 0}
                 cat("\nalgae:",rg_pars,"\ndetritus:",detr_pars,"\nrho:",0,"\nalpha:",alpha_pars,"\nmortality (if not mollusciciding):",hb_pars,"\nmolluscicide days:",me_pars, "\nmolluscicide impact: ",me_im_pars)
@@ -876,13 +916,6 @@ for(snail_snack_min in snail_snack_min_vec){
               }
               
               cat("Mollusciding on day", me_pars)
-              
-              # rg_pars <- 0
-              # detr_pars <- 0.25
-              # hb_pars <- 0.001
-              # me_im_pars
-              # alpha_pars <- 0
-              # rho_pars <- 1
               me_im_pars
               
               # if(resource_type=="algae"){detr =0; rg = 0.25;detr_impact=0;detr_impact_days=n.ticks+1}else{detr=0.25;rg=0; alpha_pars=1; rho_pars = 1}
@@ -892,18 +925,6 @@ for(snail_snack_min in snail_snack_min_vec){
                 detr_impact_days = detr_impact_days # set detritus impact days 
               }else{
                 detr_impact_days = n.ticks+1 # no detritus impact 
-              }
-              
-              # @biocontrol
-              if(biocontrol==1){
-                # new hb vector @hb
-                be_event = 0
-                hb_pars <- 0.001 # set baseline mortality 
-                if(be_event==1){snail_snack = 4:7; be_fh="be1"}
-                if(be_event==2){snail_snack = 8:10; be_fh="be2"}
-                if(be_event==3){snail_snack = 12:15; be_fh="be3"}
-                if(be_event==4){snail_snack = 18:22; be_fh="be4"}
-                if(be_event==5){snail_snack = 0:30; be_fh="all"}
               }
               
               # file handles   ----------------------------------------------------------
@@ -922,9 +943,14 @@ for(snail_snack_min in snail_snack_min_vec){
                 global_output_fh = paste0(wd,"/detr_impact_sims/",fhh,".R")
               }
               if(biocontrol==1){
-                fhh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p*fh_buff,"_rg",rg,"_rep",rn);fhh
-                global_output_fh = paste0(wd,"/biocontrol_sims/",init_host_pop,"/new_new_pred_a/productivity/",fhh,".R") 
-                
+                if(productivity==1){ # for altering rg and det values
+                  ifelse(resource_type=="algae", resource_fh <- rg, resource_fh <- detr)
+                  fhh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p*fh_buff,"_prod",resource_fh,"_rep",rn);fhh
+                  global_output_fh = paste0(wd,"/biocontrol_sims/",init_host_pop,"/new_new_pred_a/productivity/",fhh,".R") 
+                }else{
+                  fhh = paste0(resource_type,"_",be_fh,"_hostpop",init_host_pop,"_predpop",pred_p*fh_buff,"_rep",rn);fhh
+                  global_output_fh = paste0(wd,"/biocontrol_sims/",init_host_pop,"/new_new_pred_a/highpred/",fhh,".R") 
+                }
               }  
               
               if(no_control==1){
@@ -933,14 +959,12 @@ for(snail_snack_min in snail_snack_min_vec){
                 global_output_fh = paste0(wd,"/plos_sims/nocontrol/",fhh,".R")
               }
               
-              
               if(resource_type=="algae"){detr_pars <- 0; algae <- rg_pars}else{detr_pars <- detr_pars; rg_pars <- 0}
               if(length(me_days)== 1 | 2 | 3){me_days = rep(me_days,4)} # set vector same length as in sim model
               if(length(detr_impact_days)==1){detr_impact_days = rep(detr_impact_days,2)} # set vector same length as in sim model
               cat("\nalgae:",rg_pars,"\ndetritus:",detr_pars,"\nrho:",0,"\nalpha:",alpha_pars,"\nmortality (if not mollusciciding):",hb_pars,"\nmolluscicide days:",unique(me_days), "\nmolluscicide impact: ",me_im_pars)
               cat("\nM days = ",unique(me_days)); cat("\nM impact = ",me_im); cat("\nDet impact days = ",detr_impact_days) 
               global_output_fh
-              
               
               ####################################  start netlogo sim ######################################## 
               for(hb in hb_pars){
@@ -1018,16 +1042,6 @@ for(snail_snack_min in snail_snack_min_vec){
                                   # if(day==1){cat("min = ",snail_snack_min,'\nmax = ',snail_snack_max)}
                                 }
                                 
-                                ### pre hb vector (7-9-19) @hb
-                                # if(biocontrol == 1){
-                                # if(be_event==5){
-                                #   hb <- hb + (pred_a * pred_p) / (1 + pred_a * pred_h * N.snails)
-                                # }else{
-                                #   if(any(round(snail.stats$L) == snail_snack[1] | snail_snack[2] | snail_snack[3] | snail_snack[4])==T){
-                                # hb <- hb + (pred_a * pred_p) / (1 + pred_a * pred_h * N.snails)
-                                #     }
-                                #     }
-                                # }
                                 
                                 # Update DEBS, HAZ=0 so survival probs are calculated for the current day
                                 snail.update = t(mapply(DEB, L=snail.stats[,2], e=snail.stats[,3], D=snail.stats[,4], RH=snail.stats[,5],
@@ -1205,13 +1219,6 @@ for(snail_snack_min in snail_snack_min_vec){
                             infec_shed_length_master[[length(infec_shed_length_master)+1]] <- infec_shed_length_list # mean infected shedding host length master
                             
                             # day_master[[length(day_master)+1]] <- day_list
-                            ### plot outputs 
-                            #   plot(cerc_list,type="l",las=1,bty="n",ylim=c(0,do.call(max,cerc_master)),col=round(do.call(max,cerc_master)),
-                            # 	main=paste0("alpha = ",alpha, "; rho = ", rho, "; r = ", rg),ylab="Cercariae density",xlab="Days") 
-                            #   paste0(expression("alpha = ",alpha, "; rho = ", rho, "; r = ", rg)) 
-                            #   text(which(cerc_list==max(cerc_list)),max(cerc_list),paste0("a= ",alpha," \n p= ",rho)#,col=max(cerc_list),
-                            #        )
-                            #abline(h=which(cerc_list==max(cerc_list)),type=3,col=round(do.call(max,cerc_master))) # draw line at max peak
                             if(save_to_file==1){dev.off()}
                           } # ----end me_im
                         } # --------------- end mes
@@ -1248,15 +1255,15 @@ for(snail_snack_min in snail_snack_min_vec){
           # } #  ---------------------- end detr_im sim runs
         } #  ---------------------- end rep_num loop
         # } #  --------------------- end detr impact days loop
-        # } # ---------------------- end be_event sim runs
       }  # ---------------------- end init_host_pop sim runs
     } # end pred_p loop
     
   }# snail_snack_min
 } #  snail_snack_max
 
+
 # ------------------------- plot individual outputs -------------------------
-# global_output_fh =  "R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/50/algae_10_20_hostpop50_predpop150_rep1.R"
+# global_output_fh =  "R:/CivitelloLab/matt/schisto_ibm/biocontrol_sims/50/new_new_pred_a/algae_15_60_hostpop50_predpop6_rep5.R"
 mm_ = readRDS(global_output_fh)
 layout(matrix(c(1:16),4,4,byrow=T))
 require(pacman)
@@ -1280,13 +1287,11 @@ pred_ps = c(0,0.01,0.05,0.1,0.2,0.3,0.4,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,10,15)
 
 # option 1 ----------------------------------------------------------------
 # plot each output to multiplot panel by size class 
-snail_snack_window = 1
-be_fh_vec  = "5_10"
-# be_fh_vec = ifelse(snail_snack_window == 1, be_fh_vec <- paste(rep(snail_snack_min_vec,length(snail_snack_max_vec)), snail_snack_max_vec,sep="_"), be_fh_vec <- "exp"); be_fh_vec
+# be_fh_vec  = "2.5_17.5"
+be_fh_vec = ifelse(snail_snack_window == 1, be_fh_vec <- paste(rep(snail_snack_min_vec,length(snail_snack_max_vec)), snail_snack_max_vec,sep="_"), be_fh_vec <- "exp"); be_fh_vec
 for(be_fh in be_fh_vec){
   graphics.off()
   require(dplyr)
-  be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
   init_host_pop = 50 # 50 100 200 500 1000
   pred_p = pred_ps
   pred_p = pred_p * fh_buff 
@@ -1306,7 +1311,7 @@ for(be_fh in be_fh_vec){
       bio_list = c(bio_list, hm)
     } 
   }
-  
+  bio_list %>% str
   # split up list by outs 
   u <- length(unique(names(bio_list)))
   n <- length(bio_list)/u
@@ -1378,24 +1383,18 @@ for(be_fh in be_fh_vec){
 be_fh  = "0_5"
 graphics.off()
 require(dplyr)
-be_event = 0 # 1 = 4:7, 2 = 8:10, 3 = 12:15, 4 = 18:22 mm
 init_host_pop = 50 # 50 100 200 500 1000
 pred_p = pred_ps
 pred_p = pred_p * fh_buff 
-be_event = be_fh
 out = "cerc"
 outs = c("cerc", "food", "juv", "adult", "infected", "infected shedding", "mean host length", "mean parasite mass", "summed host biomass", "summed host eggs", "mean host eggs", "infected host length")
 par(mfrow=c(2,2))
 
-if(be_event==1){snail_snack = 4:7}
-if(be_event==2){snail_snack = 8:10}
-if(be_event==3){snail_snack = 12:15}
-if(be_event==4){snail_snack = 18:22}
 cat("\nHost size class eaten = ",snail_snack_min,"to",snail_snack_max, " mm",
     "\nInitial host size = ", init_host_pop,
     "\nNum of predators (500 L-1) = ", pred_p /fh_buff) 
 sc = 1 # colvec counter
-legkey = list(be_event,init_host_pop,pred_p) # combine user inputs
+legkey = list(be_fh,init_host_pop,pred_p) # combine user inputs
 legkey = unlist(legkey[[which.max(lapply(legkey,length))]]) # get one with largest length
 leglist = list()
 
@@ -1432,7 +1431,7 @@ lapply(plot_outs,PLOT) # apply function to list elements specified in plot_outs
 
 ##### plot by pred density for each host size class from bio_list
 require(gridExtra)
-ifelse(be_event=="all",ttl_list <- "No size class preference",ttl_list <-  paste0(be_fh, " mm"))
+ifelse(be_fh=="all",ttl_list <- "No size class preference",ttl_list <-  paste0(be_fh, " mm"))
 legend_pars <- pred_ps
 legend_ttl <- "Predator density"
 subttl = paste0(out," , pop = ",init_host_pop,"")
