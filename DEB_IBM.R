@@ -683,6 +683,7 @@ NLLoadModel(paste0(model.path,nl.model),nl.obj=NULL) # load model
 # enable for(me in me_pars){ ... } (line 613) and closing bracket
 # disable me_pars loop in sim model and closing bracket
 # enable three @hailmary instances in sim model
+
 # for all snail control events
 # snail_control <- 1
 # hailmary <- 0
